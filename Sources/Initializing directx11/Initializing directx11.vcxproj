@@ -24,7 +24,7 @@
     <ProjectGuid>{3ceb4fbb-b516-4151-8894-d46d7fffc913}</ProjectGuid>
     <RootNamespace>My01Initializing</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Initializing</ProjectName>
+    <ProjectName>Initializing directx11</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
