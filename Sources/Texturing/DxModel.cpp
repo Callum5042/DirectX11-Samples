@@ -1,6 +1,7 @@
 #include "DxModel.h"
 #include <DirectXMath.h>
 #include <vector>
+#include "DDSTextureLoader.h"
 
 DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
@@ -8,26 +9,54 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
+	// Create input buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
+
+	// Create texture resource
+	LoadTexture();
 }
 
 void DX::Model::CreateVertexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
+	const float width = 1.0f;
+	const float height = 1.0f;
+	const float depth = 1.0f;
+
 	// Set vertex data
 	std::vector<Vertex> vertices =
 	{
-		{ -1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front Top left vertex
-		{ +1.0f, +1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f }, // Front Top right vertex
-		{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f }, // Front Bottom left vertex
-		{ +1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Front Bottom right vertex
+		{ -width, -height, -depth, 0.0f, 1.0f },
+		{ -width, +height, -depth, 0.0f, 0.0f },
+		{ +width, +height, -depth, 1.0f, 0.0f },
+		{ +width, -height, -depth, 1.0f, 1.0f },
 
-		{ -1.0f, +1.0f, +1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Back Top left vertex
-		{ +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 1.0f, 1.0f }, // Back Top right vertex
-		{ -1.0f, -1.0f, +1.0f, 0.0f, 1.0f, 1.0f, 1.0f }, // Back Bottom left vertex
-		{ +1.0f, -1.0f, +1.0f, 1.0f, 1.0f, 1.0f, 1.0f }, // Back Bottom right vertex
+		{ -width, -height, +depth, 1.0f, 1.0f },
+		{ +width, -height, +depth, 0.0f, 1.0f },
+		{ +width, +height, +depth, 0.0f, 0.0f },
+		{ -width, +height, +depth, 1.0f, 0.0f },
+
+		{ -width, +height, -depth, 0.0f, 1.0f },
+		{ -width, +height, +depth, 0.0f, 0.0f },
+		{ +width, +height, +depth, 1.0f, 0.0f },
+		{ +width, +height, -depth, 1.0f, 1.0f },
+
+		{ -width, -height, -depth, 1.0f, 1.0f },
+		{ +width, -height, -depth, 0.0f, 1.0f },
+		{ +width, -height, +depth, 0.0f, 0.0f },
+		{ -width, -height, +depth, 1.0f, 0.0f },
+
+		{ -width, -height, +depth, 0.0f, 1.0f },
+		{ -width, +height, +depth, 0.0f, 0.0f },
+		{ -width, +height, -depth, 1.0f, 0.0f },
+		{ -width, -height, -depth, 1.0f, 1.0f },
+
+		{ +width, -height, -depth, 0.0f, 1.0f },
+		{ +width, +height, -depth, 0.0f, 0.0f },
+		{ +width, +height, +depth, 1.0f, 0.0f },
+		{ +width, -height, +depth, 1.0f, 1.0f }
 	};
 
 	// Create index buffer
@@ -49,29 +78,23 @@ void DX::Model::CreateIndexBuffer()
 	// Set Indices
 	std::vector<UINT> indices =
 	{
-		// Front panel
 		0, 1, 2,
-		2, 1, 3,
+		0, 2, 3,
 
-		// Right panel
-		1, 5, 3,
-		5, 7, 3,
+		4, 5, 6,
+		4, 6, 7,
 
-		// Back panel
-		4, 6, 5,
-		5, 6, 7,
+		8, 9, 10,
+		8, 10, 11,
 
-		// Left panel
-		0, 2, 4,
-		2, 6, 4,
+		12, 13, 14,
+		12, 14, 15,
 
-		// Top panel
-		0, 4, 5,
-		5, 1, 0,
+		16, 17, 18,
+		16, 18, 19,
 
-		// Bottom panel
-		2, 7, 6,
-		7, 2, 3
+		20, 21, 22,
+		20, 22, 23,
 	};
 
 	m_IndexCount = static_cast<UINT>(indices.size());
@@ -88,6 +111,15 @@ void DX::Model::CreateIndexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
+void DX::Model::LoadTexture()
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	ComPtr<ID3D11Resource> resource = nullptr;
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds", 
+		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
+}
+
 void DX::Model::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
@@ -96,18 +128,21 @@ void DX::Model::Render()
 	UINT vertex_stride = sizeof(Vertex);
 	auto vertex_offset = 0u;
 
-	// Bind the vertex buffer to the pipeline's Input Assembler stage
+	// Bind the vertex buffer to the Input Assembler
 	d3dDeviceContext->IASetVertexBuffers(0, 1, m_d3dVertexBuffer.GetAddressOf(), &vertex_stride, &vertex_offset);
 
 	// We need the stride and offset for the colour
 	UINT colour_stride = sizeof(DirectX::XMVECTORF32);
 	auto colour_offset = 0u;
 
-	// Bind the index buffer to the pipeline's Input Assembler stage
+	// Bind the index buffer to the Input Assembler
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	// Bind the geometry topology to the pipeline's Input Assembler stage
+	// Bind the geometry topology to the Input Assembler
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Bind texture to the pixel shader
+	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
