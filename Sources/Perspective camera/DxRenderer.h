@@ -52,6 +52,9 @@ namespace DX
 		// Get the ID3D11 Device Context
 		ID3D11DeviceContext* GetDeviceContext() const { return m_d3dDeviceContext.Get(); }
 
+		// Toggle wireframe
+		void ToggleWireframe(bool wireframe);
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
@@ -72,5 +75,12 @@ namespace DX
 
 		// Viewport
 		void SetViewport(int width, int height);
+
+		// Raster states
+		ComPtr<ID3D11RasterizerState> m_RasterStateSolid = nullptr;
+		void CreateRasterStateSolid();
+
+		ComPtr<ID3D11RasterizerState> m_RasterStateWireframe = nullptr;
+		void CreateRasterStateWireframe();
 	};
 }

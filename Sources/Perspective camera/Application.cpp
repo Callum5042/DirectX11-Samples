@@ -90,6 +90,15 @@ int Applicataion::Execute()
                 world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
                 m_DxShader->UpdateWorldConstantBuffer(world_buffer);
             }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.repeat == 0)
+                {
+                    static bool wireframe = false;
+                    wireframe = !wireframe;
+                    m_DxRenderer->ToggleWireframe(wireframe);
+                }
+            }
         }
         else
         {

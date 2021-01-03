@@ -29,6 +29,11 @@ void DX::Renderer::Create()
 	CreateSwapChain(window_width, window_height);
 	CreateRenderTargetAndDepthStencilView(window_width, window_height);
 	SetViewport(window_width, window_height);
+
+	// Create raster state
+	CreateRasterStateSolid();
+	CreateRasterStateWireframe();
+	ToggleWireframe(false);
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -70,6 +75,18 @@ void DX::Renderer::Present()
 	else
 	{
 		DX::Check(m_d3dSwapChain->Present(0, 0));
+	}
+}
+
+void DX::Renderer::ToggleWireframe(bool wireframe)
+{
+	if (wireframe)
+	{
+		m_d3dDeviceContext->RSSetState(m_RasterStateWireframe.Get());
+	}
+	else
+	{
+		m_d3dDeviceContext->RSSetState(m_RasterStateSolid.Get());
 	}
 }
 
@@ -212,4 +229,38 @@ void DX::Renderer::SetViewport(int width, int height)
 
 	// Bind viewport to the pipline's rasterization stage
 	m_d3dDeviceContext->RSSetViewports(1, &viewport);
+}
+
+void DX::Renderer::CreateRasterStateSolid()
+{
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.AntialiasedLineEnable = true;
+	rasterizerState.CullMode = D3D11_CULL_FRONT;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.DepthClipEnable = true;
+	rasterizerState.FrontCounterClockwise = true;
+	rasterizerState.MultisampleEnable = true;
+
+	rasterizerState.DepthBias = 0;
+	rasterizerState.DepthBiasClamp = 1.0f;
+	rasterizerState.SlopeScaledDepthBias = 1.0f;
+
+	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterStateSolid.ReleaseAndGetAddressOf()));
+}
+
+void DX::Renderer::CreateRasterStateWireframe()
+{
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.AntialiasedLineEnable = true;
+	rasterizerState.CullMode = D3D11_CULL_NONE;
+	rasterizerState.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerState.DepthClipEnable = true;
+	rasterizerState.FrontCounterClockwise = true;
+	rasterizerState.MultisampleEnable = true;
+
+	rasterizerState.DepthBias = 0;
+	rasterizerState.DepthBiasClamp = 1.0f;
+	rasterizerState.SlopeScaledDepthBias = 1.0f;
+
+	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterStateWireframe.ReleaseAndGetAddressOf()));
 }
