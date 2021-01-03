@@ -29,6 +29,9 @@ void DX::Renderer::Create()
 	CreateSwapChain(window_width, window_height);
 	CreateRenderTargetAndDepthStencilView(window_width, window_height);
 	SetViewport(window_width, window_height);
+
+	// Create anistropic texture filter
+	CreateAnisotropicFiltering();
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -212,4 +215,23 @@ void DX::Renderer::SetViewport(int width, int height)
 
 	// Bind viewport to the pipline's rasterization stage
 	m_d3dDeviceContext->RSSetViewports(1, &viewport);
+}
+
+void DX::Renderer::CreateAnisotropicFiltering()
+{
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0;
+	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = 1000.0f;
+
+	DX::Check(m_d3dDevice->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
+
+	// Bind to pipeline
+	m_d3dDeviceContext->PSSetSamplers(0, 1, m_AnisotropicSampler.GetAddressOf());
 }
