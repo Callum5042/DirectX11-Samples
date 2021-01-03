@@ -51,7 +51,7 @@ int Applicataion::Execute()
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED)
                 {
                     m_DxRenderer->Resize(e.window.data1, e.window.data2);
-                    m_DxCamera->Resize(e.window.data1, e.window.data2);
+                    m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 
                     // Update world constant buffer with new camera view and perspective
                     DX::WorldBuffer world_buffer = {};
@@ -77,6 +77,18 @@ int Applicataion::Execute()
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
                 }
+            }
+            else if (e.type == SDL_MOUSEWHEEL)
+            {
+                auto direction = static_cast<float>(e.wheel.y);
+                m_DxCamera->UpdateFov(-direction);
+
+                // Update world constant buffer with new camera view and perspective
+                DX::WorldBuffer world_buffer = {};
+                world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+                world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+                world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+                m_DxShader->UpdateWorldConstantBuffer(world_buffer);
             }
         }
         else

@@ -11,11 +11,14 @@ namespace DX
 		Camera(int width, int height);
 		virtual ~Camera() = default;
 
-		// Recalculates the projection based on the new window size
-		void Resize(int width, int height);
-
 		// Recalculates the view based on the pitch and yaw
 		void Rotate(float pitch, float yaw);
+
+		// Update aspect ratio
+		void UpdateAspectRatio(int width, int height);
+
+		// Set field of view
+		void UpdateFov(float fov);
 
 		// Get projection matrix
 		constexpr DirectX::XMMATRIX GetProjection() { return m_Projection; }
@@ -35,5 +38,14 @@ namespace DX
 
 		// Camera yaw in radians
 		float m_YawRadians = 0.0f;
+
+		// Camera field of view in degrees
+		float m_FieldOfViewDegrees = 50.0f;
+
+		// Float aspect ratio
+		float m_AspectRatio = 0.0f;
+
+		// Recalculates the projection based on the new window size
+		void CalculateProjection();
 	};
 }

@@ -3,24 +3,11 @@
 
 DX::Camera::Camera(int width, int height)
 {
-	Resize(width, height);
-
 	constexpr auto pitch_radians = DirectX::XMConvertToRadians(30.0f);
 	Rotate(pitch_radians, 0.0f);
-}
 
-void DX::Camera::Resize(int width, int height)
-{
-	auto fov = 50.0f;
-
-	// Convert degrees to radians
-	auto field_of_view_radians = DirectX::XMConvertToRadians(fov);
-
-	// Calculate window aspect ratio
-	auto window_aspect_ratio = static_cast<float>(width) / height;
-
-	// Calculate camera's perspective
-	m_Projection = DirectX::XMMatrixPerspectiveFovLH(field_of_view_radians, window_aspect_ratio, 0.01f, 100.0f);
+	m_AspectRatio = static_cast<float>(width) / height;
+	CalculateProjection();
 }
 
 void DX::Camera::Rotate(float pitch_radians, float yaw_radians)
@@ -40,4 +27,27 @@ void DX::Camera::Rotate(float pitch_radians, float yaw_radians)
 	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(eye, at, up);
+}
+
+void DX::Camera::UpdateAspectRatio(int width, int height)
+{
+	// Calculate window aspect ratio
+	m_AspectRatio = static_cast<float>(width) / height;
+	CalculateProjection();
+}
+
+void DX::Camera::UpdateFov(float fov)
+{
+	m_FieldOfViewDegrees += fov;
+	m_FieldOfViewDegrees = std::clamp(m_FieldOfViewDegrees, 0.1f, 179.9f);
+	CalculateProjection();
+}
+
+void DX::Camera::CalculateProjection()
+{
+	// Convert degrees to radians
+	auto field_of_view_radians = DirectX::XMConvertToRadians(m_FieldOfViewDegrees);
+
+	// Calculate camera's perspective
+	m_Projection = DirectX::XMMatrixPerspectiveFovLH(field_of_view_radians, m_AspectRatio, 0.01f, 100.0f);
 }
