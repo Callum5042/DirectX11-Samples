@@ -21,3 +21,9 @@ cbuffer WorldBuffer : register(b0)
 	matrix cView;
 	matrix cProjection;
 }
+
+// Bone constant buffer
+cbuffer BoneBuffer : register(b1)
+{
+	matrix cBoneOffset[2];
+}

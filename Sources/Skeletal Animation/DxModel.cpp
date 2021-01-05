@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <sstream>
 
-DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
+DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
 	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
@@ -101,6 +101,10 @@ void DX::Model::LoadFBX(std::string&& path)
 	// Load bones
 	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
 	{
+		BoneInfo boneInfo = {};
+		boneInfo.offset = DirectX::XMMatrixIdentity();
+		m_Mesh.bones.push_back(boneInfo);
+
 		// Vertex weight data
 		for (auto bone_weight_index = 0u; bone_weight_index < mesh->mBones[bone_index]->mNumWeights; bone_weight_index++)
 		{
@@ -124,6 +128,15 @@ void DX::Model::LoadFBX(std::string&& path)
 void DX::Model::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
+
+	// Pass bone data to pipeline
+	BoneBuffer bone_buffer = {};
+	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
+	{
+		bone_buffer.offset[i] = m_Mesh.bones[i].offset;
+	}
+
+	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 
 	// We need the stride and offset for the vertex
 	UINT vertex_stride = sizeof(Vertex);

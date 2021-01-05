@@ -13,6 +13,11 @@ namespace DX
 		DirectX::XMMATRIX projection;
 	};
 
+	struct BoneBuffer
+	{
+		DirectX::XMMATRIX offset[2];
+	};
+
 	class Shader
 	{
 	public:
@@ -31,6 +36,9 @@ namespace DX
 		// Set world constant buffer from camera
 		void UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer);
 
+		// Set bone constant buffer from camera
+		void UpdateBoneConstantBuffer(const BoneBuffer& buffer);
+
 	private:
 		Renderer* m_DxRenderer = nullptr;
 
@@ -46,5 +54,9 @@ namespace DX
 		// World constant buffer
 		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;
 		void CreateWorldConstantBuffer();
+
+		// Bone constant buffer
+		ComPtr<ID3D11Buffer> m_d3dBoneConstantBuffer = nullptr;
+		void CreateBoneConstantBuffer();
 	};
 }

@@ -5,6 +5,7 @@
 DX::Shader::Shader(Renderer* renderer) : m_DxRenderer(renderer)
 {
 	CreateWorldConstantBuffer();
+	CreateBoneConstantBuffer();
 }
 
 void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
@@ -66,6 +67,12 @@ void DX::Shader::UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer)
 	d3dDeviceContext->UpdateSubresource(m_d3dWorldConstantBuffer.Get(), 0, nullptr, &worldBuffer, 0, 0);
 }
 
+void DX::Shader::UpdateBoneConstantBuffer(const BoneBuffer& buffer)
+{
+	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
+	d3dDeviceContext->UpdateSubresource(m_d3dBoneConstantBuffer.Get(), 0, nullptr, &buffer, 0, 0);
+}
+
 void DX::Shader::CreateWorldConstantBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
@@ -77,4 +84,17 @@ void DX::Shader::CreateWorldConstantBuffer()
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dWorldConstantBuffer.ReleaseAndGetAddressOf()));
+}
+
+void DX::Shader::CreateBoneConstantBuffer()
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Create world constant buffer
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(BoneBuffer);
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dBoneConstantBuffer.ReleaseAndGetAddressOf()));
 }

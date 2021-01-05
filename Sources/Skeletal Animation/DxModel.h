@@ -3,6 +3,7 @@
 #include "DxRenderer.h"
 #include <vector>
 #include <DirectXColors.h>
+#include "DxShader.h"
 
 #undef min
 #include <assimp/Importer.hpp>
@@ -51,7 +52,7 @@ namespace DX
 	class Model
 	{
 	public:
-		Model(DX::Renderer* renderer);
+		Model(DX::Renderer* renderer, DX::Shader* shader);
 		virtual ~Model() = default;
 
 		// Create device
@@ -65,6 +66,7 @@ namespace DX
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
+		DX::Shader* m_DxShader = nullptr;
 
 		// Number of indices to draw
 		UINT m_IndexCount = 0;

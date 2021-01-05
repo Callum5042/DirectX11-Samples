@@ -20,14 +20,14 @@ int Applicataion::Execute()
     m_DxRenderer->Create();
     m_DxRenderer->ToggleWireframe(m_Wireframe);
 
-    // Initialise and create the DirectX 11 model
-    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
-    m_DxModel->Create();
-
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
     m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
+
+    // Initialise and create the DirectX 11 model
+    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get(), m_DxShader.get());
+    m_DxModel->Create();
 
     // Initialise and setup the perspective camera
     auto window_width = 0;
