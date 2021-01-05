@@ -68,33 +68,55 @@ void DX::Model::LoadFBX(std::string&& path)
 	auto mesh = scene->mMeshes[0];
 
 	// Load vertices
-	for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
+	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 	{
-		//Set the positions
-		float x = static_cast<float>(mesh->mVertices[j].x);
-		float y = static_cast<float>(mesh->mVertices[j].y);
-		float z = static_cast<float>(mesh->mVertices[j].z);
+		// Set the positions
+		float x = static_cast<float>(mesh->mVertices[i].x);
+		float y = static_cast<float>(mesh->mVertices[i].y);
+		float z = static_cast<float>(mesh->mVertices[i].z);
 
-		//Create a vertex to store the mesh's vertices temporarily
+		// Create a vertex to store the mesh's vertices temporarily
 		Vertex vertex;
 		vertex.x = x;
 		vertex.y = y;
 		vertex.z = z;
 
-		//Add the vertex to the vertices vector
+		// Add the vertex to the vertices vector
 		m_Mesh.vertices.push_back(vertex);
 	}
 
-	//Iterate over the faces of the mesh
-	for (unsigned int j = 0; j < mesh->mNumFaces; ++j)
+	// Iterate over the faces of the mesh
+	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 	{
-		//Get the face
-		aiFace face = mesh->mFaces[j];
+		// Get the face
+		aiFace face = mesh->mFaces[i];
 
-		//Add the indices of the face to the vector
+		// Add the indices of the face to the vector
 		for (unsigned int k = 0; k < face.mNumIndices; ++k)
 		{
 			m_Mesh.indices.push_back(face.mIndices[k]);
+		}
+	}
+
+	// Load bones
+	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
+	{
+		// Vertex weight data
+		for (auto bone_weight_index = 0u; bone_weight_index < mesh->mBones[bone_index]->mNumWeights; bone_weight_index++)
+		{
+			auto vertexID = mesh->mBones[bone_index]->mWeights[bone_weight_index].mVertexId;
+			auto weight = mesh->mBones[bone_index]->mWeights[bone_weight_index].mWeight;
+			auto& vertex = m_Mesh.vertices[vertexID];
+
+			for (int vertex_weight_index = 0; vertex_weight_index < 4; ++vertex_weight_index)
+			{
+				if (vertex.weight[vertex_weight_index] == 0.0)
+				{
+					vertex.weight[vertex_weight_index] = weight;
+					vertex.bone[vertex_weight_index] = bone_index;
+					break;
+				}
+			}
 		}
 	}
 }
@@ -123,4 +145,3 @@ void DX::Model::Render()
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
 }
- 

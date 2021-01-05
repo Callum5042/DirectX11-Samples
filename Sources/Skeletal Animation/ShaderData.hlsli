@@ -3,6 +3,8 @@ struct VertexInput
 {
 	float3 position : POSITION;
 	float4 colour : COLOUR;
+	float4 Weight : WEIGHT;
+	int4 Bone : BONE;
 };
 
 // Vertex output / pixel input structure

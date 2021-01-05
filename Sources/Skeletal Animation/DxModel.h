@@ -28,12 +28,24 @@ namespace DX
 
 		// Vertex colour
 		Colour colour = {};
+
+		// Weights
+		float weight[4];
+
+		// Bone index
+		int bone[4];
+	};
+
+	struct BoneInfo
+	{
+		DirectX::XMMATRIX offset;
 	};
 
 	struct Mesh
 	{
 		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
+		std::vector<BoneInfo> bones;
 	};
 
 	class Model
