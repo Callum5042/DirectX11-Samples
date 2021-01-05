@@ -4,10 +4,20 @@
 #include <exception>
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
+
+namespace
+{
+	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
+	{
+		return *reinterpret_cast<DirectX::XMMATRIX*>(&matrix);
+	}
+}
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 2.0f);
+	World *= DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f));
 }
 
 void DX::Model::Create()
@@ -16,9 +26,6 @@ void DX::Model::Create()
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
-
-	//m_Mesh.bones[0].offset *= DirectX::XMMatrixRotationY(DirectX::XMConvertToDegrees(45.0f));
-	m_Mesh.bones[1].offset *= DirectX::XMMatrixRotationY(DirectX::XMConvertToDegrees(45.0f));
 }
 
 void DX::Model::CreateVertexBuffer()
@@ -88,6 +95,33 @@ void DX::Model::LoadFBX(std::string&& path)
 		m_Mesh.vertices.push_back(vertex);
 	}
 
+	// Colour vertices
+	m_Mesh.vertices[0].colour.r = 1.0f;
+	m_Mesh.vertices[1].colour.r = 1.0f;
+	m_Mesh.vertices[2].colour.r = 1.0f;
+	m_Mesh.vertices[3].colour.r = 1.0f;
+	m_Mesh.vertices[33].colour.r = 1.0f;
+	m_Mesh.vertices[32].colour.r = 1.0f;
+	m_Mesh.vertices[29].colour.r = 1.0f;
+	m_Mesh.vertices[28].colour.r = 1.0f;
+	m_Mesh.vertices[25].colour.r = 1.0f;
+	m_Mesh.vertices[24].colour.r = 1.0f;
+	m_Mesh.vertices[26].colour.r = 1.0f;
+	m_Mesh.vertices[27].colour.r = 1.0f;
+
+	m_Mesh.vertices[40].colour.g = 1.0f;
+	m_Mesh.vertices[41].colour.g = 1.0f;
+	m_Mesh.vertices[35].colour.g = 1.0f;
+	m_Mesh.vertices[34].colour.g = 1.0f;
+	m_Mesh.vertices[36].colour.g = 1.0f;
+	m_Mesh.vertices[37].colour.g = 1.0f;
+	m_Mesh.vertices[44].colour.g = 1.0f;
+	m_Mesh.vertices[45].colour.g = 1.0f;
+	m_Mesh.vertices[49].colour.g = 1.0f;
+	m_Mesh.vertices[48].colour.g = 1.0f;
+	m_Mesh.vertices[14].colour.g = 1.0f;
+	m_Mesh.vertices[15].colour.g = 1.0f;
+
 	// Iterate over the faces of the mesh
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 	{
@@ -104,15 +138,17 @@ void DX::Model::LoadFBX(std::string&& path)
 	// Load bones
 	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
 	{
+		auto ai_bone = mesh->mBones[bone_index];
+
 		BoneInfo boneInfo = {};
-		boneInfo.offset = DirectX::XMMatrixIdentity();
+		boneInfo.offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
 		m_Mesh.bones.push_back(boneInfo);
 
 		// Vertex weight data
-		for (auto bone_weight_index = 0u; bone_weight_index < mesh->mBones[bone_index]->mNumWeights; bone_weight_index++)
+		for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
 		{
-			auto vertexID = mesh->mBones[bone_index]->mWeights[bone_weight_index].mVertexId;
-			auto weight = mesh->mBones[bone_index]->mWeights[bone_weight_index].mWeight;
+			auto vertexID = ai_bone->mWeights[bone_weight_index].mVertexId;
+			auto weight = ai_bone->mWeights[bone_weight_index].mWeight;
 			auto& vertex = m_Mesh.vertices[vertexID];
 
 			for (int vertex_weight_index = 0; vertex_weight_index < 4; ++vertex_weight_index)
@@ -126,6 +162,15 @@ void DX::Model::LoadFBX(std::string&& path)
 			}
 		}
 	}
+
+	// Load animations
+	for (auto animation_index = 0u; animation_index < scene->mNumAnimations; ++animation_index)
+	{
+		auto animation = scene->mAnimations[animation_index];
+		std::cout << "Animations frame rate: " << animation->mTicksPerSecond << '\n';
+
+
+	}
 }
 
 void DX::Model::Render()
@@ -136,8 +181,14 @@ void DX::Model::Render()
 	BoneBuffer bone_buffer = {};
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
-		bone_buffer.offset[i] = m_Mesh.bones[i].offset;
+		auto offset = DirectX::XMMatrixIdentity();
+		//bone_buffer.offset[i] = m_Mesh.bones[i].offset;
+		bone_buffer.offset[i] = offset;
 	}
+
+	auto rotation = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(-45.0f));
+	//bone_buffer.offset[1] = DirectX::XMMatrixMultiply(bone_buffer.offset[1], rotation);
+
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 
