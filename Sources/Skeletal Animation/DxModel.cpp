@@ -16,6 +16,9 @@ void DX::Model::Create()
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
+
+	//m_Mesh.bones[0].offset *= DirectX::XMMatrixRotationY(DirectX::XMConvertToDegrees(45.0f));
+	m_Mesh.bones[1].offset *= DirectX::XMMatrixRotationY(DirectX::XMConvertToDegrees(45.0f));
 }
 
 void DX::Model::CreateVertexBuffer()

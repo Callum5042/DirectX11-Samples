@@ -59,6 +59,9 @@ void DX::Shader::Use()
 
 	// Bind the world constant buffer to the vertex shader
 	d3dDeviceContext->VSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+
+	// Bind the bone constant buffer to the vertex shader
+	d3dDeviceContext->VSSetConstantBuffers(1, 1, m_d3dBoneConstantBuffer.GetAddressOf());
 }
 
 void DX::Shader::UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer)

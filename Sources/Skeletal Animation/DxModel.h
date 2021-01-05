@@ -31,10 +31,10 @@ namespace DX
 		Colour colour = {};
 
 		// Weights
-		float weight[4];
+		float weight[4] = {0, 0, 0, 0};
 
 		// Bone index
-		int bone[4];
+		int bone[4] = {0, 0, 0, 0};
 	};
 
 	struct BoneInfo
