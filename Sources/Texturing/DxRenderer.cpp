@@ -57,7 +57,7 @@ void DX::Renderer::Clear()
 	m_d3dDeviceContext->ClearDepthStencilView(m_d3dDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// Bind the render target view to the pipeline's output merger stage
-	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), nullptr);
+	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
 }
 
 void DX::Renderer::Present()

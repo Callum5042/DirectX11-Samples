@@ -187,7 +187,7 @@ void DX::Model::Render()
 	}
 
 	auto rotation = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(-45.0f));
-	//bone_buffer.offset[1] = DirectX::XMMatrixMultiply(bone_buffer.offset[1], rotation);
+	bone_buffer.offset[1] = DirectX::XMMatrixMultiply(bone_buffer.offset[1], rotation);
 
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
