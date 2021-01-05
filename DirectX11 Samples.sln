@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Perspective camera", "Sourc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Texturing", "Sources\Texturing\Texturing.vcxproj", "{B37EBCC8-3DA1-4ECC-8C13-37FC9D3658F4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skeletal Animation", "Skeletal Animation\Skeletal Animation.vcxproj", "{2FA4E7B6-87A1-4B5E-82E0-5504FB951467}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skeletal Animation", "Sources\Skeletal Animation\Skeletal Animation.vcxproj", "{2FA4E7B6-87A1-4B5E-82E0-5504FB951467}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
