@@ -93,7 +93,7 @@ int Applicataion::Execute()
             }
             else if (e.type == SDL_KEYDOWN)
             {
-                if (e.key.repeat == 0)
+                if (e.key.keysym.scancode == SDL_SCANCODE_1 && e.key.repeat == 0)
                 {
                     m_Wireframe = !m_Wireframe;
                     m_DxRenderer->ToggleWireframe(m_Wireframe);
@@ -103,6 +103,10 @@ int Applicataion::Execute()
         else
         {
             CalculateFramesPerSecond();
+
+            // Updates the model
+            float deltaTime = static_cast<float>(m_Timer.DeltaTime());
+            m_DxModel->Update(deltaTime);
 
             // Clear the buffers
             m_DxRenderer->Clear();

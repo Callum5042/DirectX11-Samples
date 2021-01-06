@@ -49,6 +49,31 @@ namespace DX
 		std::vector<BoneInfo> bones;
 	};
 
+	struct Keyframe
+	{
+		Keyframe() {};
+		~Keyframe() {};
+
+		float TimePos = 0.0f;
+		DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+		DirectX::XMFLOAT4 RotationQuat = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	};
+
+	struct BoneAnimation
+	{
+		std::string boneName;
+		std::vector<Keyframe> keyFrames;
+	};
+
+	struct AnimationData
+	{
+		std::string name;
+		float ticksPerSecond = 0;
+
+		std::vector<BoneAnimation> boneAnimation;
+	};
+
 	class Model
 	{
 	public:
@@ -58,11 +83,17 @@ namespace DX
 		// Create device
 		void Create();
 
+		// Update the model
+		void Update(float dt);
+
 		// Render the model
 		void Render();
 
 		// World 
 		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+		// Animation
+		AnimationData Animation = {};
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
@@ -74,6 +105,7 @@ namespace DX
 
 		// Vertex buffer
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;
+		ComPtr<ID3D11Buffer> m_d3dBoneVertexBuffer = nullptr;
 		void CreateVertexBuffer();
 
 		// Index buffer

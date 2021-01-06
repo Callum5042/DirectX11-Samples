@@ -10,7 +10,18 @@ namespace
 {
 	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
 	{
-		return *reinterpret_cast<DirectX::XMMATRIX*>(&matrix);
+		aiVector3D scale;
+		aiVector3D rot;
+		aiVector3D pos;
+		matrix.Decompose(scale, rot, pos);
+		// return *reinterpret_cast<DirectX::XMMATRIX*>(&matrix);
+
+		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
+		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
+		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+		return _matrix;
 	}
 }
 
@@ -26,6 +37,71 @@ void DX::Model::Create()
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
+
+	// Draw bone buffer
+	std::vector<Vertex> vertices;
+	
+	// Root?
+	Vertex v1;
+	v1.x = 0.0f;
+	v1.y = 0.0f;
+	v1.z = 0.0f;
+	v1.weight[0] = 1.0f;
+
+	DirectX::XMVECTOR scale;
+	DirectX::XMVECTOR rot;
+	DirectX::XMVECTOR pos;
+	DirectX::XMMatrixDecompose(&scale, &rot, &pos, m_Mesh.bones[0].offset);
+
+	DirectX::XMFLOAT4 pos_4;
+	DirectX::XMStoreFloat4(&pos_4, pos);
+
+	Vertex v2;
+	v2.x = 0.0f;
+	v2.y = 5.0f;
+	v2.z = 0.0f;
+	v2.weight[0] = 1.0f;
+
+	vertices.push_back(v1);
+	vertices.push_back(v2);
+
+
+	D3D11_BUFFER_DESC vertex_buffer_desc = {};
+	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices.size());
+	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA vertex_subdata = {};
+	vertex_subdata.pSysMem = vertices.data();
+
+	auto d3dDevice = m_DxRenderer->GetDevice();
+	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dBoneVertexBuffer.ReleaseAndGetAddressOf()));
+}
+
+void DX::Model::Update(float dt)
+{
+	// Pass bone data to pipeline
+	BoneBuffer bone_buffer = {};
+	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
+	{
+		//auto offset = DirectX::XMMatrixIdentity();
+		auto offset = m_Mesh.bones[i].offset;
+		bone_buffer.offset[i] = offset;
+	}
+	 
+	static float time = 0.0f;
+	time += dt * 10;
+	 
+	auto rotation = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(time));
+	//auto offset = DirectX::XMMatrixMultiply(bone_buffer.offset[0], bone_buffer.offset[1]);
+	auto offset = -m_Mesh.bones[1].offset;
+	//bone_buffer.offset[1] = DirectX::XMMatrixMultiply(offset, rotation);
+
+	//auto offset = m_Mesh.bones[0].offset;
+	//bone_buffer.offset[1] *= DirectX::XMMatrixMultiply(-offset, rotation);
+
+
+	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 }
 
 void DX::Model::CreateVertexBuffer()
@@ -167,30 +243,39 @@ void DX::Model::LoadFBX(std::string&& path)
 	for (auto animation_index = 0u; animation_index < scene->mNumAnimations; ++animation_index)
 	{
 		auto animation = scene->mAnimations[animation_index];
-		std::cout << "Animations frame rate: " << animation->mTicksPerSecond << '\n';
+		Animation.name = animation->mName.C_Str();
+		Animation.ticksPerSecond = animation->mTicksPerSecond;
+		animation->mDuration;
 
+		Animation.boneAnimation.resize(animation->mNumChannels);
+		for (unsigned i = 0; i < animation->mNumChannels; ++i)
+		{
+			auto channel = animation->mChannels[i];
+			Animation.boneAnimation[i].boneName = channel->mNodeName.C_Str();
 
+			// Animation.boneAnimation[i].keyFrames.resize(channel->mNumPositionKeys);
+			for (unsigned k = 0; k < channel->mNumPositionKeys; ++k)
+			{
+				auto time = channel->mPositionKeys[k].mTime;
+				auto pos = channel->mPositionKeys[k].mValue;
+				auto rotation = channel->mRotationKeys[k].mValue;
+				auto scale = channel->mScalingKeys[k].mValue;
+
+				Keyframe frame;
+				frame.TimePos = time;
+				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
+				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
+				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
+
+				Animation.boneAnimation[i].keyFrames.push_back(frame);
+			}
+		}
 	}
 }
 
 void DX::Model::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
-
-	// Pass bone data to pipeline
-	BoneBuffer bone_buffer = {};
-	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
-	{
-		auto offset = DirectX::XMMatrixIdentity();
-		//bone_buffer.offset[i] = m_Mesh.bones[i].offset;
-		bone_buffer.offset[i] = offset;
-	}
-
-	auto rotation = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(-45.0f));
-	bone_buffer.offset[1] = DirectX::XMMatrixMultiply(bone_buffer.offset[1], rotation);
-
-
-	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 
 	// We need the stride and offset for the vertex
 	UINT vertex_stride = sizeof(Vertex);
@@ -211,4 +296,10 @@ void DX::Model::Render()
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+
+
+	// Bone geometry
+	//d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	//d3dDeviceContext->IASetVertexBuffers(0, 1, m_d3dBoneVertexBuffer.GetAddressOf(), &vertex_stride, &vertex_offset);
+	//d3dDeviceContext->Draw(2, 0);
 }
