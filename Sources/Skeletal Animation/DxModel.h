@@ -39,7 +39,10 @@ namespace DX
 
 	struct BoneInfo
 	{
+		DirectX::XMMATRIX transform;
 		DirectX::XMMATRIX offset;
+		int parentId = 0;
+		std::string name;
 	};
 
 	struct Mesh
@@ -83,6 +86,22 @@ namespace DX
 		// Create device
 		void Create();
 
+		const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
+
+		unsigned FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		unsigned FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		unsigned FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
+
+		void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const DirectX::XMMATRIX& ParentTransform);
+
 		// Update the model
 		void Update(float dt);
 
@@ -94,6 +113,12 @@ namespace DX
 
 		// Animation
 		AnimationData Animation = {};
+
+		// Scene
+		Assimp::Importer importer;
+		const aiScene* Scene = nullptr;
+
+		DirectX::XMMATRIX GlobalInverseTransform = DirectX::XMMatrixIdentity();
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;

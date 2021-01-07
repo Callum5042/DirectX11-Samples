@@ -27,16 +27,20 @@ namespace
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 2.0f);
-	World *= DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f));
+	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	//World *= DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(90.0f));
 }
 
 void DX::Model::Create()
 {
-	LoadFBX("..\\..\\Resources\\Models\\two_bone_animation.fbx");
+	LoadFBX("..\\..\\Resources\\Models\\simple_sign.fbx");
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
+
+	// Manually set bone parents
+	m_Mesh.bones[0].parentId = 0;
+	m_Mesh.bones[1].parentId = 1;
 
 	// Draw bone buffer
 	std::vector<Vertex> vertices;
@@ -51,7 +55,7 @@ void DX::Model::Create()
 	DirectX::XMVECTOR scale;
 	DirectX::XMVECTOR rot;
 	DirectX::XMVECTOR pos;
-	DirectX::XMMatrixDecompose(&scale, &rot, &pos, m_Mesh.bones[0].offset);
+	DirectX::XMMatrixDecompose(&scale, &rot, &pos, m_Mesh.bones[0].transform);
 
 	DirectX::XMFLOAT4 pos_4;
 	DirectX::XMStoreFloat4(&pos_4, pos);
@@ -78,28 +82,205 @@ void DX::Model::Create()
 	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dBoneVertexBuffer.ReleaseAndGetAddressOf()));
 }
 
+const aiNodeAnim* DX::Model::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
+{
+	for (unsigned i = 0; i < pAnimation->mNumChannels; i++) 
+	{
+		const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
+		if (std::string(pNodeAnim->mNodeName.data) == NodeName) 
+		{
+			return pNodeAnim;
+		}
+	}
+
+	return nullptr;
+}
+
+unsigned DX::Model::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
+{
+	for (unsigned i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
+		if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
+			return i;
+		}
+	}
+
+	assert(0);
+
+	return 0;
+}
+
+
+unsigned DX::Model::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
+{
+	assert(pNodeAnim->mNumRotationKeys > 0);
+
+	for (unsigned i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++) {
+		if (AnimationTime < (float)pNodeAnim->mRotationKeys[i + 1].mTime) {
+			return i;
+		}
+	}
+
+	assert(0);
+
+	return 0;
+}
+
+
+unsigned DX::Model::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
+{
+	assert(pNodeAnim->mNumScalingKeys > 0);
+
+	for (unsigned i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
+		if (AnimationTime < (float)pNodeAnim->mScalingKeys[i + 1].mTime) {
+			return i;
+		}
+	}
+
+	assert(0);
+
+	return 0;
+}
+
+void DX::Model::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+{
+	if (pNodeAnim->mNumScalingKeys == 1) {
+		Out = pNodeAnim->mScalingKeys[0].mValue;
+		return;
+	}
+
+	unsigned ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
+	unsigned NextScalingIndex = (ScalingIndex + 1);
+	assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
+	float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
+	float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
+	assert(Factor >= 0.0f && Factor <= 1.0f);
+	const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
+	const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
+	aiVector3D Delta = End - Start;
+	Out = Start + Factor * Delta;
+}
+
+void DX::Model::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+{
+	if (pNodeAnim->mNumPositionKeys == 1) {
+		Out = pNodeAnim->mPositionKeys[0].mValue;
+		return;
+	}
+
+	unsigned PositionIndex = FindPosition(AnimationTime, pNodeAnim);
+	unsigned NextPositionIndex = (PositionIndex + 1);
+	assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
+	float DeltaTime = (float)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
+	float Factor = (AnimationTime - (float)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
+	assert(Factor >= 0.0f && Factor <= 1.0f);
+	const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
+	const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
+	aiVector3D Delta = End - Start;
+	Out = Start + Factor * Delta;
+}
+
+
+void DX::Model::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+{
+	// we need at least two values to interpolate...
+	if (pNodeAnim->mNumRotationKeys == 1) {
+		Out = pNodeAnim->mRotationKeys[0].mValue;
+		return;
+	}
+
+	unsigned RotationIndex = FindRotation(AnimationTime, pNodeAnim);
+	unsigned NextRotationIndex = (RotationIndex + 1);
+	assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
+	float DeltaTime = (float)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
+	float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
+	assert(Factor >= 0.0f && Factor <= 1.0f);
+	const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
+	const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
+	aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
+	Out = Out.Normalize();
+}
+
+void DX::Model::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const DirectX::XMMATRIX& ParentTransform)
+{
+	std::string NodeName(pNode->mName.data);
+
+	const aiAnimation* pAnimation = Scene->mAnimations[0];
+	DirectX::XMMATRIX NodeTransformation = ConvertToDirectXMatrix(pNode->mTransformation);
+
+	const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+
+	if (pNodeAnim) 
+	{
+		// Interpolate scaling and generate scaling transformation matrix
+		aiVector3D Scaling;
+		CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+		DirectX::XMMATRIX ScalingM = DirectX::XMMatrixIdentity();
+		//ScalingM *= DirectX::XMMatrixScaling(Scaling.x, Scaling.y, Scaling.z);
+		ScalingM *= DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+
+		// Interpolate rotation and generate rotation transformation matrix
+		aiQuaternion RotationQ;
+		CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+		DirectX::XMMATRIX RotationM = DirectX::XMMatrixIdentity();
+		DirectX::XMVECTOR q = DirectX::XMVectorSet(RotationQ.x, RotationQ.y, RotationQ.z, RotationQ.w);
+		RotationM *= DirectX::XMMatrixRotationQuaternion(q);
+
+		// Interpolate translation and generate translation transformation matrix
+		aiVector3D Translation;
+		CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+		DirectX::XMMATRIX TranslationM = DirectX::XMMatrixIdentity();
+		TranslationM *= DirectX::XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
+
+		// Combine the above transformations
+		NodeTransformation = TranslationM * RotationM * ScalingM;
+	}
+
+	DirectX::XMMATRIX GlobalTransformation = ParentTransform * NodeTransformation;
+
+	for (auto& bone : m_Mesh.bones)
+	{
+		if (bone.name == NodeName)
+		{
+			bone.transform = GlobalInverseTransform * GlobalTransformation * bone.offset;
+		}
+	}
+
+	//if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) 
+	//{
+	////	uint BoneIndex = m_BoneMapping[NodeName];
+	////	m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
+	//}
+
+	for (unsigned i = 0; i < pNode->mNumChildren; i++) 
+	{
+		ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+	}
+}
+
 void DX::Model::Update(float dt)
 {
+	static float TimeInSeconds = 0.0f;
+	TimeInSeconds += dt * 0.01f;
+
+	auto numBones = m_Mesh.bones.size();
+
+	DirectX::XMMATRIX Identity = DirectX::XMMatrixIdentity();
+	float TicksPerSecond = (float)(Scene->mAnimations[0]->mTicksPerSecond != 0 ? Scene->mAnimations[0]->mTicksPerSecond : 25.0f);
+	float TimeInTicks = TimeInSeconds * TicksPerSecond;
+	float AnimationTime = fmod(TimeInTicks, (float)Scene->mAnimations[0]->mDuration);
+
+	ReadNodeHeirarchy(AnimationTime, Scene->mRootNode, Identity);
+
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Pass bone data to pipeline
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 	BoneBuffer bone_buffer = {};
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
-		//auto offset = DirectX::XMMatrixIdentity();
-		auto offset = m_Mesh.bones[i].offset;
-		bone_buffer.offset[i] = offset;
+		bone_buffer.transform[i] = m_Mesh.bones[i].transform;
 	}
-	 
-	static float time = 0.0f;
-	time += dt * 10;
-	 
-	auto rotation = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(time));
-	//auto offset = DirectX::XMMatrixMultiply(bone_buffer.offset[0], bone_buffer.offset[1]);
-	auto offset = -m_Mesh.bones[1].offset;
-	//bone_buffer.offset[1] = DirectX::XMMatrixMultiply(offset, rotation);
-
-	//auto offset = m_Mesh.bones[0].offset;
-	//bone_buffer.offset[1] *= DirectX::XMMatrixMultiply(-offset, rotation);
-
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 }
@@ -139,11 +320,11 @@ void DX::Model::CreateIndexBuffer()
 
 void DX::Model::LoadFBX(std::string&& path)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
+	
+	Scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
 
 	// Load model
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
 	{
 		std::ostringstream ss;
 		ss << "ERROR::ASSIMP::" << importer.GetErrorString();
@@ -151,7 +332,7 @@ void DX::Model::LoadFBX(std::string&& path)
 	}
 
 	// Process data
-	auto mesh = scene->mMeshes[0];
+	auto mesh = Scene->mMeshes[0];
 
 	// Load vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
@@ -217,6 +398,7 @@ void DX::Model::LoadFBX(std::string&& path)
 		auto ai_bone = mesh->mBones[bone_index];
 
 		BoneInfo boneInfo = {};
+		boneInfo.name = ai_bone->mName.C_Str();
 		boneInfo.offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
 		m_Mesh.bones.push_back(boneInfo);
 
@@ -240,11 +422,11 @@ void DX::Model::LoadFBX(std::string&& path)
 	}
 
 	// Load animations
-	for (auto animation_index = 0u; animation_index < scene->mNumAnimations; ++animation_index)
+	for (auto animation_index = 0u; animation_index < Scene->mNumAnimations; ++animation_index)
 	{
-		auto animation = scene->mAnimations[animation_index];
+		auto animation = Scene->mAnimations[animation_index];
 		Animation.name = animation->mName.C_Str();
-		Animation.ticksPerSecond = animation->mTicksPerSecond;
+		Animation.ticksPerSecond = static_cast<float>(animation->mTicksPerSecond);
 		animation->mDuration;
 
 		Animation.boneAnimation.resize(animation->mNumChannels);
@@ -262,7 +444,7 @@ void DX::Model::LoadFBX(std::string&& path)
 				auto scale = channel->mScalingKeys[k].mValue;
 
 				Keyframe frame;
-				frame.TimePos = time;
+				frame.TimePos = static_cast<float>(time);
 				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
 				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
 				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
@@ -271,6 +453,9 @@ void DX::Model::LoadFBX(std::string&& path)
 			}
 		}
 	}
+
+	auto globalTransform = ConvertToDirectXMatrix(Scene->mRootNode->mTransformation);
+	GlobalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalTransform);
 }
 
 void DX::Model::Render()

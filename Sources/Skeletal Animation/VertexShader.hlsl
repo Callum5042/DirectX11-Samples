@@ -16,9 +16,9 @@ VertexOutput main(VertexInput input)
 	{
 		float weight = weights[i];
 		int bone_index = input.bone[i];
-		matrix offset = cBoneOffset[bone_index];
+		matrix transform = cBoneTransform[bone_index];
 
-		position += weight * mul(float4(input.position, 1.0f), offset).xyz;
+		position += weight * mul(float4(input.position, 1.0f), transform).xyz;
 	}
 
 	// Transform to homogeneous clip space.

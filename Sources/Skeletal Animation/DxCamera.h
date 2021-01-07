@@ -40,7 +40,7 @@ namespace DX
 		float m_YawRadians = 0.0f;
 
 		// Camera field of view in degrees
-		float m_FieldOfViewDegrees = 50.0f;
+		float m_FieldOfViewDegrees = 70.0f;
 
 		// Float aspect ratio
 		float m_AspectRatio = 0.0f;

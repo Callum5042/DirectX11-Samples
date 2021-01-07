@@ -25,5 +25,5 @@ cbuffer WorldBuffer : register(b0)
 // Bone constant buffer
 cbuffer BoneBuffer : register(b1)
 {
-	matrix cBoneOffset[2];
+	matrix cBoneTransform[2];
 }
