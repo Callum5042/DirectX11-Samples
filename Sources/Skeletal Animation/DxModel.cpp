@@ -33,53 +33,17 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 
 void DX::Model::Create()
 {
-	LoadFBX("..\\..\\Resources\\Models\\simple_sign.fbx");
+	//LoadFBX("..\\..\\Resources\\Models\\fuckyou2.fbx");
+	LoadFBX("..\\..\\Resources\\Models\\simple_sign2.fbx");
+
+	World *= ConvertToDirectXMatrix(Scene->mRootNode->mTransformation);
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
 	// Manually set bone parents
-	m_Mesh.bones[0].parentId = 0;
-	m_Mesh.bones[1].parentId = 1;
-
-	// Draw bone buffer
-	std::vector<Vertex> vertices;
-	
-	// Root?
-	Vertex v1;
-	v1.x = 0.0f;
-	v1.y = 0.0f;
-	v1.z = 0.0f;
-	v1.weight[0] = 1.0f;
-
-	DirectX::XMVECTOR scale;
-	DirectX::XMVECTOR rot;
-	DirectX::XMVECTOR pos;
-	DirectX::XMMatrixDecompose(&scale, &rot, &pos, m_Mesh.bones[0].transform);
-
-	DirectX::XMFLOAT4 pos_4;
-	DirectX::XMStoreFloat4(&pos_4, pos);
-
-	Vertex v2;
-	v2.x = 0.0f;
-	v2.y = 5.0f;
-	v2.z = 0.0f;
-	v2.weight[0] = 1.0f;
-
-	vertices.push_back(v1);
-	vertices.push_back(v2);
-
-
-	D3D11_BUFFER_DESC vertex_buffer_desc = {};
-	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices.size());
-	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-	D3D11_SUBRESOURCE_DATA vertex_subdata = {};
-	vertex_subdata.pSysMem = vertices.data();
-
-	auto d3dDevice = m_DxRenderer->GetDevice();
-	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dBoneVertexBuffer.ReleaseAndGetAddressOf()));
+	/*m_Mesh.bones[0].parentId = 0;
+	m_Mesh.bones[1].parentId = 1;*/
 }
 
 const aiNodeAnim* DX::Model::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
@@ -245,12 +209,6 @@ void DX::Model::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, cons
 		}
 	}
 
-	//if (m_BoneMapping.find(NodeName) != m_BoneMapping.end()) 
-	//{
-	////	uint BoneIndex = m_BoneMapping[NodeName];
-	////	m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
-	//}
-
 	for (unsigned i = 0; i < pNode->mNumChildren; i++) 
 	{
 		ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
@@ -260,16 +218,16 @@ void DX::Model::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, cons
 void DX::Model::Update(float dt)
 {
 	static float TimeInSeconds = 0.0f;
-	TimeInSeconds += dt * 0.01f;
+	TimeInSeconds += dt;
 
 	auto numBones = m_Mesh.bones.size();
 
-	DirectX::XMMATRIX Identity = DirectX::XMMatrixIdentity();
+	/*DirectX::XMMATRIX Identity = DirectX::XMMatrixIdentity();
 	float TicksPerSecond = (float)(Scene->mAnimations[0]->mTicksPerSecond != 0 ? Scene->mAnimations[0]->mTicksPerSecond : 25.0f);
 	float TimeInTicks = TimeInSeconds * TicksPerSecond;
-	float AnimationTime = fmod(TimeInTicks, (float)Scene->mAnimations[0]->mDuration);
+	float AnimationTime = fmod(TimeInTicks, (float)Scene->mAnimations[0]->mDuration);*/
 
-	ReadNodeHeirarchy(AnimationTime, Scene->mRootNode, Identity);
+	//ReadNodeHeirarchy(AnimationTime, Scene->mRootNode, Identity);
 
 
 
@@ -280,6 +238,7 @@ void DX::Model::Update(float dt)
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
 		bone_buffer.transform[i] = m_Mesh.bones[i].transform;
+		bone_buffer.transform[i] = DirectX::XMMatrixIdentity();
 	}
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
@@ -353,7 +312,7 @@ void DX::Model::LoadFBX(std::string&& path)
 	}
 
 	// Colour vertices
-	m_Mesh.vertices[0].colour.r = 1.0f;
+	/*m_Mesh.vertices[0].colour.r = 1.0f;
 	m_Mesh.vertices[1].colour.r = 1.0f;
 	m_Mesh.vertices[2].colour.r = 1.0f;
 	m_Mesh.vertices[3].colour.r = 1.0f;
@@ -377,7 +336,7 @@ void DX::Model::LoadFBX(std::string&& path)
 	m_Mesh.vertices[49].colour.g = 1.0f;
 	m_Mesh.vertices[48].colour.g = 1.0f;
 	m_Mesh.vertices[14].colour.g = 1.0f;
-	m_Mesh.vertices[15].colour.g = 1.0f;
+	m_Mesh.vertices[15].colour.g = 1.0f;*/
 
 	// Iterate over the faces of the mesh
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
