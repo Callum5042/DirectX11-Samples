@@ -46,7 +46,39 @@ void DX::Model::Create()
 	CreateIndexBuffer();
 
 	DirectX::XMVECTOR q0 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(0.0f));
-	DirectX::XMVECTOR q1 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(180.0f));
+	DirectX::XMVECTOR q1 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(90.0f));
+
+
+	// BoneAnimations.resize(m_Mesh.bones.size());
+	BoneAnimations.resize(m_Mesh.bones.size()); 
+
+	// Bone 0
+	BoneAnimations[0].Keyframes.resize(2);
+	BoneAnimations[0].Keyframes[0].TimePos = 0.0f;
+	BoneAnimations[0].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	BoneAnimations[0].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[0].RotationQuat, q0);
+	
+	BoneAnimations[0].Keyframes.resize(2);
+	BoneAnimations[0].Keyframes[1].TimePos = 5.0f;
+	BoneAnimations[0].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	BoneAnimations[0].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[1].RotationQuat, q0);
+
+	// Bone 1
+	BoneAnimations[1].Keyframes.resize(2);
+	BoneAnimations[1].Keyframes[0].TimePos = 0.0f;
+	BoneAnimations[1].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 3.0f, 0.0f);
+	BoneAnimations[1].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[0].RotationQuat, q0);
+
+	BoneAnimations[1].Keyframes.resize(2);
+	BoneAnimations[1].Keyframes[1].TimePos = 5.0f;
+	BoneAnimations[1].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 3.0f, 0.0f);
+	BoneAnimations[1].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&BoneAnimations[1].Keyframes[1].RotationQuat, q1);
+
+
 
 	/*Animation.Keyframes.resize(3);
 	Animation.Keyframes[0].TimePos = 0.0f;
@@ -68,8 +100,7 @@ void DX::Model::Create()
 void DX::Model::Update(float dt)
 {
 	static float TimeInSeconds = 0.0f;
-	TimeInSeconds += dt * 100.0f;
-	std::cout << TimeInSeconds << '\n';
+	TimeInSeconds += dt;
 
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMFLOAT4X4> toParentTransforms(numBones);
@@ -107,6 +138,9 @@ void DX::Model::Update(float dt)
 	{
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
 		DirectX::XMMATRIX toRoot = DirectX::XMLoadFloat4x4(&toRootTransforms[i]);
+
+		//offset = DirectX::XMMatrixTranspose(offset);
+		//offset = DirectX::XMMatrixInverse(nullptr, offset);
 
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
 		//matrix = DirectX::XMMatrixIdentity();
@@ -236,36 +270,36 @@ void DX::Model::LoadFBX(std::string&& path)
 	}
 
 	// Load animations
-	BoneAnimations.resize(m_Mesh.bones.size());
-	for (auto animation_index = 0u; animation_index < Scene->mNumAnimations; ++animation_index)
-	{
-		auto animation = Scene->mAnimations[animation_index];
-		//BoneAnimations.name = animation->mName.C_Str();
-		auto ticksPerSecond = static_cast<float>(animation->mTicksPerSecond);
+	//BoneAnimations.resize(m_Mesh.bones.size());
+	//for (auto animation_index = 0u; animation_index < Scene->mNumAnimations; ++animation_index)
+	//{
+	//	auto animation = Scene->mAnimations[animation_index];
+	//	//BoneAnimations.name = animation->mName.C_Str();
+	//	auto ticksPerSecond = static_cast<float>(animation->mTicksPerSecond);
 
-		for (unsigned i = 0; i < animation->mNumChannels; ++i)
-		{
-			auto channel = animation->mChannels[i];
-			std::string name = channel->mNodeName.C_Str();
-			// Animation.boneAnimation[i].keyFrames.resize(channel->mNumPositionKeys);
+	//	for (unsigned i = 0; i < animation->mNumChannels; ++i)
+	//	{
+	//		auto channel = animation->mChannels[i];
+	//		std::string name = channel->mNodeName.C_Str();
+	//		// Animation.boneAnimation[i].keyFrames.resize(channel->mNumPositionKeys);
 
-			for (unsigned k = 0; k < channel->mNumPositionKeys; ++k)
-			{
-				auto time = channel->mPositionKeys[k].mTime;
-				auto pos = channel->mPositionKeys[k].mValue;
-				auto rotation = channel->mRotationKeys[k].mValue;
-				auto scale = channel->mScalingKeys[k].mValue;
+	//		for (unsigned k = 0; k < channel->mNumPositionKeys; ++k)
+	//		{
+	//			auto time = channel->mPositionKeys[k].mTime;
+	//			auto pos = channel->mPositionKeys[k].mValue;
+	//			auto rotation = channel->mRotationKeys[k].mValue;
+	//			auto scale = channel->mScalingKeys[k].mValue;
 
-				Keyframe frame;
-				frame.TimePos = static_cast<float>(time);
-				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
-				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, -rotation.z, -rotation.w);
-				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
+	//			Keyframe frame;
+	//			frame.TimePos = static_cast<float>(time);
+	//			frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
+	//			frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
+	//			frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
 
-				BoneAnimations[i].Keyframes.push_back(frame);
-			}
-		}
-	}
+	//			BoneAnimations[i].Keyframes.push_back(frame);
+	//		}
+	//	}
+	//}
 }
 
 void DX::Model::Render()
