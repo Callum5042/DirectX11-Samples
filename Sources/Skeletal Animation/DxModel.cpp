@@ -16,7 +16,13 @@ namespace
 		matrix.Decompose(scale, rot, pos);
 
 		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
-		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
+		// _matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
+
+		_matrix *= DirectX::XMMatrixRotationX(rot.x);
+		_matrix *= DirectX::XMMatrixRotationY(rot.y);
+		_matrix *= DirectX::XMMatrixRotationZ(rot.z);
+
+
 		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
 
@@ -32,8 +38,8 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 
 void DX::Model::Create()
 {
+	//LoadFBX("D:\\bone.glb");
 	LoadFBX("..\\..\\Resources\\Models\\simple_sign.glb");
-	//LoadFBX("..\\..\\Resources\\Models\\simple_sign.fbx");
 
 	//World *= ConvertToDirectXMatrix(Scene->mRootNode->mTransformation);
 
@@ -197,7 +203,7 @@ void DX::Model::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, cons
 		aiQuaternion RotationQ;
 		CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
 		DirectX::XMMATRIX RotationM = DirectX::XMMatrixIdentity();
-		DirectX::XMVECTOR q = DirectX::XMVectorSet(RotationQ.x, RotationQ.y, RotationQ.z, RotationQ.w);
+		DirectX::XMVECTOR q = DirectX::XMVectorSet(-RotationQ.x, RotationQ.y, -RotationQ.z, -RotationQ.w);
 		RotationM *= DirectX::XMMatrixRotationQuaternion(q);
 
 		// Interpolate translation and generate translation transformation matrix
