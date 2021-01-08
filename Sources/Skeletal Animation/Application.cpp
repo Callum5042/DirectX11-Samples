@@ -56,7 +56,7 @@ int Applicataion::Execute()
 
                     // Update world constant buffer with new camera view and perspective
                     DX::WorldBuffer world_buffer = {};
-                    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+                    world_buffer.world = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&m_DxModel->World));
                     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
@@ -73,7 +73,7 @@ int Applicataion::Execute()
 
                     // Update world constant buffer with new camera view and perspective
                     DX::WorldBuffer world_buffer = {};
-                    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+                    world_buffer.world = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&m_DxModel->World));
                     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
@@ -86,7 +86,7 @@ int Applicataion::Execute()
 
                 // Update world constant buffer with new camera view and perspective
                 DX::WorldBuffer world_buffer = {};
-                world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+                world_buffer.world = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&m_DxModel->World));
                 world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                 world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
                 m_DxShader->UpdateWorldConstantBuffer(world_buffer);
@@ -103,6 +103,13 @@ int Applicataion::Execute()
         else
         {
             CalculateFramesPerSecond();
+
+            DX::WorldBuffer world_buffer = {};
+
+            world_buffer.world = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&m_DxModel->World));
+            world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+            world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+            m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 
             // Updates the model
             float deltaTime = static_cast<float>(m_Timer.DeltaTime());

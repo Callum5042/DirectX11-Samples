@@ -52,29 +52,35 @@ namespace DX
 		std::vector<BoneInfo> bones;
 	};
 
+	///<summary>
+	/// A Keyframe defines the bone transformation at an instant in time.
+	///</summary>
 	struct Keyframe
 	{
-		Keyframe() {};
-		~Keyframe() {};
+		Keyframe();
+		~Keyframe();
 
-		float TimePos = 0.0f;
-		DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-		DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-		DirectX::XMFLOAT4 RotationQuat = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		float TimePos;
+		DirectX::XMFLOAT3 Translation;
+		DirectX::XMFLOAT3 Scale;
+		DirectX::XMFLOAT4 RotationQuat;
 	};
 
+	///<summary>
+	/// A BoneAnimation is defined by a list of keyframes.  For time
+	/// values inbetween two keyframes, we interpolate between the
+	/// two nearest keyframes that bound the time.  
+	///
+	/// We assume an animation always has two keyframes.
+	///</summary>
 	struct BoneAnimation
 	{
-		std::string boneName;
-		std::vector<Keyframe> keyFrames;
-	};
+		float GetStartTime() const;
+		float GetEndTime() const;
 
-	struct AnimationData
-	{
-		std::string name;
-		float ticksPerSecond = 0;
+		void Interpolate(float t, DirectX::XMFLOAT4X4& M) const;
 
-		std::vector<BoneAnimation> boneAnimation;
+		std::vector<Keyframe> Keyframes;
 	};
 
 	class Model
@@ -109,10 +115,10 @@ namespace DX
 		void Render();
 
 		// World 
-		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+		DirectX::XMFLOAT4X4 World;
 
 		// Animation
-		AnimationData Animation = {};
+		BoneAnimation Animation = {};
 
 		// Scene
 		Assimp::Importer importer;
