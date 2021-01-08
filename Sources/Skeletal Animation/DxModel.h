@@ -118,7 +118,7 @@ namespace DX
 		DirectX::XMFLOAT4X4 World;
 
 		// Animation
-		BoneAnimation Animation = {};
+		//BoneAnimation Animation = {};
 
 		// Scene
 		Assimp::Importer importer;
@@ -145,5 +145,8 @@ namespace DX
 
 		// Load FBX model
 		void LoadFBX(std::string&& path);
+
+
+		std::vector<BoneAnimation> BoneAnimations;
 	};
 }
