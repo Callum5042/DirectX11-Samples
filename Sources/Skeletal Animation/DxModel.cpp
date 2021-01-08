@@ -45,10 +45,10 @@ void DX::Model::Create()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
-	/*DirectX::XMVECTOR q0 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(0.0f));
+	DirectX::XMVECTOR q0 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(0.0f));
 	DirectX::XMVECTOR q1 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(180.0f));
 
-	Animation.Keyframes.resize(3);
+	/*Animation.Keyframes.resize(3);
 	Animation.Keyframes[0].TimePos = 0.0f;
 	Animation.Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	Animation.Keyframes[0].Scale = DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f);
@@ -63,172 +63,6 @@ void DX::Model::Create()
 	Animation.Keyframes[2].Translation = DirectX::XMFLOAT3(-7.0f, 0.0f, 0.0f);
 	Animation.Keyframes[2].Scale = DirectX::XMFLOAT3(0.25f, 0.25f, 0.25f);
 	XMStoreFloat4(&Animation.Keyframes[2].RotationQuat, q0);*/
-}
-
-const aiNodeAnim* DX::Model::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
-{
-	for (unsigned i = 0; i < pAnimation->mNumChannels; i++)
-	{
-		const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
-		if (std::string(pNodeAnim->mNodeName.data) == NodeName)
-		{
-			return pNodeAnim;
-		}
-	}
-
-	return nullptr;
-}
-
-unsigned DX::Model::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
-{
-	for (unsigned i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
-		if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
-			return i;
-		}
-	}
-
-	assert(0);
-
-	return 0;
-}
-
-
-unsigned DX::Model::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
-{
-	assert(pNodeAnim->mNumRotationKeys > 0);
-
-	for (unsigned i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++) {
-		if (AnimationTime < (float)pNodeAnim->mRotationKeys[i + 1].mTime) {
-			return i;
-		}
-	}
-
-	assert(0);
-
-	return 0;
-}
-
-
-unsigned DX::Model::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
-{
-	assert(pNodeAnim->mNumScalingKeys > 0);
-
-	for (unsigned i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
-		if (AnimationTime < (float)pNodeAnim->mScalingKeys[i + 1].mTime) {
-			return i;
-		}
-	}
-
-	assert(0);
-
-	return 0;
-}
-
-void DX::Model::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-{
-	if (pNodeAnim->mNumScalingKeys == 1) {
-		Out = pNodeAnim->mScalingKeys[0].mValue;
-		return;
-	}
-
-	unsigned ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
-	unsigned NextScalingIndex = (ScalingIndex + 1);
-	assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
-	float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
-	float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
-	const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
-	const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
-	aiVector3D Delta = End - Start;
-	Out = Start + Factor * Delta;
-}
-
-void DX::Model::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-{
-	if (pNodeAnim->mNumPositionKeys == 1) {
-		Out = pNodeAnim->mPositionKeys[0].mValue;
-		return;
-	}
-
-	unsigned PositionIndex = FindPosition(AnimationTime, pNodeAnim);
-	unsigned NextPositionIndex = (PositionIndex + 1);
-	assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
-	float DeltaTime = (float)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
-	float Factor = (AnimationTime - (float)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
-	const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
-	const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
-	aiVector3D Delta = End - Start;
-	Out = Start + Factor * Delta;
-}
-
-
-void DX::Model::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-{
-	// we need at least two values to interpolate...
-	if (pNodeAnim->mNumRotationKeys == 1) {
-		Out = pNodeAnim->mRotationKeys[0].mValue;
-		return;
-	}
-
-	unsigned RotationIndex = FindRotation(AnimationTime, pNodeAnim);
-	unsigned NextRotationIndex = (RotationIndex + 1);
-	assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-	float DeltaTime = (float)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
-	float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
-	const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-	const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
-	aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-	Out = Out.Normalize();
-}
-
-void DX::Model::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const DirectX::XMMATRIX& ParentTransform)
-{
-	std::string NodeName(pNode->mName.data);
-
-	const aiAnimation* pAnimation = Scene->mAnimations[0];
-	DirectX::XMMATRIX NodeTransformation = ConvertToDirectXMatrix(pNode->mTransformation);
-
-	const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-
-	if (pNodeAnim)
-	{
-		// Interpolate scaling and generate scaling transformation matrix
-		aiVector3D Scaling;
-		CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-		DirectX::XMMATRIX ScalingM = DirectX::XMMatrixIdentity();
-		//ScalingM *= DirectX::XMMatrixScaling(Scaling.x, Scaling.y, Scaling.z);
-		ScalingM *= DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-
-		// Interpolate rotation and generate rotation transformation matrix
-		aiQuaternion RotationQ;
-		CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-		DirectX::XMMATRIX RotationM = DirectX::XMMatrixIdentity();
-		DirectX::XMVECTOR q = DirectX::XMVectorSet(-RotationQ.x, RotationQ.y, -RotationQ.z, -RotationQ.w);
-		RotationM *= DirectX::XMMatrixRotationQuaternion(q);
-
-		// Interpolate translation and generate translation transformation matrix
-		aiVector3D Translation;
-		CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-		DirectX::XMMATRIX TranslationM = DirectX::XMMatrixIdentity();
-		TranslationM *= DirectX::XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
-
-		// Combine the above transformations
-		NodeTransformation = TranslationM * RotationM * ScalingM;
-	}
-
-	DirectX::XMMATRIX GlobalTransformation = ParentTransform * NodeTransformation;
-
-	for (auto& bone : m_Mesh.bones)
-	{
-		if (bone.name == NodeName)
-		{
-			bone.transform = GlobalInverseTransform * GlobalTransformation * bone.offset;
-		}
-	}
-
-	for (unsigned i = 0; i < pNode->mNumChildren; i++)
-	{
-		ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
-	}
 }
 
 void DX::Model::Update(float dt)
@@ -432,9 +266,6 @@ void DX::Model::LoadFBX(std::string&& path)
 			}
 		}
 	}
-
-	auto globalTransform = ConvertToDirectXMatrix(Scene->mRootNode->mTransformation);
-	//GlobalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalTransform);
 }
 
 void DX::Model::Render()
