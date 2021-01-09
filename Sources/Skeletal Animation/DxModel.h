@@ -136,8 +136,5 @@ namespace DX
 		// Index buffer
 		ComPtr<ID3D11Buffer> m_d3dIndexBuffer = nullptr;
 		void CreateIndexBuffer();
-
-		// Load FBX model
-		void LoadFBX(std::string&& path);
 	};
 }

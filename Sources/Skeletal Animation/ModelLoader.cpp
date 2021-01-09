@@ -35,16 +35,17 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 	Assimp::Importer importer;
 	auto scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
 
-	// Load scene
+	// Load model
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString();
-		return false;
+		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << '\n';
+		throw std::runtime_error("Could not load model");
 	}
 
+	// Process data
 	auto mesh = scene->mMeshes[0];
 
-	// Process vertices
+	// Load vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 	{
 		// Set the positions
@@ -74,23 +75,19 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 	}
 
 	// Iterate over the faces of the mesh
-	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+	for (auto i = 0u; i < mesh->mNumFaces; ++i)
 	{
 		// Get the face
-		aiFace face = mesh->mFaces[i];
+		const auto& face = mesh->mFaces[i];
 
 		// Add the indices of the face to the vector
-		for (unsigned int k = 0; k < face.mNumIndices; ++k)
+		for (auto k = 0u; k < face.mNumIndices; ++k)
 		{
 			dx_mesh->indices.push_back(face.mIndices[k]);
 		}
 	}
 
 	// Load bones
-	auto global = ConvertToDirectXMatrix(scene->mRootNode->mTransformation);
-	DirectX::XMFLOAT4X4 _offset;
-	DirectX::XMStoreFloat4x4(&_offset, global);
-
 	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
 	{
 		auto ai_bone = mesh->mBones[bone_index];
@@ -100,7 +97,7 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 		boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
 		dx_mesh->bones.push_back(boneInfo);
 
-		dx_mesh->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
+		dx_mesh->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);;
 
 		// Vertex weight data
 		for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
@@ -150,7 +147,8 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 			}
 		}
 
-		//mAnimations["Take1"] = clip;
+		std::string animation_name = animation->mName.C_Str();
+		dx_mesh->animations["Take1"] = clip;
 	}
 
 	return true;
