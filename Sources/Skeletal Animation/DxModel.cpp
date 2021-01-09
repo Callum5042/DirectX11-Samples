@@ -27,9 +27,7 @@ namespace
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	auto world = DirectX::XMMatrixIdentity();
-	world *= DirectX::XMMatrixTranslation(0.0f, -3.0f, 0.0f);  
-	DirectX::XMStoreFloat4x4(&World, world);
+	World = DirectX::XMMatrixTranslation(0.0f, -3.0f, 0.0f);
 }
 
 void DX::Model::Create()
@@ -64,7 +62,7 @@ void DX::Model::Update(float dt)
 	TimeInSeconds += dt * 100.0f;
 
 	auto numBones = m_Mesh.bones.size();
-	std::vector<DirectX::XMFLOAT4X4> toParentTransforms(numBones);
+	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
 	auto clip = m_Animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
@@ -74,19 +72,18 @@ void DX::Model::Update(float dt)
 		TimeInSeconds = 0.0f;
 	}
 
-	std::vector<DirectX::XMFLOAT4X4> toRootTransforms(numBones);
+	std::vector<DirectX::XMMATRIX> toRootTransforms(numBones);
 	toRootTransforms[0] = toParentTransforms[0];
 
 	for (UINT i = 1; i < numBones; ++i)
 	{
-		DirectX::XMMATRIX toParent = XMLoadFloat4x4(&toParentTransforms[i]);
+		DirectX::XMMATRIX toParent = toParentTransforms[i];
 
 		int parentIndex = m_Mesh.bones[i].parentId;
-		DirectX::XMMATRIX parentToRoot = XMLoadFloat4x4(&toRootTransforms[parentIndex]);
+		DirectX::XMMATRIX parentToRoot = toRootTransforms[parentIndex];
 
 		DirectX::XMMATRIX toRoot = XMMatrixMultiply(toParent, parentToRoot);
-
-		XMStoreFloat4x4(&toRootTransforms[i], toRoot);
+		toRootTransforms[i] = toRoot;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,8 +92,8 @@ void DX::Model::Update(float dt)
 	BoneBuffer bone_buffer = {};
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
-		DirectX::XMMATRIX offset = DirectX::XMLoadFloat4x4(&m_Mesh.bones[i].offset);
-		DirectX::XMMATRIX toRoot = DirectX::XMLoadFloat4x4(&toRootTransforms[i]);
+		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
+		DirectX::XMMATRIX toRoot = toRootTransforms[i];
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
 
 		matrix = DirectX::XMMatrixTranspose(matrix);
@@ -196,11 +193,6 @@ void DX::Model::LoadFBX(std::string&& path)
 		}
 	}
 
-	// Global transform
-	auto global = ConvertToDirectXMatrix(scene->mRootNode->mTransformation);
-	DirectX::XMFLOAT4X4 _offset;
-	DirectX::XMStoreFloat4x4(&_offset, global);
-
 	// Load bones
 	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
 	{
@@ -211,10 +203,7 @@ void DX::Model::LoadFBX(std::string&& path)
 		boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
 		m_Mesh.bones.push_back(boneInfo);
 
-		auto offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
-		DirectX::XMFLOAT4X4 _offset;
-		DirectX::XMStoreFloat4x4(&_offset, offset);
-		m_Mesh.bones[bone_index].offset = _offset;
+		m_Mesh.bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);;
 
 		// Vertex weight data
 		for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
@@ -305,7 +294,7 @@ float DX::BoneAnimation::GetEndTime()const
 	return Keyframes.back().TimePos;
 }
 
-void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
+void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 {
 	if (t <= Keyframes.front().TimePos)
 	{
@@ -314,7 +303,8 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
 		DirectX::XMVECTOR Q = XMLoadFloat4(&Keyframes.front().RotationQuat);
 
 		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-		XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
+		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+		//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 	}
 	else if (t >= Keyframes.back().TimePos)
 	{
@@ -323,7 +313,8 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
 		DirectX::XMVECTOR Q = XMLoadFloat4(&Keyframes.back().RotationQuat);
 
 		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-		XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
+		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+		//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 	}
 	else
 	{
@@ -347,7 +338,8 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
 				DirectX::XMVECTOR Q = DirectX::XMQuaternionSlerp(q0, q1, lerpPercent);
 
 				DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-				XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
+				M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+				//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 
 				break;
 			}
@@ -379,7 +371,7 @@ float DX::AnimationClip::GetClipEndTime()const
 	return t;
 }
 
-void DX::AnimationClip::Interpolate(float t, std::vector<DirectX::XMFLOAT4X4>& boneTransforms)const
+void DX::AnimationClip::Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms)const
 {
 	for (UINT i = 0; i < BoneAnimations.size(); ++i)
 	{

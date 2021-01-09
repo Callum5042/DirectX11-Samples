@@ -100,10 +100,7 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 		boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
 		dx_mesh->bones.push_back(boneInfo);
 
-		auto offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
-		DirectX::XMFLOAT4X4 _offset;
-		DirectX::XMStoreFloat4x4(&_offset, offset);
-		dx_mesh->bones[bone_index].offset = _offset;
+		dx_mesh->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
 
 		// Vertex weight data
 		for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)

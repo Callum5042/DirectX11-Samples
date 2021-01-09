@@ -66,7 +66,7 @@ namespace DX
 		float GetStartTime() const;
 		float GetEndTime() const;
 
-		void Interpolate(float t, DirectX::XMFLOAT4X4& M) const;
+		void Interpolate(float t, DirectX::XMMATRIX& M) const;
 
 		std::vector<Keyframe> Keyframes;
 	};
@@ -81,7 +81,7 @@ namespace DX
 		float GetClipStartTime() const;
 		float GetClipEndTime() const;
 
-		void Interpolate(float t, std::vector<DirectX::XMFLOAT4X4>& boneTransforms)const;
+		void Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms)const;
 
 		std::vector<BoneAnimation> BoneAnimations;
 	};
@@ -91,7 +91,7 @@ namespace DX
 		int parentId = 0;
 		std::string name;
 		std::string parentName;
-		DirectX::XMFLOAT4X4 offset;
+		DirectX::XMMATRIX offset;
 	};
 
 	struct Mesh
@@ -117,7 +117,7 @@ namespace DX
 		void Render();
 
 		// World 
-		DirectX::XMFLOAT4X4 World;
+		DirectX::XMMATRIX World;
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
