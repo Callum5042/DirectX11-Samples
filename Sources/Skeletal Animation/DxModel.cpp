@@ -64,40 +64,32 @@ void DX::Model::Update(float dt)
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
+	// Animation
 	auto clip = m_Animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
-
 	if (TimeInSeconds > clip->second.GetClipEndTime())
 	{
 		TimeInSeconds = 0.0f;
 	}
 
+	// Transform to root
 	std::vector<DirectX::XMMATRIX> toRootTransforms(numBones);
 	toRootTransforms[0] = toParentTransforms[0];
-
 	for (UINT i = 1; i < numBones; ++i)
 	{
 		DirectX::XMMATRIX toParent = toParentTransforms[i];
-
-		int parentIndex = m_Mesh.bones[i].parentId;
-		DirectX::XMMATRIX parentToRoot = toRootTransforms[parentIndex];
-
-		DirectX::XMMATRIX toRoot = XMMatrixMultiply(toParent, parentToRoot);
-		toRootTransforms[i] = toRoot;
+		DirectX::XMMATRIX parentToRoot = toRootTransforms[m_Mesh.bones[i].parentId];
+		toRootTransforms[i] = XMMatrixMultiply(toParent, parentToRoot);
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Pass bone data to pipeline
-	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Transform bone
 	BoneBuffer bone_buffer = {};
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
 		DirectX::XMMATRIX toRoot = toRootTransforms[i];
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
-
-		matrix = DirectX::XMMatrixTranspose(matrix);
-		DirectX::XMStoreFloat4x4(&bone_buffer.transform[i], matrix);
+		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
 	}
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
