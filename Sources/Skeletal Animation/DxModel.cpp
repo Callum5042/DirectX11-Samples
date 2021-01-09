@@ -45,6 +45,10 @@ void DX::Model::Create()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
+	GlobalInverseTransform = ConvertToDirectXMatrix(Scene->mRootNode->mTransformation);
+	GlobalInverseTransform = DirectX::XMMatrixInverse(nullptr, GlobalInverseTransform);
+
+
 	DirectX::XMVECTOR q0 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(0.0f));
 	DirectX::XMVECTOR q1 = DirectX::XMQuaternionRotationAxis(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMConvertToRadians(90.0f));
 
@@ -68,16 +72,19 @@ void DX::Model::Create()
 	// Bone 1
 	BoneAnimations[1].Keyframes.resize(2);
 	BoneAnimations[1].Keyframes[0].TimePos = 0.0f;
-	BoneAnimations[1].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 3.0f, 0.0f);
+	BoneAnimations[1].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	BoneAnimations[1].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[0].RotationQuat, q0);
 
 	BoneAnimations[1].Keyframes.resize(2);
 	BoneAnimations[1].Keyframes[1].TimePos = 5.0f;
-	BoneAnimations[1].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 3.0f, 0.0f);
+	BoneAnimations[1].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	BoneAnimations[1].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 	DirectX::XMStoreFloat4(&BoneAnimations[1].Keyframes[1].RotationQuat, q1);
 
+
+	m_Mesh.bones[0].offset = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	m_Mesh.bones[1].offset = DirectX::XMMatrixTranslation(0.0f, 3.0f, 0.0f);
 
 
 	/*Animation.Keyframes.resize(3);
@@ -104,8 +111,13 @@ void DX::Model::Update(float dt)
 
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMFLOAT4X4> toParentTransforms(numBones);
+	for (auto& m : toParentTransforms)
+	{
+		auto matrix = DirectX::XMMatrixIdentity();
+		DirectX::XMStoreFloat4x4(&m, matrix);
+	}
 
-	for (unsigned i = 0; i < BoneAnimations.size(); ++i)
+	/*for (unsigned i = 0; i < BoneAnimations.size(); ++i)
 	{
 		BoneAnimations[i].Interpolate(TimeInSeconds, toParentTransforms[i]);
 	}
@@ -113,7 +125,7 @@ void DX::Model::Update(float dt)
 	if (TimeInSeconds > BoneAnimations.back().Keyframes.back().TimePos)
 	{
 		TimeInSeconds = 0.0f;
-	}
+	}*/
 
 	std::vector<DirectX::XMFLOAT4X4> toRootTransforms(numBones);
 	toRootTransforms[0] = toParentTransforms[0];
@@ -125,7 +137,8 @@ void DX::Model::Update(float dt)
 		int parentIndex = m_Mesh.bones[i].parentId;
 		DirectX::XMMATRIX parentToRoot = XMLoadFloat4x4(&toRootTransforms[parentIndex]);
 
-		DirectX::XMMATRIX toRoot = XMMatrixMultiply(toParent, parentToRoot);
+		//DirectX::XMMATRIX toRoot = XMMatrixMultiply(toParent, parentToRoot);
+		DirectX::XMMATRIX toRoot = toParent * parentToRoot;
 
 		XMStoreFloat4x4(&toRootTransforms[i], toRoot);
 	}
@@ -139,12 +152,14 @@ void DX::Model::Update(float dt)
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
 		DirectX::XMMATRIX toRoot = DirectX::XMLoadFloat4x4(&toRootTransforms[i]);
 
-		//offset = DirectX::XMMatrixTranspose(offset);
-		//offset = DirectX::XMMatrixInverse(nullptr, offset);
+		auto inverse_offset = DirectX::XMMatrixInverse(nullptr, offset);
+		inverse_offset = DirectX::XMMatrixTranspose(inverse_offset);
+		//toRoot = DirectX::XMMatrixTranspose(toRoot);
+
+		// GlobalInverseTransform
 
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
-		//matrix = DirectX::XMMatrixIdentity();
-		bone_buffer.transform[i] = matrix;
+		bone_buffer.transform[i] = GlobalInverseTransform * toRoot * offset;
 	}
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
