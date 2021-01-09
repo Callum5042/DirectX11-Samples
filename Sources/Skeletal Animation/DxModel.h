@@ -4,11 +4,14 @@
 #include <vector>
 #include <DirectXColors.h>
 #include "DxShader.h"
+#include <cmath>
+#include <map>
 
 #undef min
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#undef max
 
 namespace DX
 {
@@ -31,10 +34,10 @@ namespace DX
 		Colour colour = {};
 
 		// Weights
-		float weight[4] = {0, 0, 0, 0};
+		float weight[4] = { 0, 0, 0, 0 };
 
 		// Bone index
-		int bone[4] = {0, 0, 0, 0};
+		int bone[4] = { 0, 0, 0, 0 };
 	};
 
 	struct BoneInfo
@@ -81,6 +84,21 @@ namespace DX
 		void Interpolate(float t, DirectX::XMFLOAT4X4& M) const;
 
 		std::vector<Keyframe> Keyframes;
+	};
+
+	///<summary>
+	/// Examples of AnimationClips are "Walk", "Run", "Attack", "Defend".
+	/// An AnimationClip requires a BoneAnimation for every bone to form
+	/// the animation clip.    
+	///</summary>
+	struct AnimationClip
+	{
+		float GetClipStartTime()const;
+		float GetClipEndTime()const;
+
+		void Interpolate(float t, std::vector<DirectX::XMFLOAT4X4>& boneTransforms)const;
+
+		std::vector<BoneAnimation> BoneAnimations;
 	};
 
 	class Model
@@ -130,7 +148,7 @@ namespace DX
 		// Load FBX model
 		void LoadFBX(std::string&& path);
 
-
-		std::vector<BoneAnimation> BoneAnimations;
+		std::map<std::string, AnimationClip> mAnimations;
+		// std::vector<BoneAnimation> BoneAnimations;
 	};
 }

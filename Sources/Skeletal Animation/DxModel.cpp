@@ -53,34 +53,36 @@ void DX::Model::Create()
 
 
 	// BoneAnimations.resize(m_Mesh.bones.size());
-	BoneAnimations.resize(m_Mesh.bones.size()); 
+	AnimationClip clip;
+	clip.BoneAnimations.resize(m_Mesh.bones.size()); 
 
 	// Bone 0
-	BoneAnimations[0].Keyframes.resize(2);
-	BoneAnimations[0].Keyframes[0].TimePos = 0.0f;
-	BoneAnimations[0].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	BoneAnimations[0].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[0].RotationQuat, q0);
+	clip.BoneAnimations[0].Keyframes.resize(2);
+	clip.BoneAnimations[0].Keyframes[0].TimePos = 0.0f;
+	clip.BoneAnimations[0].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	clip.BoneAnimations[0].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&clip.BoneAnimations[0].Keyframes[0].RotationQuat, q0);
 	
-	BoneAnimations[0].Keyframes.resize(2);
-	BoneAnimations[0].Keyframes[1].TimePos = 5.0f;
-	BoneAnimations[0].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	BoneAnimations[0].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[1].RotationQuat, q0);
+	clip.BoneAnimations[0].Keyframes.resize(2);
+	clip.BoneAnimations[0].Keyframes[1].TimePos = 5.0f;
+	clip.BoneAnimations[0].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	clip.BoneAnimations[0].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&clip.BoneAnimations[0].Keyframes[1].RotationQuat, q0);
 
 	// Bone 1
-	BoneAnimations[1].Keyframes.resize(2);
-	BoneAnimations[1].Keyframes[0].TimePos = 0.0f;
-	BoneAnimations[1].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	BoneAnimations[1].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	DirectX::XMStoreFloat4(&BoneAnimations[0].Keyframes[0].RotationQuat, q0);
+	clip.BoneAnimations[1].Keyframes.resize(2);
+	clip.BoneAnimations[1].Keyframes[0].TimePos = 0.0f;
+	clip.BoneAnimations[1].Keyframes[0].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	clip.BoneAnimations[1].Keyframes[0].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&clip.BoneAnimations[0].Keyframes[0].RotationQuat, q0);
 
-	BoneAnimations[1].Keyframes.resize(2);
-	BoneAnimations[1].Keyframes[1].TimePos = 5.0f;
-	BoneAnimations[1].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	BoneAnimations[1].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	DirectX::XMStoreFloat4(&BoneAnimations[1].Keyframes[1].RotationQuat, q1);
+	clip.BoneAnimations[1].Keyframes.resize(2);
+	clip.BoneAnimations[1].Keyframes[1].TimePos = 5.0f;
+	clip.BoneAnimations[1].Keyframes[1].Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	clip.BoneAnimations[1].Keyframes[1].Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	DirectX::XMStoreFloat4(&clip.BoneAnimations[1].Keyframes[1].RotationQuat, q1);
 
+	mAnimations["Clip1"] = clip;
 
 	//m_Mesh.bones[0].offset = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	//m_Mesh.bones[1].offset = DirectX::XMMatrixTranslation(0.0f, 3.0f, 0.0f);
@@ -119,12 +121,10 @@ void DX::Model::Update(float dt)
 		DirectX::XMStoreFloat4x4(&m, matrix);
 	}
 
-	for (unsigned i = 0; i < BoneAnimations.size(); ++i)
-	{
-		BoneAnimations[i].Interpolate(TimeInSeconds, toParentTransforms[i]);
-	}
+	auto clip = mAnimations.find("Clip1");
+	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 
-	if (TimeInSeconds > BoneAnimations.back().Keyframes.back().TimePos)
+	if (TimeInSeconds > clip->second.GetClipEndTime())
 	{
 		TimeInSeconds = 0.0f;
 	}
@@ -419,5 +419,38 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
 				break;
 			}
 		}
+	}
+}
+
+
+float DX::AnimationClip::GetClipStartTime()const
+{
+	// Find smallest start time over all bones in this clip.
+	float t = FLT_MAX;
+	for (UINT i = 0; i < BoneAnimations.size(); ++i)
+	{
+		t = std::min(t, BoneAnimations[i].GetStartTime());
+	}
+
+	return t;
+}
+
+float DX::AnimationClip::GetClipEndTime()const
+{
+	// Find largest end time over all bones in this clip.
+	float t = 0.0f;
+	for (UINT i = 0; i < BoneAnimations.size(); ++i)
+	{
+		t = std::max(t, BoneAnimations[i].GetEndTime());
+	}
+
+	return t;
+}
+
+void DX::AnimationClip::Interpolate(float t, std::vector<DirectX::XMFLOAT4X4>& boneTransforms)const
+{
+	for (UINT i = 0; i < BoneAnimations.size(); ++i)
+	{
+		BoneAnimations[i].Interpolate(t, boneTransforms[i]);
 	}
 }
