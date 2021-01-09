@@ -164,6 +164,9 @@ void DX::Model::Update(float dt)
 
 		// GlobalInverseTransform
 		//matrix = DirectX::XMMatrixIdentity();
+
+		matrix = DirectX::XMMatrixTranspose(matrix);
+
 		DirectX::XMStoreFloat4x4(&bone_buffer.transform[i], matrix);
 		//bone_buffer.transform[i] = GlobalInverseTransform * toRoot * offset;
 	}
