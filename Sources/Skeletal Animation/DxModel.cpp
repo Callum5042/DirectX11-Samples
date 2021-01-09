@@ -42,7 +42,7 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 
 void DX::Model::Create()
 {
-	LoadFBX("D:\\bone.glb");
+	//LoadFBX("D:\\bone.glb");
 	//LoadFBX("..\\..\\Resources\\Models\\post_3bone.glb");
 	//LoadFBX("..\\..\\Resources\\Models\\side_3bone.glb");
 	//LoadFBX("..\\..\\Resources\\Models\\test.fbx");

@@ -9,7 +9,7 @@ VertexOutput main(VertexInput input)
 	weights[0] = input.weight.x;
 	weights[1] = input.weight.y;
 	weights[2] = input.weight.z;
-	weights[3] = input.weight.w; //1.0f - weights[0] - weights[1] - weights[2];
+	weights[3] = 1.0f - weights[0] - weights[1] - weights[2];
 
 	float3 position = float3(0, 0, 0);
 	for (int i = 0; i < 4; i++)
