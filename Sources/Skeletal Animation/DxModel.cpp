@@ -65,7 +65,7 @@ void DX::Model::Update(float dt)
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
 	// Animation
-	auto clip = m_Animations.find("Take1");
+	auto clip = m_Mesh.animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 	if (TimeInSeconds > clip->second.GetClipEndTime())
 	{
@@ -245,7 +245,8 @@ void DX::Model::LoadFBX(std::string&& path)
 			}
 		}
 
-		m_Animations["Take1"] = clip;
+		std::string animation_name = animation->mName.C_Str();
+		m_Mesh.animations["Take1"] = clip;
 	}
 }
 

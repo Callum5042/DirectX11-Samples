@@ -99,6 +99,7 @@ namespace DX
 		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
 		std::vector<BoneInfo> bones;
+		std::map<std::string, AnimationClip> animations;
 	};
 
 	class Model
@@ -138,6 +139,5 @@ namespace DX
 
 		// Load FBX model
 		void LoadFBX(std::string&& path);
-		std::map<std::string, AnimationClip> m_Animations;
 	};
 }
