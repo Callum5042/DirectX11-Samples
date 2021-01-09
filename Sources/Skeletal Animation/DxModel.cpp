@@ -150,7 +150,16 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Render geometry
-	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+	for (auto i = 0u; i < m_Mesh.subsets.size(); ++i)
+	{
+		auto start_count = 0u;
+		if (i > 0)
+		{
+			start_count = m_Mesh.subsets[i - 1];
+		}
+
+		d3dDeviceContext->DrawIndexed(m_Mesh.subsets[i], 0, 0);
+	}
 }
 
 float DX::BoneAnimation::GetStartTime()const

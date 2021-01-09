@@ -30,7 +30,7 @@ namespace
 	}
 }
 
-bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
+bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 {
 	Assimp::Importer importer;
 	auto scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
@@ -43,76 +43,83 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 	}
 
 	// Process data
-	auto mesh = scene->mMeshes[0];
-
-	// Load vertices
-	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
+	for (auto mesh_index = 0u; mesh_index < scene->mNumMeshes; ++mesh_index)
 	{
-		// Set the positions
-		float x = static_cast<float>(mesh->mVertices[i].x);
-		float y = static_cast<float>(mesh->mVertices[i].y);
-		float z = static_cast<float>(mesh->mVertices[i].z);
+		auto mesh = scene->mMeshes[mesh_index];
 
-		// Create a vertex to store the mesh's vertices temporarily
-		DX::Vertex vertex;
-		vertex.x = x;
-		vertex.y = y;
-		vertex.z = z;
-
-		// Detect and write colours
-		if (mesh->HasVertexColors(0))
+		// Load vertices
+		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 		{
-			auto assimp_colour = mesh->mColors[0][i];
+			// Set the positions
+			float x = static_cast<float>(mesh->mVertices[i].x);
+			float y = static_cast<float>(mesh->mVertices[i].y);
+			float z = static_cast<float>(mesh->mVertices[i].z);
 
-			vertex.colour.r = assimp_colour.r;
-			vertex.colour.g = assimp_colour.g;
-			vertex.colour.b = assimp_colour.b;
-			vertex.colour.a = assimp_colour.a;
-		}
+			// Create a vertex to store the mesh's vertices temporarily
+			DX::Vertex vertex;
+			vertex.x = x;
+			vertex.y = y;
+			vertex.z = z;
 
-		// Add the vertex to the vertices vector
-		dx_mesh->vertices.push_back(vertex);
-	}
-
-	// Iterate over the faces of the mesh
-	for (auto i = 0u; i < mesh->mNumFaces; ++i)
-	{
-		// Get the face
-		const auto& face = mesh->mFaces[i];
-
-		// Add the indices of the face to the vector
-		for (auto k = 0u; k < face.mNumIndices; ++k)
-		{
-			dx_mesh->indices.push_back(face.mIndices[k]);
-		}
-	}
-
-	// Load bones
-	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
-	{
-		auto ai_bone = mesh->mBones[bone_index];
-
-		DX::BoneInfo boneInfo = {};
-		boneInfo.name = ai_bone->mName.C_Str();
-		boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
-		dx_mesh->bones.push_back(boneInfo);
-
-		dx_mesh->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);;
-
-		// Vertex weight data
-		for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
-		{
-			auto vertexID = ai_bone->mWeights[bone_weight_index].mVertexId;
-			auto weight = ai_bone->mWeights[bone_weight_index].mWeight;
-			auto& vertex = dx_mesh->vertices[vertexID];
-
-			for (int vertex_weight_index = 0; vertex_weight_index < 4; ++vertex_weight_index)
+			// Detect and write colours
+			if (mesh->HasVertexColors(0))
 			{
-				if (vertex.weight[vertex_weight_index] == 0.0)
+				auto assimp_colour = mesh->mColors[0][i];
+
+				vertex.colour.r = assimp_colour.r;
+				vertex.colour.g = assimp_colour.g;
+				vertex.colour.b = assimp_colour.b;
+				vertex.colour.a = assimp_colour.a;
+			}
+
+			// Add the vertex to the vertices vector
+			meshData->vertices.push_back(vertex);
+		}
+
+		// Iterate over the faces of the mesh
+		auto index_count = 0u;
+		for (auto i = 0u; i < mesh->mNumFaces; ++i)
+		{
+			// Get the face
+			const auto& face = mesh->mFaces[i];
+
+			// Add the indices of the face to the vector
+			for (auto k = 0u; k < face.mNumIndices; ++k)
+			{
+				index_count++;
+				meshData->indices.push_back(face.mIndices[k]);
+			}
+		}
+
+		meshData->subsets.push_back(index_count);
+
+		// Load bones
+		for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
+		{
+			auto ai_bone = mesh->mBones[bone_index];
+
+			DX::BoneInfo boneInfo = {};
+			boneInfo.name = ai_bone->mName.C_Str();
+			boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
+			meshData->bones.push_back(boneInfo);
+
+			meshData->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);;
+
+			// Vertex weight data
+			for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
+			{
+				auto vertexID = ai_bone->mWeights[bone_weight_index].mVertexId;
+				auto weight = ai_bone->mWeights[bone_weight_index].mWeight;
+				auto& vertex = meshData->vertices[vertexID];
+
+				for (int vertex_weight_index = 0; vertex_weight_index < 4; ++vertex_weight_index)
 				{
-					vertex.weight[vertex_weight_index] = weight;
-					vertex.bone[vertex_weight_index] = bone_index;
-					break;
+					if (vertex.weight[vertex_weight_index] == 0.0)
+					{
+						vertex.weight[vertex_weight_index] = weight;
+						vertex.bone[vertex_weight_index] = bone_index;
+						break;
+					}
 				}
 			}
 		}
@@ -148,7 +155,7 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* dx_mesh)
 		}
 
 		std::string animation_name = animation->mName.C_Str();
-		dx_mesh->animations["Take1"] = clip;
+		meshData->animations["Take1"] = clip;
 	}
 
 	return true;

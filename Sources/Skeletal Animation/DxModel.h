@@ -100,6 +100,7 @@ namespace DX
 		std::vector<UINT> indices;
 		std::vector<BoneInfo> bones;
 		std::map<std::string, AnimationClip> animations;
+		std::vector<unsigned> subsets;
 	};
 
 	class Model
