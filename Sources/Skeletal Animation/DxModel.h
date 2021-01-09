@@ -4,14 +4,33 @@
 #include <vector>
 #include <DirectXColors.h>
 #include "DxShader.h"
+#include <cmath>
+#include <map>
 
 #undef min
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#undef max
 
 namespace DX
 {
+	struct Subset
+	{
+		Subset() :
+			Id(-1),
+			VertexStart(0), VertexCount(0),
+			FaceStart(0), FaceCount(0)
+		{
+		}
+
+		UINT Id;
+		UINT VertexStart;
+		UINT VertexCount;
+		UINT FaceStart;
+		UINT FaceCount;
+	};
+
 	struct Colour
 	{
 		float r = 0;
@@ -31,10 +50,10 @@ namespace DX
 		Colour colour = {};
 
 		// Weights
-		float weight[4] = {0, 0, 0, 0};
+		float weight[4] = { 0, 0, 0, 0 };
 
 		// Bone index
-		int bone[4] = {0, 0, 0, 0};
+		int bone[4] = { 0, 0, 0, 0 };
 	};
 
 	struct BoneInfo
@@ -50,6 +69,9 @@ namespace DX
 		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
 		std::vector<BoneInfo> bones;
+
+		std::vector<DirectX::XMFLOAT4X4> boneOffsets;
+		std::vector<int> boneIndexToParentIndex;
 	};
 
 	///<summary>
@@ -83,6 +105,21 @@ namespace DX
 		std::vector<Keyframe> Keyframes;
 	};
 
+	///<summary>
+	/// Examples of AnimationClips are "Walk", "Run", "Attack", "Defend".
+	/// An AnimationClip requires a BoneAnimation for every bone to form
+	/// the animation clip.    
+	///</summary>
+	struct AnimationClip
+	{
+		float GetClipStartTime()const;
+		float GetClipEndTime()const;
+
+		void Interpolate(float t, std::vector<DirectX::XMFLOAT4X4>& boneTransforms)const;
+
+		std::vector<BoneAnimation> BoneAnimations;
+	};
+
 	class Model
 	{
 	public:
@@ -101,9 +138,6 @@ namespace DX
 		// World 
 		DirectX::XMFLOAT4X4 World;
 
-		// Animation
-		//BoneAnimation Animation = {};
-
 		// Scene
 		Assimp::Importer importer;
 		const aiScene* Scene = nullptr;
@@ -117,6 +151,7 @@ namespace DX
 		// Number of indices to draw
 		UINT m_IndexCount = 0;
 		Mesh m_Mesh;
+		std::vector<DX::Subset> m_Subsets;
 
 		// Vertex buffer
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;
@@ -130,7 +165,17 @@ namespace DX
 		// Load FBX model
 		void LoadFBX(std::string&& path);
 
+		// Load m3d model
+		void LoadM3d(const std::string& path);
+		void ReadMaterials(std::ifstream& fin, UINT numMaterials);
+		void ReadSubsetTable(std::ifstream& fin, UINT numSubsets);
+		void ReadSkinnedVertices(std::ifstream& fin, UINT numVertices);
+		void ReadTriangles(std::ifstream& fin, UINT numTriangles);
+		void ReadBoneOffsets(std::ifstream& fin, UINT numBones);
+		void ReadBoneHierarchy(std::ifstream& fin, UINT numBones);
+		void ReadAnimationClips(std::ifstream& fin, UINT numBones, UINT numAnimationClips);
+		void ReadBoneKeyframes(std::ifstream& fin, UINT numBones, BoneAnimation& boneAnimation);
 
-		std::vector<BoneAnimation> BoneAnimations;
+		std::map<std::string, AnimationClip> mAnimations;
 	};
 }

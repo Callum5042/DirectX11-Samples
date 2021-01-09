@@ -15,7 +15,7 @@ namespace DX
 
 	struct BoneBuffer
 	{
-		DirectX::XMFLOAT4X4 transform[3];
+		DirectX::XMFLOAT4X4 transform[96];
 	};
 
 	class Shader
