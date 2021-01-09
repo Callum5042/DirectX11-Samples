@@ -120,7 +120,7 @@ void DX::Model::Update(float dt)
 	static float TimeInSeconds = 0.0f;
 	TimeInSeconds += dt;
 
-	auto numBones = 58;// m_Mesh.bones.size();
+	auto numBones = m_Mesh.boneOffsets.size();
 	std::vector<DirectX::XMFLOAT4X4> toParentTransforms(numBones);
 	for (auto& m : toParentTransforms)
 	{
@@ -128,42 +128,42 @@ void DX::Model::Update(float dt)
 		DirectX::XMStoreFloat4x4(&m, matrix);
 	}
 
-	/*auto clip = mAnimations.find("Clip1");
+	auto clip = mAnimations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 
 	if (TimeInSeconds > clip->second.GetClipEndTime())
 	{
 		TimeInSeconds = 0.0f;
-	}*/
+	}
 
-	/*std::vector<DirectX::XMFLOAT4X4> toRootTransforms(numBones);
-	toRootTransforms[0] = toParentTransforms[0];*/
+	std::vector<DirectX::XMFLOAT4X4> toRootTransforms(numBones);
+	toRootTransforms[0] = toParentTransforms[0];
 
-	/*for (UINT i = 1; i < numBones; ++i)
+	for (UINT i = 1; i < numBones; ++i)
 	{
 		DirectX::XMMATRIX toParent = XMLoadFloat4x4(&toParentTransforms[i]);
 
-		int parentIndex = m_Mesh.bones[i].parentId;
+		int parentIndex = m_Mesh.boneIndexToParentIndex[i];
 		DirectX::XMMATRIX parentToRoot = XMLoadFloat4x4(&toRootTransforms[parentIndex]);
 
 		DirectX::XMMATRIX toRoot = XMMatrixMultiply(toParent, parentToRoot);
 
 		XMStoreFloat4x4(&toRootTransforms[i], toRoot);
-	}*/
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Pass bone data to pipeline
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	BoneBuffer bone_buffer = {};
-	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
+	for (size_t i = 0; i < m_Mesh.boneOffsets.size(); i++)
 	{
-		/*DirectX::XMMATRIX offset = DirectX::XMLoadFloat4x4(&m_Mesh.bones[i].offset);
+		DirectX::XMMATRIX offset = DirectX::XMLoadFloat4x4(&m_Mesh.boneOffsets[i]);
 		DirectX::XMMATRIX toRoot = DirectX::XMLoadFloat4x4(&toRootTransforms[i]);
 
-		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);*/
+		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
 
 		// GlobalInverseTransform
-		auto matrix = DirectX::XMMatrixIdentity();
+		//matrix = DirectX::XMMatrixIdentity();
 		DirectX::XMStoreFloat4x4(&bone_buffer.transform[i], matrix);
 		//bone_buffer.transform[i] = GlobalInverseTransform * toRoot * offset;
 	}
@@ -350,7 +350,7 @@ void DX::Model::LoadM3d(const std::string& path)
 		ReadTriangles(fin, numTriangles);
 		ReadBoneOffsets(fin, numBones);
 		ReadBoneHierarchy(fin, numBones);
-		//ReadAnimationClips(fin, numBones, numAnimationClips);
+		ReadAnimationClips(fin, numBones, numAnimationClips);
 
 		return;
 	}

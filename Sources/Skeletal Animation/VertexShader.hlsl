@@ -5,7 +5,7 @@ VertexOutput main(VertexInput input)
 {
 	VertexOutput output;
 
-	/*float weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	weights[0] = input.weight.x;
 	weights[1] = input.weight.y;
 	weights[2] = input.weight.z;
@@ -19,10 +19,10 @@ VertexOutput main(VertexInput input)
 		matrix transform = cBoneTransform[bone_index];
 
 		position += weight * mul(float4(input.position, 1.0f), transform).xyz;
-	}*/
+	}
 
 	// Transform to homogeneous clip space.
-	output.position = mul(float4(input.position, 1.0f), cWorld);
+	output.position = mul(float4(position, 1.0f), cWorld);
 	output.position = mul(output.position, cView);
 	output.position = mul(output.position, cProjection);
 
