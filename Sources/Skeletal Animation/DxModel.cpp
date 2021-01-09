@@ -348,9 +348,9 @@ void DX::Model::LoadM3d(const std::string& path)
 		ReadSubsetTable(fin, numMaterials);
 		ReadSkinnedVertices(fin, numVertices);
 		ReadTriangles(fin, numTriangles);
-		//ReadBoneOffsets(fin, numBones, boneOffsets);
-		//ReadBoneHierarchy(fin, numBones, boneIndexToParentIndex);
-		//ReadAnimationClips(fin, numBones, numAnimationClips, animations);
+		ReadBoneOffsets(fin, numBones);
+		ReadBoneHierarchy(fin, numBones);
+		//ReadAnimationClips(fin, numBones, numAnimationClips);
 
 		return;
 	}
@@ -414,6 +414,85 @@ void DX::Model::ReadSkinnedVertices(std::ifstream& fin, UINT numVertices)
 		m_Mesh.vertices[i].bone[2] = (BYTE)boneIndices[2];
 		m_Mesh.vertices[i].bone[3] = (BYTE)boneIndices[3];
 	}
+}
+
+void DX::Model::ReadBoneOffsets(std::ifstream& fin, UINT numBones)
+{
+	std::string ignore;
+	m_Mesh.boneOffsets.resize(numBones);
+
+	fin >> ignore; // BoneOffsets header text
+	for (UINT i = 0; i < numBones; ++i)
+	{
+		fin >> ignore >>
+			m_Mesh.boneOffsets[i](0, 0) >>m_Mesh.boneOffsets[i](0, 1) >> m_Mesh.boneOffsets[i](0, 2) >> m_Mesh.boneOffsets[i](0, 3) >>
+			m_Mesh.boneOffsets[i](1, 0) >>m_Mesh.boneOffsets[i](1, 1) >> m_Mesh.boneOffsets[i](1, 2) >> m_Mesh.boneOffsets[i](1, 3) >>
+			m_Mesh.boneOffsets[i](2, 0) >>m_Mesh.boneOffsets[i](2, 1) >> m_Mesh.boneOffsets[i](2, 2) >> m_Mesh.boneOffsets[i](2, 3) >>
+			m_Mesh.boneOffsets[i](3, 0) >>m_Mesh.boneOffsets[i](3, 1) >> m_Mesh.boneOffsets[i](3, 2) >> m_Mesh.boneOffsets[i](3, 3);
+	}
+}
+
+void DX::Model::ReadAnimationClips(std::ifstream& fin, UINT numBones, UINT numAnimationClips)
+{
+	std::string ignore;
+	fin >> ignore; // AnimationClips header text
+	for (UINT clipIndex = 0; clipIndex < numAnimationClips; ++clipIndex)
+	{
+		std::string clipName;
+		fin >> ignore >> clipName;
+		fin >> ignore; // {
+
+		AnimationClip clip;
+		clip.BoneAnimations.resize(numBones);
+
+		for (UINT boneIndex = 0; boneIndex < numBones; ++boneIndex)
+		{
+			ReadBoneKeyframes(fin, numBones, clip.BoneAnimations[boneIndex]);
+		}
+		fin >> ignore; // }
+
+		mAnimations[clipName] = clip;
+	}
+}
+
+void DX::Model::ReadBoneHierarchy(std::ifstream& fin, UINT numBones)
+{
+	std::string ignore;
+	m_Mesh.boneIndexToParentIndex.resize(numBones);
+
+	fin >> ignore; // BoneHierarchy header text
+	for (UINT i = 0; i < numBones; ++i)
+	{
+		fin >> ignore >> m_Mesh.boneIndexToParentIndex[i];
+	}
+}
+
+void DX::Model::ReadBoneKeyframes(std::ifstream& fin, UINT numBones, BoneAnimation& boneAnimation)
+{
+	std::string ignore;
+	UINT numKeyframes = 0;
+	fin >> ignore >> ignore >> numKeyframes;
+	fin >> ignore; // {
+
+	boneAnimation.Keyframes.resize(numKeyframes);
+	for (UINT i = 0; i < numKeyframes; ++i)
+	{
+		float t = 0.0f;
+		DirectX::XMFLOAT3 p(0.0f, 0.0f, 0.0f);
+		DirectX::XMFLOAT3 s(1.0f, 1.0f, 1.0f);
+		DirectX::XMFLOAT4 q(0.0f, 0.0f, 0.0f, 1.0f);
+		fin >> ignore >> t;
+		fin >> ignore >> p.x >> p.y >> p.z;
+		fin >> ignore >> s.x >> s.y >> s.z;
+		fin >> ignore >> q.x >> q.y >> q.z >> q.w;
+
+		boneAnimation.Keyframes[i].TimePos = t;
+		boneAnimation.Keyframes[i].Translation = p;
+		boneAnimation.Keyframes[i].Scale = s;
+		boneAnimation.Keyframes[i].RotationQuat = q;
+	}
+
+	fin >> ignore; // }
 }
 
 void DX::Model::ReadMaterials(std::ifstream& fin, UINT numMaterials)
