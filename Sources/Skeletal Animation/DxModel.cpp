@@ -3,28 +3,21 @@
 #include <vector>
 #include <exception>
 #include <stdexcept>
-#include <sstream>
 #include <iostream>
 #include <exception>
 #include <fstream>
+
+#include "ModelLoader.h"
 
 namespace
 {
 	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
 	{
-		aiVector3D scale;
-		aiVector3D rot;
-		aiVector3D pos;
+		aiVector3D scale, rot, pos;
 		matrix.Decompose(scale, rot, pos);
 
 		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
-		// _matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
-
-		_matrix *= DirectX::XMMatrixRotationX(rot.x);
-		_matrix *= DirectX::XMMatrixRotationY(rot.y);
-		_matrix *= DirectX::XMMatrixRotationZ(rot.z);
-
-
+		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
 		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
 
@@ -35,27 +28,22 @@ namespace
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
 	auto world = DirectX::XMMatrixIdentity();
-	//world *= DirectX::XMMatrixScaling(0.01f, 0.01f, 0.01f);
-	world *= DirectX::XMMatrixTranslation(0.0f, -3.0f, 0.0f);
+	world *= DirectX::XMMatrixTranslation(0.0f, -3.0f, 0.0f);  
 	DirectX::XMStoreFloat4x4(&World, world);
 }
 
 void DX::Model::Create()
 {
-	//LoadFBX("D:\\bone.glb");
-	//LoadFBX("..\\..\\Resources\\Models\\post_3bone.glb");
-	//LoadFBX("..\\..\\Resources\\Models\\side_3bone.glb");
+	// Load data
 	LoadFBX("..\\..\\Resources\\Models\\complex_post.glb");
-	//LoadM3d("..\\..\\Resources\\Models\\soldier.m3d");
 
+	// Create buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
 	// Calculate parent
 	for (int i = 0; i < m_Mesh.bones.size(); ++i)
 	{
-		std::cout << "Bone: " << m_Mesh.bones[i].name << " - Parent Bone: " << m_Mesh.bones[i].parentName << '\n';
-
 		int parentId = 0;
 		for (int j = 0; j < m_Mesh.bones.size(); ++j)
 		{
@@ -66,7 +54,7 @@ void DX::Model::Create()
 			}
 		}
 
-		m_Mesh.boneIndexToParentIndex.push_back(parentId);
+		m_Mesh.bones[i].parentId = parentId;
 	}
 }
 
@@ -75,15 +63,10 @@ void DX::Model::Update(float dt)
 	static float TimeInSeconds = 0.0f;
 	TimeInSeconds += dt * 100.0f;
 
-	auto numBones = m_Mesh.boneOffsets.size();
+	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMFLOAT4X4> toParentTransforms(numBones);
-	for (auto& m : toParentTransforms)
-	{
-		auto matrix = DirectX::XMMatrixIdentity();
-		DirectX::XMStoreFloat4x4(&m, matrix);
-	}
 
-	auto clip = mAnimations.find("Take1");
+	auto clip = m_Animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 
 	if (TimeInSeconds > clip->second.GetClipEndTime())
@@ -98,7 +81,7 @@ void DX::Model::Update(float dt)
 	{
 		DirectX::XMMATRIX toParent = XMLoadFloat4x4(&toParentTransforms[i]);
 
-		int parentIndex = m_Mesh.boneIndexToParentIndex[i];
+		int parentIndex = m_Mesh.bones[i].parentId;
 		DirectX::XMMATRIX parentToRoot = XMLoadFloat4x4(&toRootTransforms[parentIndex]);
 
 		DirectX::XMMATRIX toRoot = XMMatrixMultiply(toParent, parentToRoot);
@@ -110,15 +93,12 @@ void DX::Model::Update(float dt)
 	// Pass bone data to pipeline
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	BoneBuffer bone_buffer = {};
-	for (size_t i = 0; i < m_Mesh.boneOffsets.size(); i++)
+	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
-		DirectX::XMMATRIX offset = DirectX::XMLoadFloat4x4(&m_Mesh.boneOffsets[i]);
+		DirectX::XMMATRIX offset = DirectX::XMLoadFloat4x4(&m_Mesh.bones[i].offset);
 		DirectX::XMMATRIX toRoot = DirectX::XMLoadFloat4x4(&toRootTransforms[i]);
-
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
 
-		// GlobalInverseTransform
-		//auto matrix = DirectX::XMMatrixIdentity();
 		matrix = DirectX::XMMatrixTranspose(matrix);
 		DirectX::XMStoreFloat4x4(&bone_buffer.transform[i], matrix);
 	}
@@ -161,18 +141,18 @@ void DX::Model::CreateIndexBuffer()
 
 void DX::Model::LoadFBX(std::string&& path)
 {
-	Scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
+	Assimp::Importer importer;
+	auto scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
 
 	// Load model
-	if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		std::ostringstream ss;
-		ss << "ERROR::ASSIMP::" << importer.GetErrorString();
+		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << '\n';
 		throw std::runtime_error("Could not load model");
 	}
 
 	// Process data
-	auto mesh = Scene->mMeshes[0];
+	auto mesh = scene->mMeshes[0];
 
 	// Load vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
@@ -204,40 +184,37 @@ void DX::Model::LoadFBX(std::string&& path)
 	}
 
 	// Iterate over the faces of the mesh
-	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+	for (auto i = 0u; i < mesh->mNumFaces; ++i)
 	{
 		// Get the face
-		aiFace face = mesh->mFaces[i];
+		const auto& face = mesh->mFaces[i];
 
 		// Add the indices of the face to the vector
-		for (unsigned int k = 0; k < face.mNumIndices; ++k)
+		for (auto k = 0u; k < face.mNumIndices; ++k)
 		{
 			m_Mesh.indices.push_back(face.mIndices[k]);
 		}
 	}
 
-	// Load bones
-	auto global = ConvertToDirectXMatrix(Scene->mRootNode->mTransformation);
+	// Global transform
+	auto global = ConvertToDirectXMatrix(scene->mRootNode->mTransformation);
 	DirectX::XMFLOAT4X4 _offset;
 	DirectX::XMStoreFloat4x4(&_offset, global);
-	//m_Mesh.boneOffsets.push_back(_offset);
 
+	// Load bones
 	for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
 	{
 		auto ai_bone = mesh->mBones[bone_index];
 
 		BoneInfo boneInfo = {};
 		boneInfo.name = ai_bone->mName.C_Str();
-		//boneInfo.offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
-
 		boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
-
 		m_Mesh.bones.push_back(boneInfo);
 
 		auto offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
 		DirectX::XMFLOAT4X4 _offset;
 		DirectX::XMStoreFloat4x4(&_offset, offset);
-		m_Mesh.boneOffsets.push_back(_offset);
+		m_Mesh.bones[bone_index].offset = _offset;
 
 		// Vertex weight data
 		for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
@@ -259,11 +236,9 @@ void DX::Model::LoadFBX(std::string&& path)
 	}
 
 	// Load animations
-	//BoneAnimations.resize(m_Mesh.bones.size());
-	for (auto animation_index = 0u; animation_index < Scene->mNumAnimations; ++animation_index)
+	for (auto animation_index = 0u; animation_index < scene->mNumAnimations; ++animation_index)
 	{
-		auto animation = Scene->mAnimations[animation_index];
-		//BoneAnimations.name = animation->mName.C_Str();
+		auto animation = scene->mAnimations[animation_index];
 		auto ticksPerSecond = static_cast<float>(animation->mTicksPerSecond);
 
 		AnimationClip clip;
@@ -289,207 +264,7 @@ void DX::Model::LoadFBX(std::string&& path)
 			}
 		}
 
-		mAnimations["Take1"] = clip;
-	}
-}
-
-void DX::Model::LoadM3d(const std::string& path)
-{
-	std::ifstream fin(path);
-
-	UINT numMaterials = 0;
-	UINT numVertices = 0;
-	UINT numTriangles = 0;
-	UINT numBones = 0;
-	UINT numAnimationClips = 0;
-
-	std::string ignore;
-
-	if (fin)
-	{
-		fin >> ignore; // file header text
-		fin >> ignore >> numMaterials;
-		fin >> ignore >> numVertices;
-		fin >> ignore >> numTriangles;
-		fin >> ignore >> numBones;
-		fin >> ignore >> numAnimationClips;
-
-		ReadMaterials(fin, numMaterials);
-		ReadSubsetTable(fin, numMaterials);
-		ReadSkinnedVertices(fin, numVertices);
-		ReadTriangles(fin, numTriangles);
-		ReadBoneOffsets(fin, numBones);
-		ReadBoneHierarchy(fin, numBones);
-		ReadAnimationClips(fin, numBones, numAnimationClips);
-
-		return;
-	}
-
-	m_Mesh.vertices;
-
-	throw std::runtime_error("Could not open file");
-}
-
-void DX::Model::ReadSubsetTable(std::ifstream& fin, UINT numSubsets)
-{
-	std::string ignore;
-	m_Subsets.resize(numSubsets);
-
-	fin >> ignore; // subset header text
-	for (UINT i = 0; i < numSubsets; ++i)
-	{
-		fin >> ignore >> m_Subsets[i].Id;
-		fin >> ignore >> m_Subsets[i].VertexStart;
-		fin >> ignore >> m_Subsets[i].VertexCount;
-		fin >> ignore >> m_Subsets[i].FaceStart;
-		fin >> ignore >> m_Subsets[i].FaceCount;
-	}
-}
-
-void DX::Model::ReadTriangles(std::ifstream& fin, UINT numTriangles)
-{
-	std::string ignore;
-	m_Mesh.indices.resize(numTriangles * 3);
-
-	fin >> ignore; // triangles header text
-	for (UINT i = 0; i < numTriangles; ++i)
-	{
-		fin >> m_Mesh.indices[i * 3 + 0] >> m_Mesh.indices[i * 3 + 1] >> m_Mesh.indices[i * 3 + 2];
-	}
-}
-
-void DX::Model::ReadSkinnedVertices(std::ifstream& fin, UINT numVertices)
-{
-	std::string ignore;
-	m_Mesh.vertices.resize(numVertices);
-
-	fin >> ignore; // vertices header text
-	int boneIndices[4];
-	float weights[4];
-	for (UINT i = 0; i < numVertices; ++i)
-	{
-		fin >> ignore >> m_Mesh.vertices[i].x >> m_Mesh.vertices[i].y >> m_Mesh.vertices[i].z;
-		fin >> ignore >> ignore >> ignore >> ignore >> ignore;
-		fin >> ignore >> ignore >> ignore >> ignore;
-		fin >> ignore >> ignore >> ignore;
-		fin >> ignore >> weights[0] >> weights[1] >> weights[2] >> weights[3];
-		fin >> ignore >> boneIndices[0] >> boneIndices[1] >> boneIndices[2] >> boneIndices[3];
-
-		m_Mesh.vertices[i].weight[0] = weights[0];
-		m_Mesh.vertices[i].weight[1] = weights[1];
-		m_Mesh.vertices[i].weight[2] = weights[2];
-
-		m_Mesh.vertices[i].bone[0] = (BYTE)boneIndices[0];
-		m_Mesh.vertices[i].bone[1] = (BYTE)boneIndices[1];
-		m_Mesh.vertices[i].bone[2] = (BYTE)boneIndices[2];
-		m_Mesh.vertices[i].bone[3] = (BYTE)boneIndices[3];
-	}
-}
-
-void DX::Model::ReadBoneOffsets(std::ifstream& fin, UINT numBones)
-{
-	std::string ignore;
-	m_Mesh.boneOffsets.resize(numBones);
-
-	fin >> ignore; // BoneOffsets header text
-	for (UINT i = 0; i < numBones; ++i)
-	{
-		fin >> ignore >>
-			m_Mesh.boneOffsets[i](0, 0) >>m_Mesh.boneOffsets[i](0, 1) >> m_Mesh.boneOffsets[i](0, 2) >> m_Mesh.boneOffsets[i](0, 3) >>
-			m_Mesh.boneOffsets[i](1, 0) >>m_Mesh.boneOffsets[i](1, 1) >> m_Mesh.boneOffsets[i](1, 2) >> m_Mesh.boneOffsets[i](1, 3) >>
-			m_Mesh.boneOffsets[i](2, 0) >>m_Mesh.boneOffsets[i](2, 1) >> m_Mesh.boneOffsets[i](2, 2) >> m_Mesh.boneOffsets[i](2, 3) >>
-			m_Mesh.boneOffsets[i](3, 0) >>m_Mesh.boneOffsets[i](3, 1) >> m_Mesh.boneOffsets[i](3, 2) >> m_Mesh.boneOffsets[i](3, 3);
-	}
-}
-
-void DX::Model::ReadAnimationClips(std::ifstream& fin, UINT numBones, UINT numAnimationClips)
-{
-	std::string ignore;
-	fin >> ignore; // AnimationClips header text
-	for (UINT clipIndex = 0; clipIndex < numAnimationClips; ++clipIndex)
-	{
-		std::string clipName;
-		fin >> ignore >> clipName;
-		fin >> ignore; // {
-
-		AnimationClip clip;
-		clip.BoneAnimations.resize(numBones);
-
-		for (UINT boneIndex = 0; boneIndex < numBones; ++boneIndex)
-		{
-			ReadBoneKeyframes(fin, numBones, clip.BoneAnimations[boneIndex]);
-		}
-		fin >> ignore; // }
-
-		mAnimations[clipName] = clip;
-	}
-}
-
-void DX::Model::ReadBoneHierarchy(std::ifstream& fin, UINT numBones)
-{
-	std::string ignore;
-	m_Mesh.boneIndexToParentIndex.resize(numBones);
-
-	fin >> ignore; // BoneHierarchy header text
-	for (UINT i = 0; i < numBones; ++i)
-	{
-		fin >> ignore >> m_Mesh.boneIndexToParentIndex[i];
-	}
-}
-
-void DX::Model::ReadBoneKeyframes(std::ifstream& fin, UINT numBones, BoneAnimation& boneAnimation)
-{
-	std::string ignore;
-	UINT numKeyframes = 0;
-	fin >> ignore >> ignore >> numKeyframes;
-	fin >> ignore; // {
-
-	boneAnimation.Keyframes.resize(numKeyframes);
-	for (UINT i = 0; i < numKeyframes; ++i)
-	{
-		float t = 0.0f;
-		DirectX::XMFLOAT3 p(0.0f, 0.0f, 0.0f);
-		DirectX::XMFLOAT3 s(1.0f, 1.0f, 1.0f);
-		DirectX::XMFLOAT4 q(0.0f, 0.0f, 0.0f, 1.0f);
-		fin >> ignore >> t;
-		fin >> ignore >> p.x >> p.y >> p.z;
-		fin >> ignore >> s.x >> s.y >> s.z;
-		fin >> ignore >> q.x >> q.y >> q.z >> q.w;
-
-		boneAnimation.Keyframes[i].TimePos = t;
-		boneAnimation.Keyframes[i].Translation = p;
-		boneAnimation.Keyframes[i].Scale = s;
-		boneAnimation.Keyframes[i].RotationQuat = q;
-	}
-
-	fin >> ignore; // }
-}
-
-void DX::Model::ReadMaterials(std::ifstream& fin, UINT numMaterials)
-{
-	std::string ignore;
-	//mats.resize(numMaterials);
-
-	std::string diffuseMapName;
-	std::string normalMapName;
-
-	fin >> ignore; // materials header text
-	for (UINT i = 0; i < numMaterials; ++i)
-	{
-		fin >> ignore >> ignore >> ignore >> ignore;
-		fin >> ignore >> ignore >> ignore >> ignore;
-		fin >> ignore >> ignore >> ignore >> ignore;
-		fin >> ignore >> ignore;
-		fin >> ignore >> ignore >> ignore >> ignore;
-		fin >> ignore >> ignore;
-		fin >> ignore >> ignore;
-		fin >> ignore >> ignore;
-		fin >> ignore >> ignore;
-
-		/*mats[i].DiffuseMapName.resize(diffuseMapName.size(), ' ');
-		mats[i].NormalMapName.resize(normalMapName.size(), ' ');*/
-		/*std::copy(diffuseMapName.begin(), diffuseMapName.end(), mats[i].DiffuseMapName.begin());
-		std::copy(normalMapName.begin(), normalMapName.end(), mats[i].NormalMapName.begin());*/
+		m_Animations["Take1"] = clip;
 	}
 }
 
@@ -516,27 +291,6 @@ void DX::Model::Render()
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
-
-	/*for (int i = 0; i < m_Subsets.size(); ++i)
-	{
-		d3dDeviceContext->DrawIndexed(m_Subsets[i].FaceStart * 3, m_Subsets[i].FaceCount * 3, 0);
-	}*/
-
-	// Bone geometry
-	//d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	//d3dDeviceContext->IASetVertexBuffers(0, 1, m_d3dBoneVertexBuffer.GetAddressOf(), &vertex_stride, &vertex_offset);
-	//d3dDeviceContext->Draw(2, 0);
-}
-
-DX::Keyframe::Keyframe() : TimePos(0.0f),
-	Translation(0.0f, 0.0f, 0.0f),
-	Scale(1.0f, 1.0f, 1.0f),
-	RotationQuat(0.0f, 0.0f, 0.0f, 1.0f)
-{
-}
-
-DX::Keyframe::~Keyframe()
-{
 }
 
 float DX::BoneAnimation::GetStartTime()const
@@ -548,9 +302,7 @@ float DX::BoneAnimation::GetStartTime()const
 float DX::BoneAnimation::GetEndTime()const
 {
 	// Keyframes are sorted by time, so last keyframe gives end time.
-	float f = Keyframes.back().TimePos;
-
-	return f;
+	return Keyframes.back().TimePos;
 }
 
 void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
@@ -602,7 +354,6 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMFLOAT4X4& M)const
 		}
 	}
 }
-
 
 float DX::AnimationClip::GetClipStartTime()const
 {

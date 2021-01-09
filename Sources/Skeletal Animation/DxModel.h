@@ -15,22 +15,6 @@
 
 namespace DX
 {
-	struct Subset
-	{
-		Subset() :
-			Id(-1),
-			VertexStart(0), VertexCount(0),
-			FaceStart(0), FaceCount(0)
-		{
-		}
-
-		UINT Id;
-		UINT VertexStart;
-		UINT VertexCount;
-		UINT FaceStart;
-		UINT FaceCount;
-	};
-
 	struct Colour
 	{
 		float r = 0;
@@ -56,37 +40,18 @@ namespace DX
 		int bone[4] = { 0, 0, 0, 0 };
 	};
 
-	struct BoneInfo
-	{
-		DirectX::XMMATRIX transform;
-		DirectX::XMFLOAT4X4 offset;
-		int parentId = 0;
-		std::string name;
-		std::string parentName;
-	};
-
-	struct Mesh
-	{
-		std::vector<Vertex> vertices;
-		std::vector<UINT> indices;
-		std::vector<BoneInfo> bones;
-
-		std::vector<DirectX::XMFLOAT4X4> boneOffsets;
-		std::vector<int> boneIndexToParentIndex;
-	};
-
 	///<summary>
 	/// A Keyframe defines the bone transformation at an instant in time.
 	///</summary>
 	struct Keyframe
 	{
-		Keyframe();
-		~Keyframe();
+		Keyframe() = default;
+		virtual ~Keyframe() = default;
 
-		float TimePos;
-		DirectX::XMFLOAT3 Translation;
-		DirectX::XMFLOAT3 Scale;
-		DirectX::XMFLOAT4 RotationQuat;
+		float TimePos = 0.0f;
+		DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+		DirectX::XMFLOAT4 RotationQuat = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	};
 
 	///<summary>
@@ -113,12 +78,27 @@ namespace DX
 	///</summary>
 	struct AnimationClip
 	{
-		float GetClipStartTime()const;
-		float GetClipEndTime()const;
+		float GetClipStartTime() const;
+		float GetClipEndTime() const;
 
 		void Interpolate(float t, std::vector<DirectX::XMFLOAT4X4>& boneTransforms)const;
 
 		std::vector<BoneAnimation> BoneAnimations;
+	};
+
+	struct BoneInfo
+	{
+		int parentId = 0;
+		std::string name;
+		std::string parentName;
+		DirectX::XMFLOAT4X4 offset;
+	};
+
+	struct Mesh
+	{
+		std::vector<Vertex> vertices;
+		std::vector<UINT> indices;
+		std::vector<BoneInfo> bones;
 	};
 
 	class Model
@@ -139,12 +119,6 @@ namespace DX
 		// World 
 		DirectX::XMFLOAT4X4 World;
 
-		// Scene
-		Assimp::Importer importer;
-		const aiScene* Scene = nullptr;
-
-		DirectX::XMMATRIX GlobalInverseTransform = DirectX::XMMatrixIdentity();
-
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 		DX::Shader* m_DxShader = nullptr;
@@ -152,7 +126,6 @@ namespace DX
 		// Number of indices to draw
 		UINT m_IndexCount = 0;
 		Mesh m_Mesh;
-		std::vector<DX::Subset> m_Subsets;
 
 		// Vertex buffer
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;
@@ -165,18 +138,6 @@ namespace DX
 
 		// Load FBX model
 		void LoadFBX(std::string&& path);
-
-		// Load m3d model
-		void LoadM3d(const std::string& path);
-		void ReadMaterials(std::ifstream& fin, UINT numMaterials);
-		void ReadSubsetTable(std::ifstream& fin, UINT numSubsets);
-		void ReadSkinnedVertices(std::ifstream& fin, UINT numVertices);
-		void ReadTriangles(std::ifstream& fin, UINT numTriangles);
-		void ReadBoneOffsets(std::ifstream& fin, UINT numBones);
-		void ReadBoneHierarchy(std::ifstream& fin, UINT numBones);
-		void ReadAnimationClips(std::ifstream& fin, UINT numBones, UINT numAnimationClips);
-		void ReadBoneKeyframes(std::ifstream& fin, UINT numBones, BoneAnimation& boneAnimation);
-
-		std::map<std::string, AnimationClip> mAnimations;
+		std::map<std::string, AnimationClip> m_Animations;
 	};
 }
