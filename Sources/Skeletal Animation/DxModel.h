@@ -40,7 +40,7 @@ namespace DX
 	struct BoneInfo
 	{
 		DirectX::XMMATRIX transform;
-		DirectX::XMMATRIX offset;
+		DirectX::XMFLOAT4X4 offset;
 		int parentId = 0;
 		std::string name;
 	};
