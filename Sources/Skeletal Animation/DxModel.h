@@ -62,6 +62,7 @@ namespace DX
 		DirectX::XMFLOAT4X4 offset;
 		int parentId = 0;
 		std::string name;
+		std::string parentName;
 	};
 
 	struct Mesh
