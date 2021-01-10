@@ -38,22 +38,6 @@ void DX::Model::Create()
 	// Create buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
-
-	// Calculate parent
-	for (int i = 0; i < m_Mesh.bones.size(); ++i)
-	{
-		int parentId = 0;
-		for (int j = 0; j < m_Mesh.bones.size(); ++j)
-		{
-			if (m_Mesh.bones[i].parentName == m_Mesh.bones[j].name)
-			{
-				parentId = j;
-				break;
-			}
-		}
-
-		m_Mesh.bones[i].parentId = parentId;
-	}
 }
 
 void DX::Model::Update(float dt)
@@ -152,13 +136,8 @@ void DX::Model::Render()
 	// Render geometry
 	for (auto i = 0u; i < m_Mesh.subsets.size(); ++i)
 	{
-		auto start_count = 0u;
-		if (i > 0)
-		{
-			start_count = m_Mesh.subsets[i - 1];
-		}
-
-		d3dDeviceContext->DrawIndexed(m_Mesh.subsets[i], 0, 0);
+		auto& subset = m_Mesh.subsets[i];
+		d3dDeviceContext->DrawIndexed(subset.totalIndex, subset.startIndex, subset.baseVertex);
 	}
 }
 

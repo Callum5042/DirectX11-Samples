@@ -94,13 +94,20 @@ namespace DX
 		DirectX::XMMATRIX offset;
 	};
 
+	struct Subset
+	{
+		unsigned totalIndex = 0;
+		unsigned startIndex = 0;
+		unsigned baseVertex = 0;
+	};
+
 	struct Mesh
 	{
 		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
 		std::vector<BoneInfo> bones;
 		std::map<std::string, AnimationClip> animations;
-		std::vector<unsigned> subsets;
+		std::vector<Subset> subsets;
 	};
 
 	class Model

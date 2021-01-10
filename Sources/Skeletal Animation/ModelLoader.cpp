@@ -10,19 +10,11 @@ namespace
 {
 	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
 	{
-		aiVector3D scale;
-		aiVector3D rot;
-		aiVector3D pos;
+		aiVector3D scale, rot, pos;
 		matrix.Decompose(scale, rot, pos);
 
 		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
-		// _matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
-
-		_matrix *= DirectX::XMMatrixRotationX(rot.x);
-		_matrix *= DirectX::XMMatrixRotationY(rot.y);
-		_matrix *= DirectX::XMMatrixRotationZ(rot.z);
-
-
+		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
 		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
 
@@ -42,14 +34,26 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 		throw std::runtime_error("Could not load model");
 	}
 
+	unsigned total_index = 0;
+	unsigned base_vertex = 0;
+
 	// Process data
 	for (auto mesh_index = 0u; mesh_index < scene->mNumMeshes; ++mesh_index)
 	{
+		DX::Subset subset;
+		subset.startIndex = total_index;
+		subset.baseVertex = base_vertex;
+
 		auto mesh = scene->mMeshes[mesh_index];
+
+		std::string name = mesh->mName.C_Str();
+		std::cout << name << '\n';
 
 		// Load vertices
 		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 		{
+			base_vertex++;
+
 			// Set the positions
 			float x = static_cast<float>(mesh->mVertices[i].x);
 			float y = static_cast<float>(mesh->mVertices[i].y);
@@ -86,12 +90,14 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 			// Add the indices of the face to the vector
 			for (auto k = 0u; k < face.mNumIndices; ++k)
 			{
+				total_index++;
 				index_count++;
 				meshData->indices.push_back(face.mIndices[k]);
 			}
 		}
 
-		meshData->subsets.push_back(index_count);
+		subset.totalIndex = index_count;
+		meshData->subsets.push_back(subset);
 
 		// Load bones
 		for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
@@ -122,6 +128,22 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 					}
 				}
 			}
+		}
+
+		// Calculate parent
+		for (int i = 0; i < meshData->bones.size(); ++i)
+		{
+			int parentId = 0;
+			for (int j = 0; j < meshData->bones.size(); ++j)
+			{
+				if (meshData->bones[i].parentName == meshData->bones[j].name)
+				{
+					parentId = j;
+					break;
+				}
+			}
+
+			meshData->bones[i].parentId = parentId;
 		}
 	}
 
