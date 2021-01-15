@@ -117,16 +117,19 @@ void GeometryGenerator::CreateTriangle(float length, DX::Model* model)
 	v1.x = 0.0f;
 	v1.y = length;
 	v1.z = 0.0f;
+	v1.colour.r = 1.0f;
 
 	DX::Vertex v2;
 	v2.x = length;
 	v2.y = -length;
 	v2.z = 0.0f;
+	v2.colour.r = 1.0f;
 
 	DX::Vertex v3;
 	v3.x = -length;
 	v3.y = -length;
 	v3.z = 0.0f;
+	v3.colour.r = 1.0f;
 
 	model->Vertices.push_back(v1);
 	model->Vertices.push_back(v2);

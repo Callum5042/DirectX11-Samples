@@ -14,7 +14,7 @@ void DX::Model::Create()
 
 	GeometryGenerator::CreateTriangle(1.0f, this);
 
-	CreateVertexBuffer();
+	CreateVertexBuffer(); 
 	CreateIndexBuffer();
 }
 
