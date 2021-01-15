@@ -120,4 +120,3 @@ void DX::Model::Render()
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
 }
- 

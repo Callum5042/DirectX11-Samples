@@ -20,15 +20,30 @@ void DX::Model::CreateVertexBuffer()
 	// Set vertex data
 	std::vector<Vertex> vertices =
 	{
-		{ -1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f }, // Front Top left vertex
-		{ +1.0f, +1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f }, // Front Top right vertex
-		{ -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f }, // Front Bottom left vertex
-		{ +1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Front Bottom right vertex
-
-		{ -1.0f, +1.0f, +1.0f, 1.0f, 1.0f, 0.0f, 1.0f }, // Back Top left vertex
-		{ +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 1.0f, 1.0f }, // Back Top right vertex
-		{ -1.0f, -1.0f, +1.0f, 0.0f, 1.0f, 1.0f, 1.0f }, // Back Bottom left vertex
-		{ +1.0f, -1.0f, +1.0f, 1.0f, 1.0f, 1.0f, 1.0f }, // Back Bottom right vertex
+		{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, +1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+		{ +1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f, 1.0f }
 	};
 
 	// Create index buffer
@@ -50,29 +65,18 @@ void DX::Model::CreateIndexBuffer()
 	// Set Indices
 	std::vector<UINT> indices =
 	{
-		// Front panel
 		0, 1, 2,
-		2, 1, 3,
-
-		// Right panel
-		1, 5, 3,
-		5, 7, 3,
-
-		// Back panel
-		4, 6, 5,
-		5, 6, 7,
-
-		// Left panel
-		0, 2, 4,
-		2, 6, 4,
-
-		// Top panel
-		0, 4, 5,
-		5, 1, 0,
-
-		// Bottom panel
-		2, 7, 6,
-		7, 2, 3
+		0, 2, 3,
+		4, 5, 6,
+		4, 6, 7,
+		8, 9, 10,
+		8, 10, 11,
+		12, 13, 14,
+		12, 14, 15,
+		16, 17, 18,
+		16, 18, 19,
+		20, 21, 22,
+		20, 22, 23,
 	};
 
 	m_IndexCount = static_cast<UINT>(indices.size());
