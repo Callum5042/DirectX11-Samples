@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skeletal Animation", "Sourc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Picking", "Picking\Picking.vcxproj", "{9546E34D-88D1-48E9-B2E0-18B9A81F33FD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation", "Tessellation\Tessellation.vcxproj", "{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{9546E34D-88D1-48E9-B2E0-18B9A81F33FD}.Release|x64.Build.0 = Release|x64
 		{9546E34D-88D1-48E9-B2E0-18B9A81F33FD}.Release|x86.ActiveCfg = Release|Win32
 		{9546E34D-88D1-48E9-B2E0-18B9A81F33FD}.Release|x86.Build.0 = Release|Win32
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Debug|x64.ActiveCfg = Debug|x64
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Debug|x64.Build.0 = Debug|x64
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Debug|x86.ActiveCfg = Debug|Win32
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Debug|x86.Build.0 = Debug|Win32
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Release|x64.ActiveCfg = Release|x64
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Release|x64.Build.0 = Release|x64
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Release|x86.ActiveCfg = Release|Win32
+		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
