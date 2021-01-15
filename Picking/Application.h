@@ -7,6 +7,7 @@
 #include "DxModel.h"
 #include "DxShader.h"
 #include "DxCamera.h"
+#include <DirectXCollision.h>
 
 class Applicataion
 {
@@ -37,4 +38,12 @@ private:
 
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
+
+	// Picking
+	void Pick(int sx, int sy);
+
+	// Selected triangle
+	UINT m_PickedTriangle;
+
+	DirectX::BoundingBox m_Meshbox;
 };

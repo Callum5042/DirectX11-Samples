@@ -40,11 +40,17 @@ namespace DX
 		// World 
 		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
+		// Vertices
+		std::vector<Vertex> Vertices;
+
+		// Indices
+		std::vector<UINT> Indices;
+
+		// Create vertex buffer
+		void CreateVertexBufferAgain();
+
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
-
-		// Number of indices to draw
-		UINT m_IndexCount = 0;
 
 		// Vertex buffer
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;

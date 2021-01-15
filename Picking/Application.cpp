@@ -99,6 +99,13 @@ int Applicataion::Execute()
                     m_DxRenderer->ToggleWireframe(wireframe);
                 }
             }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (e.button.button == SDL_BUTTON_RIGHT)
+                {
+                    Pick(e.button.x, e.button.y);
+                }
+            }
         }
         else
         {
@@ -168,5 +175,98 @@ void Applicataion::CalculateFramesPerSecond()
 
         auto title = "DirectX - Drawing a Triangle - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
         SDL_SetWindowTitle(m_SdlWindow, title.c_str());
+    }
+}
+
+void Applicataion::Pick(int sx, int sy)
+{
+    auto projection = m_DxCamera->GetProjection();
+
+    // Get window size
+    int width = 0;
+    int height = 0;
+    SDL_GetWindowSize(m_SdlWindow, &width, &height);
+
+    // Compute picking ray in view space.
+    // define _XM_NO_INTRINSICS_
+    float vx = (+2.0f * sx / width - 1.0f) / projection(0, 0);
+    float vy = (-2.0f * sy / height + 1.0f) / projection(1, 1);
+
+    // Ray definition in view space.
+    auto rayOrigin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+    auto rayDir = DirectX::XMVectorSet(vx, vy, 1.0f, 0.0f);
+
+    // Tranform ray to local space of Mesh.
+    auto V = m_DxCamera->GetView();
+    auto determinant_v = DirectX::XMMatrixDeterminant(V);
+    auto invView = DirectX::XMMatrixInverse(&determinant_v, V);
+
+    auto W = m_DxModel->World;
+    auto determinant_w = DirectX::XMMatrixDeterminant(W);
+    auto invWorld = DirectX::XMMatrixInverse(&determinant_w, W);
+
+    auto toLocal = DirectX::XMMatrixMultiply(invView, invWorld);
+
+    rayOrigin = DirectX::XMVector3TransformCoord(rayOrigin, toLocal);
+    rayDir = DirectX::XMVector3TransformNormal(rayDir, toLocal);
+
+    // Make the ray direction unit length for the intersection tests.
+    rayDir = XMVector3Normalize(rayDir);
+
+    // If we hit the bounding box of the Mesh, then we might have picked a Mesh triangle,
+    // so do the ray/triangle tests.
+    //
+    // If we did not hit the bounding box, then it is impossible that we hit 
+    // the Mesh, so do not waste effort doing ray/triangle tests.
+
+    // Assume we have not picked anything yet, so init to -1.
+    m_PickedTriangle = -1;
+    float tmin = 0.0f;
+    //if (XNA::IntersectRayAxisAlignedBox(rayOrigin, rayDir, &mMeshBox, &tmin))
+
+    if (m_Meshbox.Intersects(rayOrigin, rayDir, tmin))
+    {
+        // Find the nearest ray/triangle intersection.
+        tmin = FLT_MAX;// MathHelper::Infinity;
+        for (UINT i = 0; i < m_DxModel->Indices.size() / 3; ++i)
+        {
+            // Indices for this triangle.
+            UINT i0 = m_DxModel->Indices[i * 3 + 0];
+            UINT i1 = m_DxModel->Indices[i * 3 + 1];
+            UINT i2 = m_DxModel->Indices[i * 3 + 2];
+
+            // Vertices for this triangle.
+            auto& vertex0 = m_DxModel->Vertices[i0];
+            auto& vertex1 = m_DxModel->Vertices[i1];
+            auto& vertex2 = m_DxModel->Vertices[i2];
+
+            DirectX::FXMVECTOR v0 = DirectX::XMVectorSet(vertex0.x, vertex0.y, vertex0.z, 1.0f);
+            DirectX::GXMVECTOR v1 = DirectX::XMVectorSet(vertex1.x, vertex1.y, vertex1.z, 1.0f);
+            DirectX::HXMVECTOR v2 = DirectX::XMVectorSet(vertex2.x, vertex2.y, vertex2.z, 1.0f);
+
+            // We have to iterate over all the triangles in order to find the nearest intersection.
+            float t = 0.0f;
+            if (DirectX::TriangleTests::Intersects(rayOrigin, rayDir, v0, v1, v2, t))
+            {
+                if (t < tmin)
+                {
+                    // This is the new nearest picked triangle.
+                    tmin = t;
+                    m_PickedTriangle = i;
+
+                    //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Test", "Hitbox", nullptr);
+
+                    vertex0.colour.r = 0.0f;
+                    vertex1.colour.r = 0.0f;
+                    vertex2.colour.r = 0.0f;
+
+                    vertex0.colour.g = 1.0f;
+                    vertex1.colour.g = 1.0f;
+                    vertex2.colour.g = 1.0f;
+
+                    m_DxModel->CreateVertexBufferAgain();
+                }
+            }
+        }
     }
 }
