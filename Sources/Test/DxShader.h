@@ -25,6 +25,12 @@ namespace DX
 		// Create pixel shader
 		void LoadPixelShader(std::string&& pixel_shader_path);
 
+		// Create hull shader
+		void LoadHullShader(std::string&& hull_shader_path);
+
+		// Create domain shader
+		void LoadDomainShader(std::string&& domain_shader_path);
+
 		// Bind the shader to the pipeline
 		void Use();
 
@@ -42,6 +48,12 @@ namespace DX
 
 		// Pixel shader
 		ComPtr<ID3D11PixelShader> m_d3dPixelShader = nullptr;
+
+		// Hull shader
+		ComPtr<ID3D11HullShader> m_d3dHullShader = nullptr;
+
+		// Domain shader
+		ComPtr<ID3D11DomainShader> m_d3dDomainShader = nullptr;
 
 		// World constant buffer
 		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;

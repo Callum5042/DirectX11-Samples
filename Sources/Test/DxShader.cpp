@@ -22,7 +22,7 @@ void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -41,6 +41,28 @@ void DX::Shader::LoadPixelShader(std::string&& pixel_shader_path)
 	DX::Check(d3dDevice->CreatePixelShader(data.data(), data.size(), nullptr, m_d3dPixelShader.ReleaseAndGetAddressOf()));
 }
 
+void DX::Shader::LoadHullShader(std::string&& hull_shader_path)
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Load the binary file into memory
+	std::ifstream file(hull_shader_path, std::fstream::in | std::fstream::binary);
+	std::vector<char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	DX::Check(d3dDevice->CreateHullShader(data.data(), data.size(), nullptr, m_d3dHullShader.ReleaseAndGetAddressOf()));
+}
+
+void DX::Shader::LoadDomainShader(std::string&& domain_shader_path)
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Load the binary file into memory
+	std::ifstream file(domain_shader_path, std::fstream::in | std::fstream::binary);
+	std::vector<char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	DX::Check(d3dDevice->CreateDomainShader(data.data(), data.size(), nullptr, m_d3dDomainShader.ReleaseAndGetAddressOf()));
+}
+
 void DX::Shader::Use()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
@@ -55,7 +77,13 @@ void DX::Shader::Use()
 	d3dDeviceContext->PSSetShader(m_d3dPixelShader.Get(), nullptr, 0);
 
 	// Bind the world constant buffer to the vertex shader
-	d3dDeviceContext->VSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+	d3dDeviceContext->DSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+
+	// Bind the hull shader to the pipeline's Hull Shader stage
+	d3dDeviceContext->HSSetShader(m_d3dHullShader.Get(), nullptr, 0);
+
+	// Bind the hull shader to the pipeline's Hull Shader stage
+	d3dDeviceContext->DSSetShader(m_d3dDomainShader.Get(), nullptr, 0);
 }
 
 void DX::Shader::UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer)

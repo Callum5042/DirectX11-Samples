@@ -21,8 +21,8 @@ void DX::Model::CreateVertexBuffer()
 	std::vector<Vertex> vertices =
 	{
 		{ 0.0f, +1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },
-		{ +1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },
-		{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f }
+		{ +1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f },
+		{ -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f }
 	};
 
 	// Create index buffer
@@ -80,7 +80,7 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Bind the geometry topology to the pipeline's Input Assembler stage
-	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);

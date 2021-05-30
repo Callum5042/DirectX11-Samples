@@ -28,6 +28,8 @@ int Applicataion::Execute()
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
     m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
+    m_DxShader->LoadHullShader("Shaders/HullShader.cso");
+    m_DxShader->LoadDomainShader("Shaders/DomainShader.cso");
 
     // Initialise and setup the perspective camera
     auto window_width = 0;
