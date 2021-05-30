@@ -24,7 +24,7 @@
     <ProjectGuid>{E2F9FA88-A975-4601-86CD-9C043E789DE4}</ProjectGuid>
     <RootNamespace>_05_Perspective_Camera</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Test</ProjectName>
+    <ProjectName>Basic Tessellation</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

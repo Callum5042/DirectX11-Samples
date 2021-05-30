@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Picking", "Sources\Picking\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation", "Sources\Tessellation\Tessellation.vcxproj", "{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Sources\Test\Test.vcxproj", "{E2F9FA88-A975-4601-86CD-9C043E789DE4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Tessellation", "Sources\Basic Tessellation\Basic Tessellation.vcxproj", "{E2F9FA88-A975-4601-86CD-9C043E789DE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
