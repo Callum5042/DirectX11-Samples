@@ -11,7 +11,7 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 void DX::Model::Create()
 {
 	//GeometryGenerator::CreateSphere(1.0f, 6, 6, this);
-
+	//GeometryGenerator::CreateRectangle(1.0f, 1.0f, this);
 	GeometryGenerator::CreateTriangle(1.0f, this);
 
 	CreateVertexBuffer(); 
@@ -67,7 +67,7 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Bind the geometry topology to the pipeline's Input Assembler stage
-	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
