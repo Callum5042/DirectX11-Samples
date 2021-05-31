@@ -11,6 +11,7 @@ namespace DX
 		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
+		DirectX::XMFLOAT4 tess;
 	};
 
 	class Shader

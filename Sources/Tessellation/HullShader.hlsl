@@ -1,41 +1,60 @@
-#include "ShaderData.hlsli"
+// Input control point
+struct HullInputType
+{
+	float3 position : POSITION;
+	float4 color : COLOR;
+};
 
-//cbuffer TessellationBuffer
-//{
-//	float tessellationAmount;
-//	float3 padding;
-//};
+// Output control point
+struct DomainInputType
+{
+	float3 position : POSITION;
+	float4 color : COLOR;
+};
+
+// Output patch constant data.
+struct HullConstDataOutput
+{
+	float EdgeTess[3] : SV_TessFactor; // e.g. would be [4] for a quad domain
+	float InsideTess : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
+};
+
+cbuffer WorldBuffer : register(b0)
+{
+	matrix cWorld;
+	matrix cView;
+	matrix cProjection;
+	float4 cTess;
+}
 
 // Patch Constant Function
-ConstantOutputType ColorPatchConstantFunction(InputPatch<VertexOutput, 3> inputPatch, uint patchId : SV_PrimitiveID)
+HullConstDataOutput CalcHSPatchConstants(InputPatch<HullInputType, 3> patch, uint PatchID : SV_PrimitiveID)
 {
-	ConstantOutputType output;
+	HullConstDataOutput pt;
 
-	// Set the tessellation factors for the three edges of the triangle.
-	output.edges[0] = 12.0f;
-	output.edges[1] = 12.0f;
-	output.edges[2] = 12.0f;
+	float tess = cTess.x;
 
-	// Set the tessellation factor for tessallating inside the triangle.
-	output.inside = 12.0f;
+	pt.EdgeTess[0] = tess;
+	pt.EdgeTess[1] = tess;
+	pt.EdgeTess[2] = tess;
 
-	return output;
+	pt.InsideTess = tess;
+
+	return pt;
 }
 
 [domain("tri")]
-[partitioning("integer")]
+[partitioning("fractional_odd")]
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(3)]
-[patchconstantfunc("ColorPatchConstantFunction")]
-HullOutput main(InputPatch<VertexOutput, 3> patch, uint pointId : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID )
+[patchconstantfunc("CalcHSPatchConstants")]
+DomainInputType main(InputPatch<HullInputType, 3> patch, uint i : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID)
 {
-	HullOutput output;
+	DomainInputType Output;
 
-	// Set the position for this control point as the output position.
-	output.position = patch[pointId].position;
+	// Insert code to compute Output here
+	Output.position = patch[i].position;
+	Output.color = patch[i].color;
 
-	// Set the input color as the output color.
-	output.colour = patch[pointId].colour;
-
-	return output;
+	return Output;
 }

@@ -1,20 +1,42 @@
-#include "ShaderData.hlsli"
+struct DomainInputType
+{
+	float3 position : POSITION;
+	float4 color : COLOR;
+};
+
+struct PixelInputType
+{
+	float4 position : SV_POSITION;
+	float4 color : COLOR;
+};
+
+// Output patch constant data.
+struct HullConstDataOutput
+{
+	float EdgeTessFactor[3]			: SV_TessFactor; // e.g. would be [4] for a quad domain
+	float InsideTessFactor : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
+};
+
+cbuffer WorldBuffer : register(b0)
+{
+	matrix cWorld;
+	matrix cView;
+	matrix cProjection;
+	float4 cTess;
+}
 
 [domain("tri")]
-DomainOutput main(ConstantOutputType input, float3 uvwCoord : SV_DomainLocation, const OutputPatch<HullOutput, 3> patch)
+PixelInputType main(HullConstDataOutput input, float3 domain : SV_DomainLocation, const OutputPatch<DomainInputType, 3> patch)
 {
-	DomainOutput output;
+	PixelInputType Output;
 
-	// Determine the position of the new vertex.
-	float3 vertexPosition = uvwCoord.x * patch[0].position + uvwCoord.y * patch[1].position + uvwCoord.z * patch[2].position;
+	float3 vertexPosition = patch[0].position * domain.x + patch[1].position * domain.y + patch[2].position * domain.z;
 
-	// Calculate the position of the new vertex against the world, view, and projection matrices.
-	output.position = mul(float4(vertexPosition, 1.0f), cWorld);
-	output.position = mul(output.position, cView);
-	output.position = mul(output.position, cProjection);
+	Output.position = mul(float4(vertexPosition, 1.0f), cWorld);
+	Output.position = mul(Output.position, cView);
+	Output.position = mul(Output.position, cProjection);
 
-	// Send the input color into the pixel shader.
-	output.colour = patch[0].colour;
+	Output.color = patch[0].color * domain.x + patch[1].color * domain.y + patch[2].color * domain.z;
 
-	return output;
+	return Output;
 }

@@ -1,31 +1,4 @@
-// Input control point
-struct HullInputType
-{
-	float3 position : POSITION;
-	float4 color : COLOR;
-};
-
-// Output control point
-struct DomainInputType
-{
-	float3 position : POSITION;
-	float4 color : COLOR;
-};
-
-// Output patch constant data.
-struct HullConstDataOutput
-{
-	float EdgeTess[3] : SV_TessFactor; // e.g. would be [4] for a quad domain
-	float InsideTess : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
-};
-
-cbuffer WorldBuffer : register(b0)
-{
-	matrix cWorld;
-	matrix cView;
-	matrix cProjection;
-	float4 cTess;
-}
+#include "ShaderData.hlsli"
 
 // Patch Constant Function
 HullConstDataOutput CalcHSPatchConstants(InputPatch<HullInputType, 3> patch, uint PatchID : SV_PrimitiveID)

@@ -22,7 +22,7 @@ void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOUR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -77,7 +77,8 @@ void DX::Shader::Use()
 	d3dDeviceContext->PSSetShader(m_d3dPixelShader.Get(), nullptr, 0);
 
 	// Bind the world constant buffer to the vertex shader
-	d3dDeviceContext->VSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+	d3dDeviceContext->DSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+	d3dDeviceContext->HSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
 
 	// Bind the hull shader to the pipeline's Hull Shader stage
 	d3dDeviceContext->HSSetShader(m_d3dHullShader.Get(), nullptr, 0);

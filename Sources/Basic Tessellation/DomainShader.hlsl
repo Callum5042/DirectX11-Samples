@@ -1,29 +1,4 @@
-struct DomainInputType
-{
-	float3 position : POSITION;
-	float4 color : COLOR;
-};
-
-struct PixelInputType
-{
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
-};
-
-// Output patch constant data.
-struct HullConstDataOutput
-{
-	float EdgeTessFactor[3]			: SV_TessFactor; // e.g. would be [4] for a quad domain
-	float InsideTessFactor			: SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
-};
-
-cbuffer WorldBuffer : register(b0)
-{
-	matrix cWorld;
-	matrix cView;
-	matrix cProjection;
-	float4 cTess;
-}
+#include "ShaderData.hlsli"
 
 [domain("tri")]
 PixelInputType main(HullConstDataOutput input, float3 domain : SV_DomainLocation, const OutputPatch<DomainInputType, 3> patch)
