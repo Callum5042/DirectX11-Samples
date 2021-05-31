@@ -87,10 +87,7 @@ int Applicataion::Execute()
             else if (e.type == SDL_MOUSEWHEEL)
             {
                 auto direction = static_cast<float>(e.wheel.y);
-
-                // Update tessellation rate depending on the scroll wheel direction
-                m_TessellationRate += direction;
-                m_TessellationRate = std::clamp(m_TessellationRate, 1.0f, 100.0f);
+                m_DxCamera->UpdateRadius(direction);
 
                 // Update world constant buffer with new camera view and perspective
                 DX::WorldBuffer world_buffer = {};
@@ -143,7 +140,7 @@ bool Applicataion::SDLInit()
 
     // Create SDL Window
     auto window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-    m_SdlWindow = SDL_CreateWindow("DirectX - Basic Tessellation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+    m_SdlWindow = SDL_CreateWindow("DirectX - Tessellation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
     if (m_SdlWindow == nullptr)
     {
         std::string error = "SDL_CreateWindow failed: ";
@@ -176,7 +173,7 @@ void Applicataion::CalculateFramesPerSecond()
         time = 0.0f;
         frameCount = 0;
 
-        auto title = "DirectX - Basic Tessellation - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
+        auto title = "DirectX - Tessellation - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
         SDL_SetWindowTitle(m_SdlWindow, title.c_str());
     }
 }

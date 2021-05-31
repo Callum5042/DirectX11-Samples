@@ -26,6 +26,9 @@ namespace DX
 		// Get view matrix
 		constexpr DirectX::XMMATRIX GetView() { return m_View; }
 
+		// Update radius
+		void UpdateRadius(float radius);
+
 	private:
 		// Projection matrix
 		DirectX::XMMATRIX m_Projection;
@@ -47,5 +50,8 @@ namespace DX
 
 		// Recalculates the projection based on the new window size
 		void CalculateProjection();
+
+		// Radius
+		float m_Radius = -8.0f;
 	};
 }
