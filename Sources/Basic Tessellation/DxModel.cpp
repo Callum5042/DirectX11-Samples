@@ -80,6 +80,7 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Bind the geometry topology to the pipeline's Input Assembler stage
+	// Use patch list with control point 3 as we want to tessellate a triangle
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 	// Render geometry

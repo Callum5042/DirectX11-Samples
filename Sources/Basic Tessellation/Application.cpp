@@ -42,8 +42,6 @@ int Applicataion::Execute()
     // Starts the timer
     m_Timer.Start();
 
-    float tess_rate = 5.0f;
-
     // Main application event loop
     SDL_Event e = {};
     while (e.type != SDL_QUIT)
@@ -64,7 +62,7 @@ int Applicataion::Execute()
                     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
                     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                    world_buffer.tess = DirectX::XMFLOAT4(tess_rate, 0.0f, 0.0f, 0.0f);
+                    world_buffer.tess = DirectX::XMFLOAT4(m_TessellationRate, 0.0f, 0.0f, 0.0f);
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
                 }
             }
@@ -82,24 +80,24 @@ int Applicataion::Execute()
                     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
                     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                    world_buffer.tess = DirectX::XMFLOAT4(tess_rate, 0.0f, 0.0f, 0.0f);
+                    world_buffer.tess = DirectX::XMFLOAT4(m_TessellationRate, 0.0f, 0.0f, 0.0f);
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
             {
                 auto direction = static_cast<float>(e.wheel.y);
-                m_DxCamera->UpdateFov(-direction);
 
-                tess_rate += direction;
-                tess_rate = std::clamp(tess_rate, 1.0f, 100.0f);
+                // Update tessellation rate depending on the scroll wheel direction
+                m_TessellationRate += direction;
+                m_TessellationRate = std::clamp(m_TessellationRate, 1.0f, 100.0f);
 
                 // Update world constant buffer with new camera view and perspective
                 DX::WorldBuffer world_buffer = {};
                 world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
                 world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                 world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                world_buffer.tess = DirectX::XMFLOAT4(tess_rate, 0.0f, 0.0f, 0.0f);
+                world_buffer.tess = DirectX::XMFLOAT4(m_TessellationRate, 0.0f, 0.0f, 0.0f);
                 m_DxShader->UpdateWorldConstantBuffer(world_buffer);
             }
             else if (e.type == SDL_KEYDOWN)

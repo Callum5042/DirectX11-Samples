@@ -235,7 +235,7 @@ void DX::Renderer::CreateRasterStateSolid()
 {
 	D3D11_RASTERIZER_DESC rasterizerState = {};
 	rasterizerState.AntialiasedLineEnable = true;
-	rasterizerState.CullMode = D3D11_CULL_FRONT;
+	rasterizerState.CullMode = D3D11_CULL_NONE;
 	rasterizerState.FillMode = D3D11_FILL_SOLID;
 	rasterizerState.DepthClipEnable = true;
 	rasterizerState.FrontCounterClockwise = true;

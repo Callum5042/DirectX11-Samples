@@ -11,13 +11,11 @@ struct PixelInputType
 };
 
 // Output patch constant data.
-struct HS_CONSTANT_DATA_OUTPUT
+struct HullConstDataOutput
 {
 	float EdgeTessFactor[3]			: SV_TessFactor; // e.g. would be [4] for a quad domain
 	float InsideTessFactor			: SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
 };
-
-#define NUM_CONTROL_POINTS 3
 
 cbuffer WorldBuffer : register(b0)
 {
@@ -28,7 +26,7 @@ cbuffer WorldBuffer : register(b0)
 }
 
 [domain("tri")]
-PixelInputType main(HS_CONSTANT_DATA_OUTPUT input, float3 domain : SV_DomainLocation, const OutputPatch<DomainInputType, NUM_CONTROL_POINTS> patch)
+PixelInputType main(HullConstDataOutput input, float3 domain : SV_DomainLocation, const OutputPatch<DomainInputType, 3> patch)
 {
 	PixelInputType Output;
 
