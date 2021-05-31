@@ -78,6 +78,7 @@ void DX::Shader::Use()
 
 	// Bind the world constant buffer to the vertex shader
 	d3dDeviceContext->DSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+	d3dDeviceContext->HSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
 
 	// Bind the hull shader to the pipeline's Hull Shader stage
 	d3dDeviceContext->HSSetShader(m_d3dHullShader.Get(), nullptr, 0);

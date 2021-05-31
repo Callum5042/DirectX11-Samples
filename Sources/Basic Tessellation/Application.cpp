@@ -3,6 +3,7 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+#include <algorithm>
 
 Applicataion::~Applicataion()
 {
@@ -41,6 +42,8 @@ int Applicataion::Execute()
     // Starts the timer
     m_Timer.Start();
 
+    float tess_rate = 5.0f;
+
     // Main application event loop
     SDL_Event e = {};
     while (e.type != SDL_QUIT)
@@ -61,6 +64,7 @@ int Applicataion::Execute()
                     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
                     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+                    world_buffer.tess = DirectX::XMFLOAT4(tess_rate, 0.0f, 0.0f, 0.0f);
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
                 }
             }
@@ -78,6 +82,7 @@ int Applicataion::Execute()
                     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
                     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+                    world_buffer.tess = DirectX::XMFLOAT4(tess_rate, 0.0f, 0.0f, 0.0f);
                     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
                 }
             }
@@ -86,11 +91,15 @@ int Applicataion::Execute()
                 auto direction = static_cast<float>(e.wheel.y);
                 m_DxCamera->UpdateFov(-direction);
 
+                tess_rate += direction;
+                tess_rate = std::clamp(tess_rate, 1.0f, 100.0f);
+
                 // Update world constant buffer with new camera view and perspective
                 DX::WorldBuffer world_buffer = {};
                 world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
                 world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
                 world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+                world_buffer.tess = DirectX::XMFLOAT4(tess_rate, 0.0f, 0.0f, 0.0f);
                 m_DxShader->UpdateWorldConstantBuffer(world_buffer);
             }
             else if (e.type == SDL_KEYDOWN)
@@ -136,7 +145,7 @@ bool Applicataion::SDLInit()
 
     // Create SDL Window
     auto window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-    m_SdlWindow = SDL_CreateWindow("DirectX - Drawing a Triangle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+    m_SdlWindow = SDL_CreateWindow("DirectX - Basic Tessellation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
     if (m_SdlWindow == nullptr)
     {
         std::string error = "SDL_CreateWindow failed: "; 
@@ -169,7 +178,7 @@ void Applicataion::CalculateFramesPerSecond()
         time = 0.0f;
         frameCount = 0;
 
-        auto title = "DirectX - Drawing a Triangle - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
+        auto title = "DirectX - Basic Tessellation - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
         SDL_SetWindowTitle(m_SdlWindow, title.c_str());
     }
 }
