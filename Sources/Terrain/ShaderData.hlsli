@@ -11,37 +11,39 @@ cbuffer WorldBuffer : register(b0)
 struct VertexInputType
 {
 	float3 position : POSITION;
-	float4 color : COLOR;
+	float2 tex : TEXTURE;
 };
 
 // Hull input / vertex output
 struct HullInputType
 {
 	float3 position : POSITION;
-	float4 color : COLOR;
+	float2 tex : TEXTURE;
 };
 
 // Domain input / Hull output
 struct DomainInputType
 {
 	float3 position : POSITION;
-	float4 color : COLOR;
+	float2 tex : TEXTURE;
 };
 
 // Pixel input / Domain output
 struct PixelInputType
 {
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
+    float4 position : SV_POSITION;
+	float2 tex : TEXTURE;
 };
 
 // Output patch constant data.
 struct HullConstDataOutput
 {
-	float EdgeTess[3] : SV_TessFactor; // e.g. would be [4] for a quad domain
-	float InsideTess[1] : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
-
-	float3 f3B0 : POSITION0;
-	float3 f3B1 : POSITION1;
-	float3 f3B2 : POSITION2;
+	float EdgeTess[4] : SV_TessFactor; // e.g. would be [4] for a quad domain
+	float InsideTess[2] : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
 };
+
+// Texture sampler
+SamplerState gSamplerAnisotropic : register(s0);
+
+// Textures
+Texture2D gTextureDiffuse : register(t0);

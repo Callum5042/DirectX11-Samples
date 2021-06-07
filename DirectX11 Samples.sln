@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation", "Sources\Tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Tessellation", "Sources\Basic Tessellation\Basic Tessellation.vcxproj", "{E2F9FA88-A975-4601-86CD-9C043E789DE4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain", "Sources\Terrain\Terrain.vcxproj", "{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,14 @@ Global
 		{E2F9FA88-A975-4601-86CD-9C043E789DE4}.Release|x64.Build.0 = Release|x64
 		{E2F9FA88-A975-4601-86CD-9C043E789DE4}.Release|x86.ActiveCfg = Release|Win32
 		{E2F9FA88-A975-4601-86CD-9C043E789DE4}.Release|x86.Build.0 = Release|Win32
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Debug|x64.ActiveCfg = Debug|x64
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Debug|x64.Build.0 = Debug|x64
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Debug|x86.ActiveCfg = Debug|Win32
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Debug|x86.Build.0 = Debug|Win32
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Release|x64.ActiveCfg = Release|x64
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Release|x64.Build.0 = Release|x64
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Release|x86.ActiveCfg = Release|Win32
+		{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

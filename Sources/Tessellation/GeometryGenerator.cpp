@@ -204,22 +204,28 @@ void GeometryGenerator::CreateRectangle(float width, float height, DX::Model* mo
 	v1.x = -width;
 	v1.y = height;
 	v1.z = 0.0f;
-	v1.colour.r = 1.0f;
+	v1.colour.r = 0.0f;
+	v1.colour.g = 1.0f;
+	v1.colour.b = 0.0f;
 
 	DX::Vertex v2;
 	v2.x = width;
 	v2.y = height;
 	v2.z = 0.0f;
-	v2.colour.r = 1.0f;
+	v2.colour.r = 0.0f;
+	v2.colour.g = 0.0f;
+	v2.colour.b = 1.0f;
 
 	DX::Vertex v3;
-	v3.x = width;
+	v3.x = -width;
 	v3.y = -height;
 	v3.z = 0.0f;
 	v3.colour.r = 1.0f;
+	v3.colour.g = 1.0f;
+	v3.colour.b = 0.0f;
 
 	DX::Vertex v4;
-	v4.x = -width;
+	v4.x = width;
 	v4.y = -height;
 	v4.z = 0.0f;
 	v4.colour.r = 1.0f;
@@ -233,7 +239,7 @@ void GeometryGenerator::CreateRectangle(float width, float height, DX::Model* mo
 	model->Indices.push_back(1);
 	model->Indices.push_back(2);
 
-	model->Indices.push_back(3);
-	model->Indices.push_back(0);
 	model->Indices.push_back(2);
+	model->Indices.push_back(1);
+	model->Indices.push_back(3);
 }

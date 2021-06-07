@@ -2,6 +2,7 @@
 #include <DirectXMath.h>
 #include <vector>
 #include "GeometryGenerator.h"
+#include "DDSTextureLoader.h"
 
 DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
@@ -10,11 +11,14 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
-	GeometryGenerator::CreateSphere(1.0f, 6, 6, this);
-	//GeometryGenerator::CreateRectangle(1.0f, 1.0f, this);
+	GeometryGenerator::CreateGrid(2.0f, 2.0f, 2, 2, this);
 
-	CreateVertexBuffer(); 
+	// Create input buffers
+	CreateVertexBuffer();
 	CreateIndexBuffer();
+
+	// Load texture
+	LoadTexture();
 }
 
 void DX::Model::CreateVertexBuffer()
@@ -29,6 +33,7 @@ void DX::Model::CreateVertexBuffer()
 
 	D3D11_SUBRESOURCE_DATA vertex_subdata = {};
 	vertex_subdata.pSysMem = Vertices.data();
+
 	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dVertexBuffer.ReleaseAndGetAddressOf()));
 }
 
@@ -44,7 +49,17 @@ void DX::Model::CreateIndexBuffer()
 
 	D3D11_SUBRESOURCE_DATA index_subdata = {};
 	index_subdata.pSysMem = Indices.data();
+
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
+}
+
+void DX::Model::LoadTexture()
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	ComPtr<ID3D11Resource> resource = nullptr;
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds",
+		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
 }
 
 void DX::Model::Render()
@@ -66,9 +81,12 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Bind the geometry topology to the pipeline's Input Assembler stage
-	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
+
+	// Bind texture to the pixel shader
+	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
 
 	// Render geometry
-	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
-	//d3dDeviceContext->Draw(static_cast<UINT>(Vertices.size()), 0);
+	d3dDeviceContext->Draw(static_cast<UINT>(Vertices.size()), 0);
 }
+ 
