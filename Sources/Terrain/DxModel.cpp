@@ -3,6 +3,12 @@
 #include <vector>
 #include "GeometryGenerator.h"
 #include "DDSTextureLoader.h"
+#include <fstream>
+#include <numeric>
+#undef min
+#undef max
+#include <iostream>
+#include <algorithm>
 
 DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
@@ -11,7 +17,30 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
-	GeometryGenerator::CreateGrid(2.0f, 2.0f, 2, 2, this);
+	GeometryGenerator::CreateQuadGrid(3.0f, 3.0f, 64, 64, this);
+
+	// Load height map
+	std::ifstream file("..\\..\\Resources\\heightmap_64.raw", std::fstream::in | std::fstream::binary);
+	std::vector<unsigned char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	//m_Heightmap = data;
+
+	int index = 0;
+	int size = std::sqrt(Vertices.size());
+	for (size_t i = 0; i < size; i++)
+	{
+		for (size_t j = 0; j < size; j++)
+		{
+			float factor = ((float)data.size() / (float)Vertices.size());
+			int index2 = index * factor;
+
+			float height = (float)data[index2];
+
+			Vertices[index].y = height / 255.0f; /*normalise(height, 255.0f, 0.0f);*/
+			//std::cout << "Index: " << index << '\n';
+
+			index++;
+		}
+	}
 
 	// Create input buffers
 	CreateVertexBuffer();
@@ -87,6 +116,6 @@ void DX::Model::Render()
 	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
 
 	// Render geometry
-	d3dDeviceContext->Draw(static_cast<UINT>(Vertices.size()), 0);
+	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
 }
  

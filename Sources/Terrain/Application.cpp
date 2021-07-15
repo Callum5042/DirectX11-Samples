@@ -90,7 +90,7 @@ int Applicataion::Execute()
 
                 // Update tessellation rate depending on the scroll wheel direction
                 m_TessellationRate += direction;
-                m_TessellationRate = std::clamp(m_TessellationRate, 1.0f, 100.0f);
+                m_TessellationRate = std::clamp(m_TessellationRate, 1.0f, 64.0f);
 
                 // Update world constant buffer with new camera view and perspective
                 DX::WorldBuffer world_buffer = {};

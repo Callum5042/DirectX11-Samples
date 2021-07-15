@@ -3,6 +3,11 @@
 #include <vector>
 #include "DDSTextureLoader.h"
 
+constexpr uint32_t ConvertToInt(DirectX::XMVECTORF32 v)
+{
+	return ((int)(v.f[0] * 255.0f)) | ((int)(v.f[1] * 255.0f) << 8) | ((int)(v.f[2] * 255.0f) << 16) | ((int)(v.f[3] * 255.0f) << 24);
+}
+
 DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
 }
@@ -115,9 +120,39 @@ void DX::Model::LoadTexture()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
-	ComPtr<ID3D11Resource> resource = nullptr;
+	/*ComPtr<ID3D11Resource> resource = nullptr;
 	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds", 
-		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
+		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));*/
+
+	// Generate texture
+	uint32_t resourceColour = ConvertToInt(DirectX::Colors::Green);
+
+	D3D11_SUBRESOURCE_DATA initData = {};
+	initData.pSysMem = &resourceColour;
+	initData.SysMemPitch = sizeof(uint32_t);
+	initData.SysMemSlicePitch = 0;
+
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = 1;
+	desc.Height = 1;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.Usage = D3D11_USAGE_IMMUTABLE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+
+	ComPtr<ID3D11Texture2D> texture = nullptr;
+	DX::Check(d3dDevice->CreateTexture2D(&desc, &initData, texture.GetAddressOf()));
+
+	// Shader resource
+	D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	SRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	SRVDesc.Texture2D.MipLevels = 1;
+
+	DX::Check(d3dDevice->CreateShaderResourceView(texture.Get(), &SRVDesc, m_DiffuseTexture.GetAddressOf()));
 }
 
 void DX::Model::Render()

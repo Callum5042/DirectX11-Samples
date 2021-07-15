@@ -53,5 +53,21 @@ namespace DX
 		// Texture resource
 		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
 		void LoadTexture();
+
+		// Heightmap
+		std::vector<float> m_Heightmap;
+		std::vector<DirectX::XMFLOAT2> mPatchBoundsY;
+		void CalcPatchBoundsY(UINT i, UINT j);
+
+		int CellsPerPatch = 64;
+		float m_HeightScale = 50.0f;
+		float m_HeightmapWidth = 2049;
+		float m_HeightmapHeight = 2049;
+		float m_CellSpacing = 0.5f;
+
+		float mNumPatchVertRows = 0;
+		float mNumPatchVertCols = 0;
+		float mNumPatchVertices = 0;
+		float mNumPatchQuadFaces = 0;
 	};
 }
