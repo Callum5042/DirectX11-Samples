@@ -17,15 +17,18 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
-	GeometryGenerator::CreateQuadGrid(3.0f, 3.0f, 64, 64, this);
 
 	// Load height map
 	std::ifstream file("..\\..\\Resources\\heightmap_64.raw", std::fstream::in | std::fstream::binary);
 	std::vector<unsigned char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	//m_Heightmap = data;
 
-	int index = 0;
+	int length = std::sqrt(data.size());
+
+	GeometryGenerator::CreateQuadGrid(3.0f, 3.0f, 64, 64, this);
 	int size = std::sqrt(Vertices.size());
+
+	int index = 0;
 	for (size_t i = 0; i < size; i++)
 	{
 		for (size_t j = 0; j < size; j++)
