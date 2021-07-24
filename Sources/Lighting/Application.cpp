@@ -37,9 +37,9 @@ int Applicataion::Execute()
 
     // Set the light direction
     DX::LightBuffer light_buffer = {};
-    light_buffer.directionalLight.diffuse = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-    light_buffer.directionalLight.ambient = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-    light_buffer.directionalLight.specular = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.diffuse = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.ambient = DirectX::XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.specular = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
     m_DxShader->UpdateLightConstantBuffer(light_buffer);
 
     // Starts the timer
