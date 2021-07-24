@@ -18,6 +18,7 @@ cbuffer WorldBuffer : register(b0)
 	matrix cWorld;
 	matrix cView;
 	matrix cProjection;
+	matrix cWorldInverse;
 }
 
 // Directional light value

@@ -113,6 +113,7 @@ void Applicataion::SetWorldBuffer()
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    world_buffer.worldInverse = DirectX::XMMatrixInverse(nullptr, world_buffer.world);
 
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }

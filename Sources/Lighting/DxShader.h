@@ -12,6 +12,7 @@ namespace DX
 		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
+		DirectX::XMMATRIX worldInverse;
 	};
 
 	struct DirectionalLight

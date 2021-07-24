@@ -10,11 +10,8 @@ VertexOutput main(VertexInput input)
 	output.position = mul(output.position, cView);
 	output.position = mul(output.position, cProjection);
 
-	// Pass the normals to pixel shader
-	output.normal = input.normal;
-	
-	// Will want to transform the normals by the world space
-	//output.normal = mul(input.normal, (float3x3)InverseWorld).xyz;
+	// Transform the normals by the inverse world space
+	output.normal = mul(input.normal, (float3x3)cWorldInverse).xyz;
 
 	return output;
 }
