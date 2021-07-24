@@ -21,7 +21,8 @@ namespace DX
 		DirectX::XMFLOAT4 ambient;
 		DirectX::XMFLOAT4 specular;
 
-		DirectX::XMFLOAT4 cameraPosition;
+		DirectX::XMFLOAT3 cameraPosition;
+		float padding;
 	};
 
 	struct LightBuffer

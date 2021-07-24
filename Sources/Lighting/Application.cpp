@@ -36,11 +36,7 @@ int Applicataion::Execute()
     m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
 
     // Set the light direction
-    DX::LightBuffer light_buffer = {};
-    light_buffer.directionalLight.diffuse = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
-    light_buffer.directionalLight.ambient = DirectX::XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
-    light_buffer.directionalLight.specular = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
-    m_DxShader->UpdateLightConstantBuffer(light_buffer);
+    SetLightBuffer();
 
     // Starts the timer
     m_Timer.Start();
@@ -75,6 +71,9 @@ int Applicataion::Execute()
 
                     // Update world constant buffer with new camera view and perspective
                     SetWorldBuffer();
+
+                    // Update light buffer with new camera position
+                    SetLightBuffer();
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
@@ -105,6 +104,22 @@ int Applicataion::Execute()
     }
 
     return 0;
+}
+
+void Applicataion::SetLightBuffer()
+{
+    DX::LightBuffer light_buffer = {};
+    light_buffer.directionalLight.diffuse = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.ambient = DirectX::XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.specular = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 8.0f);
+
+    // Camera position
+    auto position = m_DxCamera->GetPosition();
+    light_buffer.directionalLight.cameraPosition = position;
+
+    /*std::cout << "Camera: " << light_buffer.directionalLight.cameraPosition.x << " - " << light_buffer.directionalLight.cameraPosition.y << " - " << light_buffer.directionalLight.cameraPosition.z << '\n';*/
+
+    m_DxShader->UpdateLightConstantBuffer(light_buffer);
 }
 
 void Applicataion::SetWorldBuffer()

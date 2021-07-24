@@ -22,11 +22,19 @@ void DX::Camera::Rotate(float pitch_radians, float yaw_radians)
 	auto position = DirectX::XMVectorSet(0.0f, 0.0f, radius, 0.0f);
 	position = XMVector3TransformCoord(position, rotation_matrix);
 
+
 	// Calculate camera's view
 	auto eye = position;
 	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+	// Calculate camera position
+	//DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&m_Position);
+	DirectX::XMMATRIX camRotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(pitch_radians, yaw_radians, 0);
+	position = XMVector3TransformCoord(position, camRotationMatrix);
+
+	DirectX::XMStoreFloat3(&m_Position, position);
 }
 
 void DX::Camera::UpdateAspectRatio(int width, int height)

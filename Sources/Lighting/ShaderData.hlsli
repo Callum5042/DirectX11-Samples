@@ -8,7 +8,8 @@ struct VertexInput
 // Vertex output / pixel input structure
 struct VertexOutput
 {
-	float4 position : SV_POSITION;
+	float4 positionClipSpace : SV_POSITION;
+	float3 position : POSITION;
 	float3 normal : NORMAL;
 };
 
@@ -27,7 +28,7 @@ struct DirectionalLight
 	float4 diffuse;
 	float4 ambient;
 	float4 specular;
-	float4 direction;
+	//float4 direction;
 
 	// Camera is used for calculating the specular value
 	float3 cameraPosition;

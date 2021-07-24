@@ -16,6 +16,8 @@ public:
 
 	int Execute();
 
+	void SetLightBuffer();
+
 	void SetWorldBuffer();
 
 private:
