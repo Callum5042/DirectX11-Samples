@@ -3,7 +3,6 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
-#include <algorithm>
 
 Applicataion::~Applicataion()
 {
@@ -23,14 +22,11 @@ int Applicataion::Execute()
     // Initialise and create the DirectX 11 model
     m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
     m_DxModel->Create();
-    m_DxRenderer->ToggleWireframe(true);
 
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
     m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
-    m_DxShader->LoadHullShader("Shaders/HullShader.cso");
-    m_DxShader->LoadDomainShader("Shaders/DomainShader.cso");
 
     // Initialise and setup the perspective camera
     auto window_width = 0;
@@ -38,6 +34,13 @@ int Applicataion::Execute()
     SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
 
     m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
+
+    // Set the light direction
+    DX::LightBuffer light_buffer = {};
+    light_buffer.directionalLight.diffuse = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.ambient = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+    light_buffer.directionalLight.specular = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+    m_DxShader->UpdateLightConstantBuffer(light_buffer);
 
     // Starts the timer
     m_Timer.Start();
@@ -77,21 +80,10 @@ int Applicataion::Execute()
             else if (e.type == SDL_MOUSEWHEEL)
             {
                 auto direction = static_cast<float>(e.wheel.y);
-                //m_DxCamera->UpdateRadius(direction);
-                m_TessellationRate += direction;
-                m_TessellationRate = std::clamp(m_TessellationRate, 1.0f, 64.0f);
+                m_DxCamera->UpdateFov(-direction);
 
                 // Update world constant buffer with new camera view and perspective
                 SetWorldBuffer();
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                if (e.key.repeat == 0)
-                {
-                    static bool wireframe = true;
-                    wireframe = !wireframe;
-                    m_DxRenderer->ToggleWireframe(wireframe);
-                }
             }
         }
         else
@@ -121,7 +113,7 @@ void Applicataion::SetWorldBuffer()
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-    world_buffer.tess = DirectX::XMFLOAT4(m_TessellationRate, 0.0f, 0.0f, 0.0f);
+
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }
 
@@ -137,10 +129,10 @@ bool Applicataion::SDLInit()
 
     // Create SDL Window
     auto window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-    m_SdlWindow = SDL_CreateWindow("DirectX - Tessellation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+    m_SdlWindow = SDL_CreateWindow("DirectX - Lighting", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
     if (m_SdlWindow == nullptr)
     {
-        std::string error = "SDL_CreateWindow failed: ";
+        std::string error = "SDL_CreateWindow failed: "; 
         error += SDL_GetError();
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", error.c_str(), nullptr);
         return false;
@@ -170,7 +162,7 @@ void Applicataion::CalculateFramesPerSecond()
         time = 0.0f;
         frameCount = 0;
 
-        auto title = "DirectX - Tessellation - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
+        auto title = "DirectX - Lighting - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
         SDL_SetWindowTitle(m_SdlWindow, title.c_str());
     }
 }

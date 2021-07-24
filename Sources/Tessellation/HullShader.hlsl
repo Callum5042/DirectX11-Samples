@@ -5,7 +5,7 @@ HullConstDataOutput CalcHSPatchConstants(InputPatch<HullInputType, 3> patch, uin
 {
 	HullConstDataOutput pt;
 
-	float tess = 2.0f;// cTess.x;
+	float tess = cTess.x;
 
 	pt.EdgeTess[0] = tess;
 	pt.EdgeTess[1] = tess;
