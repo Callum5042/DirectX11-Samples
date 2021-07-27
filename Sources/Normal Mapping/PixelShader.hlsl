@@ -28,7 +28,7 @@ float3 CalculateNormalsFromNormalMap(float3 normal, float2 tex, float3 tangent)
 	float3 normalMapSample = gTextureNormal.Sample(gSamplerAnisotropic, tex).rgb;
 
 	// Uncompress each component from [0,1] to [-1,1].
-	float3 normalT = 2.0f * normalMapSample - 1.0f;
+	float3 normalT = normalize(normalMapSample * 2.0f - 1.0f);
 
 	// Build orthonormal basis.
 	float3 N = normal;
@@ -40,7 +40,6 @@ float3 CalculateNormalsFromNormalMap(float3 normal, float2 tex, float3 tangent)
 	// Transform from tangent space to world space.
 	float3 bumpedNormalW = mul(normalT, TBN);
 
-	//input.Normal = bumpedNormalW;
 	return bumpedNormalW;
 }
 
