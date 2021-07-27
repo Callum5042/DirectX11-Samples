@@ -21,10 +21,7 @@ VertexOutput main(VertexInput input)
 
 	// Normal mapping
 	output.tangent = mul(input.tangent, (float3x3)cWorldInverse);
-	output.bitangent = mul(input.bitangent, (float3x3)cWorldInverse);
-
 	output.tangent = normalize(output.tangent);
-	output.bitangent = normalize(output.bitangent);
 
 	return output;
 }

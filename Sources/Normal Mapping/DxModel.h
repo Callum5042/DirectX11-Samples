@@ -26,11 +26,6 @@ namespace DX
 		float tx = 0;
 		float ty = 0;
 		float tz = 0;
-
-		// Bi-tangents
-		float bx = 0;
-		float by = 0;
-		float bz = 0;
 	};
 
 	class Model

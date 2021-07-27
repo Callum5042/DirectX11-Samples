@@ -5,7 +5,6 @@ struct VertexInput
 	float3 normal : NORMAL;
 	float2 tex : TEXTURE;
 	float3 tangent : TANGENT;
-	float3 bitangent : BITANGENT;
 };
 
 // Vertex output / pixel input structure
@@ -16,7 +15,6 @@ struct VertexOutput
 	float3 normal : NORMAL;
 	float2 tex : TEXTURE;
 	float3 tangent : TANGENT;
-	float3 bitangent : BITANGENT;
 };
 
 // World constant buffer
