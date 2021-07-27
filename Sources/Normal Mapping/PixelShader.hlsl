@@ -3,7 +3,7 @@
 float4 CalculateDirectionalLighting(float3 position, float3 normal)
 {
 	// Light direction
-	float3 light_direction = float3(1.0f, 0.7f, 0.4f);
+	float3 light_direction = float3(1.0f, -0.7f, 0.4f);
 
 	// Diffuse lighting
 	float4 diffuse_light = saturate(dot(-light_direction, normal)) * cDirectionalLight.diffuse;
