@@ -1,6 +1,6 @@
 #include "DxModel.h"
 #include <DirectXMath.h>
-#include <vector>
+#include "GeometryGenerator.h"
 #include "DDSTextureLoader.h"
 
 DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
@@ -9,6 +9,8 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
+	GeometryGenerator::CreateBox(1.0f, 1.0f, 1.0f, this);
+
 	// Create input buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
@@ -21,52 +23,14 @@ void DX::Model::CreateVertexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
-	const float width = 1.0f;
-	const float height = 1.0f;
-	const float depth = 1.0f;
-
-	// Set vertex data
-	std::vector<Vertex> vertices =
-	{
-		{ -width, -height, -depth, 0.0f, 1.0f },
-		{ -width, +height, -depth, 0.0f, 0.0f },
-		{ +width, +height, -depth, 1.0f, 0.0f },
-		{ +width, -height, -depth, 1.0f, 1.0f },
-
-		{ -width, -height, +depth, 1.0f, 1.0f },
-		{ +width, -height, +depth, 0.0f, 1.0f },
-		{ +width, +height, +depth, 0.0f, 0.0f },
-		{ -width, +height, +depth, 1.0f, 0.0f },
-
-		{ -width, +height, -depth, 0.0f, 1.0f },
-		{ -width, +height, +depth, 0.0f, 0.0f },
-		{ +width, +height, +depth, 1.0f, 0.0f },
-		{ +width, +height, -depth, 1.0f, 1.0f },
-
-		{ -width, -height, -depth, 1.0f, 1.0f },
-		{ +width, -height, -depth, 0.0f, 1.0f },
-		{ +width, -height, +depth, 0.0f, 0.0f },
-		{ -width, -height, +depth, 1.0f, 0.0f },
-
-		{ -width, -height, +depth, 0.0f, 1.0f },
-		{ -width, +height, +depth, 0.0f, 0.0f },
-		{ -width, +height, -depth, 1.0f, 0.0f },
-		{ -width, -height, -depth, 1.0f, 1.0f },
-
-		{ +width, -height, -depth, 0.0f, 1.0f },
-		{ +width, +height, -depth, 0.0f, 0.0f },
-		{ +width, +height, +depth, 1.0f, 0.0f },
-		{ +width, -height, +depth, 1.0f, 1.0f }
-	};
-
 	// Create index buffer
 	D3D11_BUFFER_DESC vertex_buffer_desc = {};
 	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices.size());
+	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * Vertices.size());
 	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 	D3D11_SUBRESOURCE_DATA vertex_subdata = {};
-	vertex_subdata.pSysMem = vertices.data();
+	vertex_subdata.pSysMem = Vertices.data();
 
 	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dVertexBuffer.ReleaseAndGetAddressOf()));
 }
@@ -75,38 +39,16 @@ void DX::Model::CreateIndexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
-	// Set Indices
-	std::vector<UINT> indices =
-	{
-		0, 1, 2,
-		0, 2, 3,
-
-		4, 5, 6,
-		4, 6, 7,
-
-		8, 9, 10,
-		8, 10, 11,
-
-		12, 13, 14,
-		12, 14, 15,
-
-		16, 17, 18,
-		16, 18, 19,
-
-		20, 21, 22,
-		20, 22, 23,
-	};
-
-	m_IndexCount = static_cast<UINT>(indices.size());
+	m_IndexCount = static_cast<UINT>(Indices.size());
 
 	// Create index buffer
 	D3D11_BUFFER_DESC index_buffer_desc = {};
 	index_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	index_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * indices.size());
+	index_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * Indices.size());
 	index_buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 	D3D11_SUBRESOURCE_DATA index_subdata = {};
-	index_subdata.pSysMem = indices.data();
+	index_subdata.pSysMem = Indices.data();
 
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
@@ -116,8 +58,11 @@ void DX::Model::LoadTexture()
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
 	ComPtr<ID3D11Resource> resource = nullptr;
-	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds", 
-	resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds",
+		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
+
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_normal.dds",
+		resource.ReleaseAndGetAddressOf(), m_NormalTexture.ReleaseAndGetAddressOf()));
 }
 
 void DX::Model::Render()
@@ -143,6 +88,7 @@ void DX::Model::Render()
 
 	// Bind texture to the pixel shader
 	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
+	d3dDeviceContext->PSSetShaderResources(1, 1, m_NormalTexture.GetAddressOf());
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
