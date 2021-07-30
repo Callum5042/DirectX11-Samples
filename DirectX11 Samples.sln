@@ -25,6 +25,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Sources\Lightin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Normal Mapping", "Sources\Normal Mapping\Normal Mapping.vcxproj", "{113E74A2-169F-49A1-A9F2-8B460FB24D6E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamentals", "{B03A36B0-3D23-4F70-99EE-B573BCEE25AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skybox", "Sources\Skybox\Skybox.vcxproj", "{184D3646-458C-4421-9268-962FC489C852}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -121,9 +125,22 @@ Global
 		{113E74A2-169F-49A1-A9F2-8B460FB24D6E}.Release|x64.Build.0 = Release|x64
 		{113E74A2-169F-49A1-A9F2-8B460FB24D6E}.Release|x86.ActiveCfg = Release|Win32
 		{113E74A2-169F-49A1-A9F2-8B460FB24D6E}.Release|x86.Build.0 = Release|Win32
+		{184D3646-458C-4421-9268-962FC489C852}.Debug|x64.ActiveCfg = Debug|x64
+		{184D3646-458C-4421-9268-962FC489C852}.Debug|x64.Build.0 = Debug|x64
+		{184D3646-458C-4421-9268-962FC489C852}.Debug|x86.ActiveCfg = Debug|Win32
+		{184D3646-458C-4421-9268-962FC489C852}.Debug|x86.Build.0 = Debug|Win32
+		{184D3646-458C-4421-9268-962FC489C852}.Release|x64.ActiveCfg = Release|x64
+		{184D3646-458C-4421-9268-962FC489C852}.Release|x64.Build.0 = Release|x64
+		{184D3646-458C-4421-9268-962FC489C852}.Release|x86.ActiveCfg = Release|Win32
+		{184D3646-458C-4421-9268-962FC489C852}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3CEB4FBB-B516-4151-8894-D46D7FFFC913} = {B03A36B0-3D23-4F70-99EE-B573BCEE25AC}
+		{6135E7D0-8E96-4504-B863-95B10BC31AF6} = {B03A36B0-3D23-4F70-99EE-B573BCEE25AC}
+		{13FE8F86-4D4C-4717-A10F-FD56C3B93AE5} = {B03A36B0-3D23-4F70-99EE-B573BCEE25AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
