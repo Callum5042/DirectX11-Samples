@@ -8,7 +8,9 @@ VertexOutput main(VertexInput input)
 	// Transform to homogeneous clip space.
 	output.position = mul(float4(input.position, 1.0f), cWorld);
 	output.position = mul(output.position, cView);
-	output.position = mul(output.position, cProjection);
+
+	// Set z = w so that z/w = 1 (i.e., skydome always on far plane).
+	output.position = mul(output.position, cProjection).xyww; 
 
 	// Set the vertex colour
 	output.tex = input.tex;

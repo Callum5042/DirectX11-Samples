@@ -95,6 +95,9 @@
     <ClInclude Include="DxSkyShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WorldBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

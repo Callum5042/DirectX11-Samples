@@ -224,6 +224,7 @@
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="WorldBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">

@@ -19,6 +19,13 @@ int Applicataion::Execute()
     m_DxRenderer = std::make_unique<DX::Renderer>(m_SdlWindow);
     m_DxRenderer->Create();
 
+    // Initialise and setup the perspective camera
+    auto window_width = 0;
+    auto window_height = 0;
+    SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
+
+    m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
+
     // Initialise and create the DirectX 11 model
     m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
     m_DxModel->Create();
@@ -36,13 +43,6 @@ int Applicataion::Execute()
     m_DxSkyShader = std::make_unique<DX::SkyShader>(m_DxRenderer.get());
     m_DxSkyShader->LoadVertexShader("Shaders/SkyboxVertexShader.cso");
     m_DxSkyShader->LoadPixelShader("Shaders/SkyboxPixelShader.cso");
-
-    // Initialise and setup the perspective camera
-    auto window_width = 0;
-    auto window_height = 0;
-    SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
-
-    m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
 
     // Starts the timer
     m_Timer.Start();
@@ -117,11 +117,25 @@ int Applicataion::Execute()
 
 void Applicataion::UpdateWorldBuffer()
 {
+    // Default world buffer
     DX::WorldBuffer world_buffer = {};
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+    // Skybox world buffer
+    auto camera_position = m_DxCamera->GetPosition();
+    auto skybox_world = DirectX::XMMatrixIdentity();
+   //skybox_world *= DirectX::XMMatrixTranslation(camera_position.x, camera_position.y, camera_position.z);
+
+
+    DX::WorldBuffer skybox_world_buffer = {};
+    skybox_world_buffer.world = DirectX::XMMatrixTranspose(skybox_world);
+    skybox_world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+    skybox_world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    m_DxSkyShader->UpdateWorldConstantBuffer(skybox_world_buffer);
 }
 
 bool Applicataion::SDLInit()

@@ -12,7 +12,7 @@ struct VertexOutput
 };
 
 // World constant buffer
-cbuffer WorldBuffer : register(b0)
+cbuffer SkyWorldBuffer : register(b0)
 {
 	matrix cWorld;
 	matrix cView;

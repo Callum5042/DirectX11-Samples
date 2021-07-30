@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DxRenderer.h"
+#include "DxCamera.h"
 #include "MeshData.h"
 #include <vector>
 #include <DirectXColors.h>
@@ -39,6 +40,10 @@ namespace DX
 		// Texture resource
 		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
 		void LoadTexture();
+
+		// Depth stencil
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilState = nullptr;
+		void CreateDepthStencilState();
 
 		// Raster state
 		void CreateRasterState();

@@ -4,6 +4,7 @@
 
 DX::SkyShader::SkyShader(Renderer* renderer) : m_DxRenderer(renderer)
 {
+	CreateWorldConstantBuffer();
 }
 
 void DX::SkyShader::LoadVertexShader(std::string&& vertex_shader_path)
@@ -39,6 +40,12 @@ void DX::SkyShader::LoadPixelShader(std::string&& pixel_shader_path)
 	DX::Check(d3dDevice->CreatePixelShader(data.data(), data.size(), nullptr, m_d3dPixelShader.ReleaseAndGetAddressOf()));
 }
 
+void DX::SkyShader::UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer)
+{
+	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
+	d3dDeviceContext->UpdateSubresource(m_d3dWorldConstantBuffer.Get(), 0, nullptr, &worldBuffer, 0, 0);
+}
+
 void DX::SkyShader::Use()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
@@ -51,4 +58,20 @@ void DX::SkyShader::Use()
 
 	// Bind the pixel shader to the pipeline's Pixel SkyShader stage
 	d3dDeviceContext->PSSetShader(m_d3dPixelShader.Get(), nullptr, 0);
+
+	// Bind the world constant buffer to the vertex shader
+	d3dDeviceContext->VSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+}
+
+void DX::SkyShader::CreateWorldConstantBuffer()
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Create world constant buffer
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(WorldBuffer);
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dWorldConstantBuffer.ReleaseAndGetAddressOf()));
 }

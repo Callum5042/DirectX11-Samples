@@ -26,12 +26,18 @@ namespace DX
 		// Get view matrix
 		constexpr DirectX::XMMATRIX GetView() { return m_View; }
 
+		// Get position vector
+		constexpr DirectX::XMFLOAT3 GetPosition() { return m_Position; }
+
 	private:
 		// Projection matrix
 		DirectX::XMMATRIX m_Projection;
 
 		// View matrix
 		DirectX::XMMATRIX m_View;
+
+		// Position matrix
+		DirectX::XMFLOAT3 m_Position;
 
 		// Camera pitch in radians
 		float m_PitchRadians = 0.0f;

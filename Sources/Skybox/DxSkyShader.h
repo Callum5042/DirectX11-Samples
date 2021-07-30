@@ -3,6 +3,7 @@
 #include "DxRenderer.h"
 #include <DirectXMath.h>
 #include <string>
+#include "WorldBuffer.h"
 
 namespace DX
 {
@@ -18,6 +19,9 @@ namespace DX
 		// Create pixel shader
 		void LoadPixelShader(std::string&& pixel_shader_path);
 
+		// Set world constant buffer from camera
+		void UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer);
+
 		// Bind the shader to the pipeline
 		void Use();
 
@@ -32,5 +36,9 @@ namespace DX
 
 		// Pixel shader
 		ComPtr<ID3D11PixelShader> m_d3dPixelShader = nullptr;
+
+		// World constant buffer
+		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;
+		void CreateWorldConstantBuffer();
 	};
 }

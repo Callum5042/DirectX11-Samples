@@ -21,6 +21,9 @@ void DX::Sky::Create()
 
 	// Create raster states
 	CreateRasterState();
+
+	// Create depth stencil
+	CreateDepthStencilState();
 }
 
 void DX::Sky::CreateVertexBuffer()
@@ -64,6 +67,18 @@ void DX::Sky::LoadTexture()
 		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
 }
 
+void DX::Sky::CreateDepthStencilState()
+{
+	auto device = m_DxRenderer->GetDevice();
+
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
+	depth_stencil_desc.DepthEnable = true;
+	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+	device->CreateDepthStencilState(&depth_stencil_desc, &m_DepthStencilState);
+}
+
 void DX::Sky::CreateRasterState()
 {
 	auto device = m_DxRenderer->GetDevice();
@@ -85,6 +100,9 @@ void DX::Sky::Render()
 
 	// Set raster state
 	d3dDeviceContext->RSSetState(m_RasterState.Get());
+
+	// Set depth stencil
+	d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
 
 	// We need the stride and offset for the vertex
 	UINT vertex_stride = sizeof(Vertex);

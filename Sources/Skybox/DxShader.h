@@ -3,16 +3,10 @@
 #include "DxRenderer.h"
 #include <DirectXMath.h>
 #include <string>
+#include "WorldBuffer.h"
 
 namespace DX
 {
-	struct WorldBuffer
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-	};
-
 	class Shader
 	{
 	public:
