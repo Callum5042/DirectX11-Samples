@@ -10,8 +10,7 @@ DX::Sky::Sky(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Sky::Create()
 {
-	//Geometry::CreateBox(1.0f, 1.0f, 1.0f, &m_MeshData);
-	Geometry::CreateSphere(2.0f, 8, 8, &m_MeshData);
+	Geometry::CreateSphere(4.0f, 8, 8, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();
@@ -19,6 +18,9 @@ void DX::Sky::Create()
 
 	// Create texture resource
 	LoadTexture();
+
+	// Create raster states
+	CreateRasterState();
 }
 
 void DX::Sky::CreateVertexBuffer()
@@ -62,9 +64,27 @@ void DX::Sky::LoadTexture()
 		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
 }
 
+void DX::Sky::CreateRasterState()
+{
+	auto device = m_DxRenderer->GetDevice();
+
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.AntialiasedLineEnable = true;
+	rasterizerState.CullMode = D3D11_CULL_FRONT;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.DepthClipEnable = true;
+	rasterizerState.FrontCounterClockwise = false;
+	rasterizerState.MultisampleEnable = false;
+
+	DX::Check(device->CreateRasterizerState(&rasterizerState, &m_RasterState));
+}
+
 void DX::Sky::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
+
+	// Set raster state
+	d3dDeviceContext->RSSetState(m_RasterState.Get());
 
 	// We need the stride and offset for the vertex
 	UINT vertex_stride = sizeof(Vertex);
@@ -72,10 +92,6 @@ void DX::Sky::Render()
 
 	// Bind the vertex buffer to the Input Assembler
 	d3dDeviceContext->IASetVertexBuffers(0, 1, m_d3dVertexBuffer.GetAddressOf(), &vertex_stride, &vertex_offset);
-
-	// We need the stride and offset for the colour
-	UINT colour_stride = sizeof(DirectX::XMVECTORF32);
-	auto colour_offset = 0u;
 
 	// Bind the index buffer to the Input Assembler
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);

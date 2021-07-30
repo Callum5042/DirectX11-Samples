@@ -39,5 +39,9 @@ namespace DX
 		// Texture resource
 		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
 		void LoadTexture();
+
+		// Raster state
+		void CreateRasterState();
+		ComPtr<ID3D11RasterizerState> m_RasterState = nullptr;
 	};
 }

@@ -22,6 +22,9 @@
     <Filter Include="Shader Files\Default">
       <UniqueIdentifier>{d995f9fa-afee-4eef-9614-358a49b526e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Skybox">
+      <UniqueIdentifier>{5b4248dc-a663-433f-a589-8083d8d77b79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -52,6 +55,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DxSky.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxSkyShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,6 +92,9 @@
     <ClInclude Include="DxSky.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DxSkyShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -94,10 +103,19 @@
     <FxCompile Include="PixelShader.hlsl">
       <Filter>Shader Files\Default</Filter>
     </FxCompile>
+    <FxCompile Include="SkyboxVertexShader.hlsl">
+      <Filter>Shader Files\Skybox</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxPixelShader.hlsl">
+      <Filter>Shader Files\Skybox</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderData.hlsli">
       <Filter>Shader Files\Default</Filter>
+    </None>
+    <None Include="SkyboxShaderData.hlsli">
+      <Filter>Shader Files\Skybox</Filter>
     </None>
   </ItemGroup>
 </Project>
