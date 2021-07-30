@@ -6,12 +6,12 @@ VertexOutput main(VertexInput input)
 	VertexOutput output;
 
 	// Transform to homogeneous clip space.
-	output.position = mul(float4(input.position, 1.0f), cWorld);
-	output.position = mul(output.position, cView);
-	output.position = mul(output.position, cProjection);
+	output.positionClipSpace = mul(float4(input.position, 1.0f), cWorld);
+	output.positionClipSpace = mul(output.positionClipSpace, cView);
+	output.positionClipSpace = mul(output.positionClipSpace, cProjection);
 
-	// Set the vertex colour
-	output.tex = input.tex;
+	// Use local vertex position as cubemap lookup vector.
+	output.position = input.position;
 
 	return output;
 }

@@ -2,14 +2,13 @@
 struct VertexInput
 {
 	float3 position : POSITION;
-	float2 tex : TEXTURE;
 };
 
 // Vertex output / pixel input structure
 struct VertexOutput
 {
-	float4 position : SV_POSITION;
-	float2 tex : TEXTURE;
+	float4 positionClipSpace : SV_POSITION;
+	float3 position : POSITION;
 };
 
 // World constant buffer
@@ -24,4 +23,4 @@ cbuffer WorldBuffer : register(b0)
 SamplerState gSamplerAnisotropic : register(s0);
 
 // Textures
-Texture2D gTextureDiffuse : register(t0);
+TextureCube gTextureSkybox : register(t0);

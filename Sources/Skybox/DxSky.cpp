@@ -10,7 +10,7 @@ DX::Sky::Sky(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Sky::Create()
 {
-	Geometry::CreateSphere(4.0f, 8, 8, &m_MeshData);
+	Geometry::CreateSphere(2.0f, 8, 8, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();
@@ -60,7 +60,7 @@ void DX::Sky::LoadTexture()
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
 	ComPtr<ID3D11Resource> resource = nullptr;
-	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds",
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\grass_cubemap.dds",
 		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
 }
 
