@@ -128,8 +128,7 @@ void Applicataion::UpdateWorldBuffer()
     // Skybox world buffer
     auto camera_position = m_DxCamera->GetPosition();
     auto skybox_world = DirectX::XMMatrixIdentity();
-   //skybox_world *= DirectX::XMMatrixTranslation(camera_position.x, camera_position.y, camera_position.z);
-
+    skybox_world *= DirectX::XMMatrixTranslation(camera_position.x, camera_position.y, camera_position.z);
 
     DX::WorldBuffer skybox_world_buffer = {};
     skybox_world_buffer.world = DirectX::XMMatrixTranspose(skybox_world);
