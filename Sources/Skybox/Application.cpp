@@ -28,6 +28,10 @@ int Applicataion::Execute()
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
     m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
 
+    // Initialise and create the DirectX 11 sky
+    m_DxSky = std::make_unique<DX::Sky>(m_DxRenderer.get());
+    m_DxSky->Create();
+
     // Initialise and setup the perspective camera
     auto window_width = 0;
     auto window_height = 0;
@@ -90,7 +94,10 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
-            m_DxModel->Render();
+            //m_DxModel->Render();
+
+            // Render the sky
+            m_DxSky->Render();
 
             // Display the rendered scene
             m_DxRenderer->Present();

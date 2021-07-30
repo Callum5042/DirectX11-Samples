@@ -7,6 +7,7 @@
 #include "DxModel.h"
 #include "DxShader.h"
 #include "DxCamera.h"
+#include "DxSky.h"
 
 class Applicataion
 {
@@ -39,4 +40,7 @@ private:
 
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
+
+	// Direct3D 11 sky
+	std::unique_ptr<DX::Sky> m_DxSky = nullptr;
 };

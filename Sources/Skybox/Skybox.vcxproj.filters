@@ -19,6 +19,9 @@
     <Filter Include="Third-Party">
       <UniqueIdentifier>{2ee07627-6979-4784-8c77-73ef9610f788}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Default">
+      <UniqueIdentifier>{d995f9fa-afee-4eef-9614-358a49b526e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -46,6 +49,9 @@
       <Filter>Third-Party</Filter>
     </ClCompile>
     <ClCompile Include="GeometryGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxSky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,18 +83,21 @@
     <ClInclude Include="MeshData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DxSky.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\Default</Filter>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\Default</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderData.hlsli">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\Default</Filter>
     </None>
   </ItemGroup>
 </Project>
