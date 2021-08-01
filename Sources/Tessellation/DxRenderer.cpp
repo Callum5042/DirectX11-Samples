@@ -252,10 +252,10 @@ void DX::Renderer::CreateRasterStateWireframe()
 {
 	D3D11_RASTERIZER_DESC rasterizerState = {};
 	rasterizerState.AntialiasedLineEnable = true;
-	rasterizerState.CullMode = D3D11_CULL_FRONT;
+	rasterizerState.CullMode = D3D11_CULL_NONE;
 	rasterizerState.FillMode = D3D11_FILL_WIREFRAME;
 	rasterizerState.DepthClipEnable = true;
-	rasterizerState.FrontCounterClockwise = true;
+	rasterizerState.FrontCounterClockwise = false;
 	rasterizerState.MultisampleEnable = true;
 
 	rasterizerState.DepthBias = 0;

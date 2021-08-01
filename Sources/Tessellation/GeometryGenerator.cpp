@@ -238,8 +238,5 @@ void GeometryGenerator::CreateRectangle(float width, float height, DX::Model* mo
 	model->Indices.push_back(0);
 	model->Indices.push_back(1);
 	model->Indices.push_back(2);
-
-	model->Indices.push_back(2);
-	model->Indices.push_back(1);
 	model->Indices.push_back(3);
 }

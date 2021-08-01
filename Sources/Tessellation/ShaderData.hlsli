@@ -38,10 +38,6 @@ struct PixelInputType
 // Output patch constant data.
 struct HullConstDataOutput
 {
-	float EdgeTess[3] : SV_TessFactor; // e.g. would be [4] for a quad domain
-	float InsideTess[1] : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
-
-	float3 f3B0 : POSITION0;
-	float3 f3B1 : POSITION1;
-	float3 f3B2 : POSITION2;
+	float EdgeTess[4] : SV_TessFactor;
+	float InsideTess[2] : SV_InsideTessFactor;
 };

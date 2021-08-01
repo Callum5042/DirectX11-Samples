@@ -24,7 +24,7 @@
     <ProjectGuid>{d73311d7-1c29-4377-b9a9-d0c0dd35f0bd}</ProjectGuid>
     <RootNamespace>Tessellation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tessellation</ProjectName>
+    <ProjectName>Adaptive Tessellation</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
