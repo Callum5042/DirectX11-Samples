@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fundamentals", "Fundamental
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Skybox", "Sources\Skybox\Skybox.vcxproj", "{184D3646-458C-4421-9268-962FC489C852}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adaptive Tessellation", "Sources\Tessellation\Tessellation.vcxproj", "{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adaptive Tessellation", "Sources\Adapative Tessellation\Adapative Tessellation.vcxproj", "{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
