@@ -21,10 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{13fe8f86-4d4c-4717-a10f-fd56c3b93ae5}</ProjectGuid>
+    <ProjectGuid>{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E}</ProjectGuid>
     <RootNamespace>_05_Perspective_Camera</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Orthographic Camera</ProjectName>
+    <ProjectName>Perspective Camera</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

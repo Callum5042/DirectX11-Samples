@@ -80,8 +80,8 @@ int Applicataion::Execute()
             }
             else if (e.type == SDL_MOUSEWHEEL)
             {
-                /*auto direction = static_cast<float>(e.wheel.y);
-                m_DxCamera->UpdateFov(-direction);*/
+                auto direction = static_cast<float>(e.wheel.y);
+                m_DxCamera->UpdateFov(-direction);
 
                 // Update world constant buffer with new camera view and perspective
                 DX::WorldBuffer world_buffer = {};
@@ -133,7 +133,7 @@ bool Applicataion::SDLInit()
 
     // Create SDL Window
     auto window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-    m_SdlWindow = SDL_CreateWindow("DirectX - Orthographic Camera", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+    m_SdlWindow = SDL_CreateWindow("DirectX - Perspective Camera", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
     if (m_SdlWindow == nullptr)
     {
         std::string error = "SDL_CreateWindow failed: "; 
@@ -166,7 +166,7 @@ void Applicataion::CalculateFramesPerSecond()
         time = 0.0f;
         frameCount = 0;
 
-        auto title = "DirectX - Orthographic Camera - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
+        auto title = "DirectX - Perspective Camera - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
         SDL_SetWindowTitle(m_SdlWindow, title.c_str());
     }
 }

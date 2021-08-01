@@ -17,6 +17,9 @@ namespace DX
 		// Update aspect ratio
 		void UpdateAspectRatio(int width, int height);
 
+		// Set field of view
+		void UpdateFov(float fov);
+
 		// Get projection matrix
 		constexpr DirectX::XMMATRIX GetProjection() { return m_Projection; }
 
@@ -43,6 +46,6 @@ namespace DX
 		float m_AspectRatio = 0.0f;
 
 		// Recalculates the projection based on the new window size
-		void CalculateProjection(int width, int height);
+		void CalculateProjection();
 	};
 }
