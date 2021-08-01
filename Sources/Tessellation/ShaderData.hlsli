@@ -4,7 +4,8 @@ cbuffer WorldBuffer : register(b0)
 	matrix cWorld;
 	matrix cView;
 	matrix cProjection;
-	float4 cTess;
+	float3 cCameraPosition;
+	float padding;
 }
 
 // Vertex input

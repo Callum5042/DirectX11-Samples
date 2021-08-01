@@ -10,9 +10,9 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
-	GeometryGenerator::CreateRectangle(1.0f, 1.0f, this);
+	GeometryGenerator::CreateGrid(50.0f, 50.0f, 10, 10, this);
 
-	CreateVertexBuffer(); 
+	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
 

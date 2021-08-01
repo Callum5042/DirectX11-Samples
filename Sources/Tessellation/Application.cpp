@@ -77,21 +77,10 @@ int Applicataion::Execute()
             else if (e.type == SDL_MOUSEWHEEL)
             {
                 auto direction = static_cast<float>(e.wheel.y);
-                //m_DxCamera->UpdateRadius(direction);
-                m_TessellationRate += direction;
-                m_TessellationRate = std::clamp(m_TessellationRate, 1.0f, 64.0f);
+                m_DxCamera->UpdateRadius(direction);
 
                 // Update world constant buffer with new camera view and perspective
                 SetWorldBuffer();
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                if (e.key.repeat == 0)
-                {
-                    static bool wireframe = true;
-                    wireframe = !wireframe;
-                    m_DxRenderer->ToggleWireframe(wireframe);
-                }
             }
         }
         else
@@ -121,7 +110,10 @@ void Applicataion::SetWorldBuffer()
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-    world_buffer.tess = DirectX::XMFLOAT4(m_TessellationRate, 0.0f, 0.0f, 0.0f);
+
+    auto position = m_DxCamera->GetPosition();
+    world_buffer.cameraPosition = DirectX::XMFLOAT4(position.x, position.y, position.z, 1.0f);
+
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }
 

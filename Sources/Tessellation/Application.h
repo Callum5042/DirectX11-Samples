@@ -39,7 +39,4 @@ private:
 
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
-
-	// Tessellation rate
-	float m_TessellationRate = 1.0f;
 };

@@ -26,6 +26,9 @@ namespace DX
 		// Get view matrix
 		constexpr DirectX::XMMATRIX GetView() { return m_View; }
 
+		// Get position
+		constexpr DirectX::XMFLOAT4 GetPosition() { return m_Position; }
+
 		// Update radius
 		void UpdateRadius(float radius);
 
@@ -35,6 +38,9 @@ namespace DX
 
 		// View matrix
 		DirectX::XMMATRIX m_View;
+
+		// Position
+		DirectX::XMFLOAT4 m_Position;
 
 		// Camera pitch in radians
 		float m_PitchRadians = 0.0f;
@@ -52,6 +58,6 @@ namespace DX
 		void CalculateProjection();
 
 		// Radius
-		float m_Radius = -8.0f;
+		float m_Radius = -50.0f;
 	};
 }

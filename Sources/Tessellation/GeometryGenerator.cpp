@@ -168,8 +168,8 @@ void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, DX:
 
 			int index = i * n + j;
 			model->Vertices[index].x = x;
-			model->Vertices[index].y = z;
-			model->Vertices[index].z = 0.0f;
+			model->Vertices[index].y = 0.0f;
+			model->Vertices[index].z = z;
 		}
 	}
 
@@ -177,7 +177,7 @@ void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, DX:
 	// Create the indices.
 	//
 
-	model->Indices.resize(static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(faceCount) * 3); // 3 indices per face
+	model->Indices.resize(static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(faceCount) * 4); // 3 indices per face
 
 	// Iterate over each quad and compute indices.
 	UINT k = 0;
@@ -187,13 +187,11 @@ void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, DX:
 		{
 			model->Indices[k] = i * n + j;
 			model->Indices[static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(k) + 1] = i * n + j + 1;
+
 			model->Indices[static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(k) + 2] = (i + 1) * n + j;
+			model->Indices[static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(k) + 3] = (i + 1) * n + j + 1;
 
-			model->Indices[static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(k) + 3] = (i + 1) * n + j;
-			model->Indices[static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(k) + 4] = i * n + j + 1;
-			model->Indices[static_cast<std::vector<UINT, std::allocator<UINT>>::size_type>(k) + 5] = (i + 1) * n + j + 1;
-
-			k += 6; // next quad
+			k += 4; // next quad
 		}
 	}
 }

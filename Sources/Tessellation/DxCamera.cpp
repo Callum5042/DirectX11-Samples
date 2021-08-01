@@ -26,6 +26,8 @@ void DX::Camera::Rotate(float pitch_radians, float yaw_radians)
 	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+	DirectX::XMStoreFloat4(&m_Position, position);
 }
 
 void DX::Camera::UpdateAspectRatio(int width, int height)
@@ -48,13 +50,13 @@ void DX::Camera::CalculateProjection()
 	auto field_of_view_radians = DirectX::XMConvertToRadians(m_FieldOfViewDegrees);
 
 	// Calculate camera's perspective
-	m_Projection = DirectX::XMMatrixPerspectiveFovLH(field_of_view_radians, m_AspectRatio, 0.01f, 100.0f);
+	m_Projection = DirectX::XMMatrixPerspectiveFovLH(field_of_view_radians, m_AspectRatio, 0.01f, 200.0f);
 }
 
 void DX::Camera::UpdateRadius(float radius)
 {
 	m_Radius += radius;
-	m_Radius = std::clamp(m_Radius, -50.0f, -1.0f);
+	m_Radius = std::clamp(m_Radius, -100.0f, -1.0f);
 
 	// Convert Spherical to Cartesian coordinates
 	auto rotation_matrix = DirectX::XMMatrixRotationRollPitchYaw(m_PitchRadians, m_YawRadians, 0);
@@ -66,4 +68,6 @@ void DX::Camera::UpdateRadius(float radius)
 	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+	DirectX::XMStoreFloat4(&m_Position, position);
 }

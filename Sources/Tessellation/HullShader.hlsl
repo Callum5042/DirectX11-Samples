@@ -1,18 +1,39 @@
 #include "ShaderData.hlsli"
 
+float CalcTessFactor(float3 p)
+{
+	float d = distance(p, cCameraPosition);
+
+	float gMinDist = 10.0f;
+	float gMaxDist = 50.0f;
+
+	float gMinTess = 0.0f;
+	float gMaxTess = 6.0f;
+
+	// max norm in xz plane (useful to see detail levels from a bird's eye).
+	//float d = max( abs(p.x-gEyePosW.x), abs(p.z-gEyePosW.z) );
+	float s = saturate((d - gMinDist) / (gMaxDist - gMinDist));
+
+	return pow(2, (lerp(gMaxTess, gMinTess, s)));
+}
+
 // Patch Constant Function
 HullConstDataOutput CalcHSPatchConstants(InputPatch<HullInputType, 4> patch, uint PatchID : SV_PrimitiveID)
 {
 	HullConstDataOutput pt;
 
-	float tess = cTess.x;
+	float3 e0 = 0.5f * (patch[0].position + patch[2].position);
+	float3 e1 = 0.5f * (patch[0].position + patch[1].position);
+	float3 e2 = 0.5f * (patch[1].position + patch[3].position);
+	float3 e3 = 0.5f * (patch[2].position + patch[3].position);
+	float3 c = 0.25f * (patch[0].position + patch[1].position + patch[2].position + patch[3].position);
 
-	pt.EdgeTess[0] = tess;
-	pt.EdgeTess[1] = tess;
-	pt.EdgeTess[2] = tess;
-	pt.EdgeTess[3] = tess;
+	pt.EdgeTess[0] = CalcTessFactor(e0);
+	pt.EdgeTess[1] = CalcTessFactor(e1);
+	pt.EdgeTess[2] = CalcTessFactor(e2);
+	pt.EdgeTess[3] = CalcTessFactor(e3);
 
-	pt.InsideTess[0] = tess;
+	pt.InsideTess[0] = CalcTessFactor(c);
 	pt.InsideTess[1] = pt.InsideTess[0];
 
 	return pt;
