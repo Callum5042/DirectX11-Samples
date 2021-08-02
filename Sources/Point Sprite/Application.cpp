@@ -78,6 +78,15 @@ int Application::Execute()
                 // Update world constant buffer with new camera view and perspective
                 UpdateWorldBuffer();
             }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.repeat == 0)
+                {
+                    static bool wireframe = false;
+                    wireframe = !wireframe;
+                    m_DxRenderer->ToggleWireframe(wireframe);
+                }
+            }
         }
         else
         {
