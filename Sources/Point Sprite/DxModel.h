@@ -12,6 +12,10 @@ namespace DX
 		float x = 0;
 		float y = 0;
 		float z = 0;
+
+		// Size
+		float width = 0;
+		float height = 0;
 	};
 
 	class Model

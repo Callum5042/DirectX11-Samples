@@ -29,6 +29,9 @@ void DX::Model::CreateVertexBuffer()
 	m_Vertex.y = 0.0f;
 	m_Vertex.z = 0.0f;
 
+	m_Vertex.width = 2.0f;
+	m_Vertex.height = 1.0f;
+
 	// Create index buffer
 	D3D11_BUFFER_DESC vertex_buffer_desc = {};
 	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
