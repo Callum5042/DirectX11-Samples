@@ -40,8 +40,11 @@ namespace DX
 		// Resizing
 		void Resize(int width, int height);
 
-		// Clear the buffers
-		void Clear();
+		// Clear the buffers and set render target to the back buffer
+		void SetRenderTargetBackBuffer();
+
+		// Clear the buffers and set render target to the texture
+		void SetRenderTargetTexture();
 
 		// Display the rendered scene
 		void Present();
@@ -54,6 +57,9 @@ namespace DX
 
 		// Toggle wireframe
 		void ToggleWireframe(bool wireframe);
+
+		// Get texture
+		ID3D11ShaderResourceView* GetRenderedTexture() { return m_RenderedTexture.Get(); }
 
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
@@ -86,5 +92,16 @@ namespace DX
 
 		ComPtr<ID3D11RasterizerState> m_RasterStateWireframe = nullptr;
 		void CreateRasterStateWireframe();
+
+		// Render to texture
+		ComPtr<ID3D11ShaderResourceView> m_RenderedTexture = nullptr;
+		ComPtr<ID3D11Texture2D> m_Texture = nullptr;
+
+		ComPtr<ID3D11RenderTargetView> m_TextureRenderTargetView = nullptr;
+		ComPtr<ID3D11DepthStencilView> m_TextureDepthStencilView = nullptr;
+
+		void CreateRenderToTextureTargetView(int width, int height);
+		void CreateRenderToTextureDepthStencilView(int width, int height);
+		void CreateTextureShaderResource(int width, int height);
 	};
 }

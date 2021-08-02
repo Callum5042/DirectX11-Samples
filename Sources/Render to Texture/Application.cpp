@@ -23,6 +23,9 @@ int Applicataion::Execute()
     m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
     m_DxModel->Create();
 
+    m_DxPlane = std::make_unique<DX::Plane>(m_DxRenderer.get());
+    m_DxPlane->Create();
+
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -92,14 +95,33 @@ int Applicataion::Execute()
         {
             CalculateFramesPerSecond();
 
+            //
+            // Render to texture
+            //
+
             // Clear the buffers
-            m_DxRenderer->Clear();
+            m_DxRenderer->SetRenderTargetTexture();
+
+            //// Bind the shader to the pipeline
+            m_DxShader->Use();
+
+            //// Render the model
+            m_DxModel->Render();
+
+            // 
+            // Render to back buffer
+            //
+
+            // Clear the buffers
+            m_DxRenderer->SetRenderTargetBackBuffer();
 
             // Bind the shader to the pipeline
             m_DxShader->Use();
 
-            // Render the model
-            m_DxModel->Render();
+            // Render the plane
+            auto rendered_texture = m_DxRenderer->GetRenderedTexture();
+            m_DxPlane->SetTexture(rendered_texture);
+            m_DxPlane->Render();
 
             // Display the rendered scene
             m_DxRenderer->Present();

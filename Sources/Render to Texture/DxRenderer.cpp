@@ -1,6 +1,7 @@
 #include "DxRenderer.h"
 #include <SDL.h>
 #include <DirectXColors.h>
+#include "DDSTextureLoader.h"
 
 // Required for using SDL_SysWMinfo
 #include <SDL_syswm.h>
@@ -37,6 +38,16 @@ void DX::Renderer::Create()
 	CreateRasterStateSolid();
 	CreateRasterStateWireframe();
 	ToggleWireframe(false);
+
+	// Render to texture
+	CreateRenderToTextureTargetView(window_width, window_height);
+	CreateRenderToTextureDepthStencilView(window_width, window_height); 
+	CreateTextureShaderResource(window_width, window_height);
+
+	// Tempoary
+	/*ComPtr<ID3D11Resource> resource = nullptr;
+	DX::Check(DirectX::CreateDDSTextureFromFile(m_d3dDevice.Get(), L"..\\..\\Resources\\Textures\\crate_diffuse.dds",
+		resource.ReleaseAndGetAddressOf(), m_RenderedTexture.ReleaseAndGetAddressOf()));*/
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -55,7 +66,7 @@ void DX::Renderer::Resize(int width, int height)
 	SetViewport(width, height);
 }
 
-void DX::Renderer::Clear()
+void DX::Renderer::SetRenderTargetBackBuffer()
 {
 	// Clear the render target view to the chosen colour
 	m_d3dDeviceContext->ClearRenderTargetView(m_d3dRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
@@ -63,6 +74,16 @@ void DX::Renderer::Clear()
 
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
+}
+
+void DX::Renderer::SetRenderTargetTexture()
+{
+	// Clear the render target view to the chosen colour
+	m_d3dDeviceContext->ClearRenderTargetView(m_TextureRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::DarkGreen));
+	m_d3dDeviceContext->ClearDepthStencilView(m_TextureDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Bind the render target view to the pipeline's output merger stage
+	m_d3dDeviceContext->OMSetRenderTargets(1, m_TextureRenderTargetView.GetAddressOf(), m_TextureDepthStencilView.Get());
 }
 
 void DX::Renderer::Present()
@@ -285,4 +306,60 @@ void DX::Renderer::CreateRasterStateWireframe()
 	rasterizerState.SlopeScaledDepthBias = 1.0f;
 
 	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterStateWireframe.ReleaseAndGetAddressOf()));
+}
+
+void DX::Renderer::CreateRenderToTextureTargetView(int width, int height)
+{
+	// Render targets
+	D3D11_TEXTURE2D_DESC texture_desc = {};
+	texture_desc.Width = width;
+	texture_desc.Height = height;
+	texture_desc.MipLevels = 1;
+	texture_desc.ArraySize = 1;
+	texture_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texture_desc.SampleDesc.Count = 1;
+	texture_desc.SampleDesc.Quality = 0;
+	texture_desc.Usage = D3D11_USAGE_DEFAULT;
+	texture_desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	texture_desc.CPUAccessFlags = 0;
+	texture_desc.MiscFlags = 0;
+
+	DX::Check(m_d3dDevice->CreateTexture2D(&texture_desc, 0, m_Texture.ReleaseAndGetAddressOf()));
+
+	// Create the render target view.
+	D3D11_RENDER_TARGET_VIEW_DESC target_view_desc = {};
+	target_view_desc.Format = texture_desc.Format;
+	target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	target_view_desc.Texture2D.MipSlice = 0;
+
+	DX::Check(m_d3dDevice->CreateRenderTargetView(m_Texture.Get(), &target_view_desc, m_TextureRenderTargetView.ReleaseAndGetAddressOf()));
+}
+
+void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
+{
+	D3D11_TEXTURE2D_DESC texture_desc = {};
+	texture_desc.Width = width;
+	texture_desc.Height = height;
+	texture_desc.MipLevels = 1;
+	texture_desc.ArraySize = 1;
+	texture_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	texture_desc.SampleDesc.Count = 1;
+	texture_desc.SampleDesc.Quality = 0;
+	texture_desc.Usage = D3D11_USAGE_DEFAULT;
+	texture_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	ComPtr<ID3D11Texture2D> texture = nullptr;
+	DX::Check(m_d3dDevice->CreateTexture2D(&texture_desc, nullptr, texture.ReleaseAndGetAddressOf()));
+	DX::Check(m_d3dDevice->CreateDepthStencilView(texture.Get(), nullptr, m_TextureDepthStencilView.ReleaseAndGetAddressOf()));
+}
+
+void DX::Renderer::CreateTextureShaderResource(int width, int height)
+{
+	D3D11_SHADER_RESOURCE_VIEW_DESC view_desc = {};
+	view_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	view_desc.Texture2D.MostDetailedMip = 0;
+	view_desc.Texture2D.MipLevels = 1;
+
+	DX::Check(m_d3dDevice->CreateShaderResourceView(m_Texture.Get(), &view_desc, m_RenderedTexture.ReleaseAndGetAddressOf()));
 }

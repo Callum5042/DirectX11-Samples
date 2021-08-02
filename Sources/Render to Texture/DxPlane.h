@@ -7,11 +7,11 @@
 
 namespace DX
 {
-	class Model
+	class Plane
 	{
 	public:
-		Model(DX::Renderer* renderer);
-		virtual ~Model() = default;
+		Plane(DX::Renderer* renderer);
+		virtual ~Plane() = default;
 
 		// Create device
 		void Create();
@@ -21,6 +21,9 @@ namespace DX
 
 		// World 
 		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+		// Set texture
+		void SetTexture(ID3D11ShaderResourceView* texture);
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
@@ -38,6 +41,5 @@ namespace DX
 
 		// Texture resource
 		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
-		void LoadTexture();
 	};
 }

@@ -7,6 +7,7 @@
 #include "DxModel.h"
 #include "DxShader.h"
 #include "DxCamera.h"
+#include "DxPlane.h"
 
 class Applicataion
 {
@@ -15,8 +16,6 @@ public:
 	virtual ~Applicataion();
 
 	int Execute();
-
-	void UpdateWorldBuffer();
 
 private:
 	// SDL window
@@ -33,10 +32,14 @@ private:
 	
 	// Direct3D 11 model
 	std::unique_ptr<DX::Model> m_DxModel = nullptr;
+	std::unique_ptr<DX::Plane> m_DxPlane = nullptr;
 
 	// Direct3D 11 shader
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;
 
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
+
+	// Update buffers
+	void UpdateWorldBuffer();
 };
