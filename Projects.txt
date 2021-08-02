@@ -1,6 +1,6 @@
 === Basics ===
 [-] Billboarding
-[-] Render to Texture
+[x] Render to Texture
 [-] Point Sprite
 [-] Instancing
 [-] Fog

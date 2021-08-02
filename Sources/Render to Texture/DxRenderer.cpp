@@ -43,11 +43,6 @@ void DX::Renderer::Create()
 	CreateRenderToTextureTargetView(window_width, window_height);
 	CreateRenderToTextureDepthStencilView(window_width, window_height); 
 	CreateTextureShaderResource(window_width, window_height);
-
-	// Tempoary
-	/*ComPtr<ID3D11Resource> resource = nullptr;
-	DX::Check(DirectX::CreateDDSTextureFromFile(m_d3dDevice.Get(), L"..\\..\\Resources\\Textures\\crate_diffuse.dds",
-		resource.ReleaseAndGetAddressOf(), m_RenderedTexture.ReleaseAndGetAddressOf()));*/
 }
 
 void DX::Renderer::Resize(int width, int height)
