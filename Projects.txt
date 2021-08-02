@@ -1,9 +1,9 @@
 === Basics ===
 [-] Billboarding
 [x] Render to Texture
-[-] Point Sprite
+[x] Point Sprite
 [-] Instancing
-[-] Fog
+[-] Fog? - Looks bad with height camera far plane
 [-] Point Lighting
 [-] Spot lighting
 [x] Stencil Outline
