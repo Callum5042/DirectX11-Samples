@@ -4,12 +4,12 @@
 #include <SDL.h>
 #include <iostream>
 
-Applicataion::~Applicataion()
+Application::~Application()
 {
     SDLCleanup();
 }
 
-int Applicataion::Execute()
+int Application::Execute()
 {
     // Initialise SDL subsystems and creates the window
     if (!SDLInit())
@@ -54,11 +54,7 @@ int Applicataion::Execute()
                     m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 
                     // Update world constant buffer with new camera view and perspective
-                    DX::WorldBuffer world_buffer = {};
-                    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-                    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-                    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+                    UpdateWorldBuffers();
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
@@ -71,11 +67,7 @@ int Applicataion::Execute()
                     m_DxCamera->Rotate(pitch, yaw);
 
                     // Update world constant buffer with new camera view and perspective
-                    DX::WorldBuffer world_buffer = {};
-                    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-                    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-                    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+                    UpdateWorldBuffers();
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
@@ -84,11 +76,7 @@ int Applicataion::Execute()
                 m_DxCamera->UpdateFov(-direction);
 
                 // Update world constant buffer with new camera view and perspective
-                DX::WorldBuffer world_buffer = {};
-                world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-                world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-                world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+                UpdateWorldBuffers();
             }
             else if (e.type == SDL_KEYDOWN)
             {
@@ -121,7 +109,17 @@ int Applicataion::Execute()
     return 0;
 }
 
-bool Applicataion::SDLInit()
+void Application::UpdateWorldBuffers()
+{
+    DX::WorldBuffer world_buffer = {};
+    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+
+    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+}
+
+bool Application::SDLInit()
 {
     // Initialise SDL subsystems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -145,13 +143,13 @@ bool Applicataion::SDLInit()
     return true;
 }
 
-void Applicataion::SDLCleanup()
+void Application::SDLCleanup()
 {
     SDL_DestroyWindow(m_SdlWindow);
     SDL_Quit();
 }
 
-void Applicataion::CalculateFramesPerSecond()
+void Application::CalculateFramesPerSecond()
 {
     // Changes the window title to show the frames per second and average frame time every second
 

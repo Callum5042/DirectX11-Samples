@@ -6,6 +6,7 @@
 [-] Fog
 [-] Point Lighting
 [-] Spot lighting
+[-] Stencil Stroke
 
 === Advanced ===
 [-] Displacement Mapping

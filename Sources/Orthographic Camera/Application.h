@@ -8,13 +8,15 @@
 #include "DxShader.h"
 #include "DxCamera.h"
 
-class Applicataion
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
+
+	void UpdateWorldBuffers();
 
 private:
 	// SDL window
