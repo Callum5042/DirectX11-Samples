@@ -22,7 +22,7 @@ namespace DX
 		// Create vertex shader
 		void LoadVertexShader(std::string&& vertex_shader_path);
 
-		// Create pixel shader
+		// Create textured pixel shader
 		void LoadPixelShader(std::string&& pixel_shader_path);
 
 		// Bind the shader to the pipeline
@@ -40,7 +40,7 @@ namespace DX
 		// Vertex shader input layout
 		ComPtr<ID3D11InputLayout> m_d3dVertexLayout = nullptr;
 
-		// Pixel shader
+		// Pixel shader textured
 		ComPtr<ID3D11PixelShader> m_d3dPixelShader = nullptr;
 
 		// World constant buffer

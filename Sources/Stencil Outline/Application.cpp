@@ -25,8 +25,13 @@ int Application::Execute()
 
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
-    m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
-    m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
+    m_DxShader->LoadVertexShader("Shaders/TexturedVertexShader.cso");
+    m_DxShader->LoadPixelShader("Shaders/TexturedPixelShader.cso");
+
+    // Initialise and create the DirectX 11 shader
+    m_DxStencilOutlineShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
+    m_DxStencilOutlineShader->LoadVertexShader("Shaders/SolidVertexShader.cso");
+    m_DxStencilOutlineShader->LoadPixelShader("Shaders/SolidPixelShader.cso");
 
     // Initialise and setup the perspective camera
     auto window_width = 0;
@@ -86,10 +91,12 @@ int Application::Execute()
             // Clear the buffers
             m_DxRenderer->Clear();
 
-            // Bind the shader to the pipeline
-            m_DxShader->Use();
+            // Bind stencil outline shader and render model
+            m_DxStencilOutlineShader->Use();
+            m_DxModel->Render();
 
-            // Render the model
+            // Bind textured shader and render the model
+            m_DxShader->Use();
             m_DxModel->Render();
 
             // Display the rendered scene
@@ -108,6 +115,9 @@ void Application::UpdateWorldBuffer()
     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
 
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World * DirectX::XMMatrixScaling(1.2f, 1.2f, 1.2f));
+    m_DxStencilOutlineShader->UpdateWorldConstantBuffer(world_buffer);
 }
 
 bool Application::SDLInit()

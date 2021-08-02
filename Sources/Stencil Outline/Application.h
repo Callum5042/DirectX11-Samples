@@ -35,6 +35,9 @@ private:
 	// Direct3D 11 shader
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;
 
+	// stencil outline shader
+	std::unique_ptr<DX::Shader> m_DxStencilOutlineShader = nullptr;
+
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
 

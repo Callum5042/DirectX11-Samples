@@ -19,6 +19,12 @@
     <Filter Include="Third-Party">
       <UniqueIdentifier>{2ee07627-6979-4784-8c77-73ef9610f788}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Textured">
+      <UniqueIdentifier>{9c6e53e8-fc9e-415f-aeb9-530f60b79ef0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Stencil Outline">
+      <UniqueIdentifier>{3d775ad6-8ee3-46b3-a7c1-a638329a1b99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -70,11 +76,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>Shader Files</Filter>
+    <FxCompile Include="SolidPixelShader.hlsl">
+      <Filter>Shader Files\Stencil Outline</Filter>
     </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
-      <Filter>Shader Files</Filter>
+    <FxCompile Include="TexturedPixelShader.hlsl">
+      <Filter>Shader Files\Textured</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedVertexShader.hlsl">
+      <Filter>Shader Files\Textured</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidVertexShader.hlsl">
+      <Filter>Shader Files\Stencil Outline</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
