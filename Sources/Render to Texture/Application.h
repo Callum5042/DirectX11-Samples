@@ -42,4 +42,7 @@ private:
 
 	// Update buffers
 	void UpdateWorldBuffer();
+
+	// Wireframe
+	bool m_EnableWireframe = false;
 };

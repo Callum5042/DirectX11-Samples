@@ -85,9 +85,7 @@ int Applicataion::Execute()
             {
                 if (e.key.repeat == 0)
                 {
-                    static bool wireframe = false;
-                    wireframe = !wireframe;
-                    m_DxRenderer->ToggleWireframe(wireframe);
+                    m_EnableWireframe = !m_EnableWireframe;
                 }
             }
         }
@@ -102,6 +100,9 @@ int Applicataion::Execute()
             // Clear the buffers
             m_DxRenderer->SetRenderTargetTexture();
 
+            // Enable raster state
+            m_DxRenderer->ToggleWireframe(m_EnableWireframe);
+
             //// Bind the shader to the pipeline
             m_DxShader->Use();
 
@@ -114,6 +115,9 @@ int Applicataion::Execute()
 
             // Clear the buffers
             m_DxRenderer->SetRenderTargetBackBuffer();
+
+            // Enable raster state - wireframe off for the plane
+            m_DxRenderer->ToggleWireframe(false);
 
             // Bind the shader to the pipeline
             m_DxShader->Use();
