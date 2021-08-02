@@ -9,11 +9,11 @@
 #include "DxCamera.h"
 #include <DirectXCollision.h>
 
-class Applicataion
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
 
@@ -38,6 +38,9 @@ private:
 
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
+
+	// Update world buffer
+	void UpdateWorldBuffer();
 
 	// Picking
 	void Pick(int sx, int sy);
