@@ -40,11 +40,7 @@ namespace DX
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;
 		void CreateVertexBuffer();
 
-		// Texture resource
-		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
-		void LoadTexture();
-
-		// Position
-		Vertex m_Vertex;
+		// Vertices
+		std::vector<Vertex> m_Vertices;
 	};
 }

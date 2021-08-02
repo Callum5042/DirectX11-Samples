@@ -25,9 +25,3 @@ cbuffer WorldBuffer : register(b0)
 	matrix cView;
 	matrix cProjection;
 }
-
-// Texture sampler
-SamplerState gSamplerAnisotropic : register(s0);
-
-// Textures
-Texture2D gTextureDiffuse : register(t0);

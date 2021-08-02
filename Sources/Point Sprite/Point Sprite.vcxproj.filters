@@ -16,9 +16,6 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{c5ce5fbc-7fad-4f62-b162-d52b928dbe4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Third-Party">
-      <UniqueIdentifier>{2ee07627-6979-4784-8c77-73ef9610f788}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -42,9 +39,6 @@
     <ClCompile Include="DxCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DDSTextureLoader.cpp">
-      <Filter>Third-Party</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -64,9 +58,6 @@
     </ClInclude>
     <ClInclude Include="DxCamera.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DDSTextureLoader.h">
-      <Filter>Third-Party</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

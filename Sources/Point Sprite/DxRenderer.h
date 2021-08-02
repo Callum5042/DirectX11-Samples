@@ -72,9 +72,5 @@ namespace DX
 
 		// Viewport
 		void SetViewport(int width, int height);
-
-		// Texture sampler
-		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
-		void CreateAnisotropicFiltering();
 	};
 }
