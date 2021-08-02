@@ -36,7 +36,8 @@ int Applicataion::Execute()
     auto window_height = 0;
     SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
 
-    m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
+    m_DxCamera1 = std::make_unique<DX::Camera>(window_width, window_height);
+    m_DxCamera2 = std::make_unique<DX::Camera>(window_width, window_height);
 
     // Starts the timer
     m_Timer.Start();
@@ -54,10 +55,8 @@ int Applicataion::Execute()
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED)
                 {
                     m_DxRenderer->Resize(e.window.data1, e.window.data2);
-                    m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
-
-                    // Update world constant buffer with new camera view and perspective
-                    UpdateWorldBuffer();
+                    m_DxCamera1->UpdateAspectRatio(e.window.data1, e.window.data2);
+                    m_DxCamera2->UpdateAspectRatio(e.window.data1, e.window.data2);
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
@@ -67,19 +66,21 @@ int Applicataion::Execute()
                     // Rotate the world 
                     auto pitch = e.motion.yrel * 0.01f;
                     auto yaw = e.motion.xrel * 0.01f;
-                    m_DxCamera->Rotate(pitch, yaw);
-
-                    // Update world constant buffer with new camera view and perspective
-                    UpdateWorldBuffer();
+                    m_DxCamera2->Rotate(pitch, yaw);
+                }
+                
+                if (e.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
+                {
+                    // Rotate the world 
+                    auto pitch = e.motion.yrel * 0.01f;
+                    auto yaw = e.motion.xrel * 0.01f;
+                    m_DxCamera1->Rotate(pitch, yaw);
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
             {
                 auto direction = static_cast<float>(e.wheel.y);
-                m_DxCamera->UpdateFov(-direction);
-
-                // Update world constant buffer with new camera view and perspective
-                UpdateWorldBuffer();
+                m_DxCamera1->UpdateFov(-direction);
             }
             else if (e.type == SDL_KEYDOWN)
             {
@@ -103,10 +104,13 @@ int Applicataion::Execute()
             // Enable raster state
             m_DxRenderer->ToggleWireframe(m_EnableWireframe);
 
-            //// Bind the shader to the pipeline
+            // Bind the shader to the pipeline
             m_DxShader->Use();
 
-            //// Render the model
+            // Update camera
+            UpdateWorldBufferCamera1();
+
+            // Render the model
             m_DxModel->Render();
 
             // 
@@ -122,6 +126,9 @@ int Applicataion::Execute()
             // Bind the shader to the pipeline
             m_DxShader->Use();
 
+            // Update camera
+            UpdateWorldBufferCamera2();
+
             // Render the plane
             auto rendered_texture = m_DxRenderer->GetRenderedTexture();
             m_DxPlane->SetTexture(rendered_texture);
@@ -135,12 +142,21 @@ int Applicataion::Execute()
     return 0;
 }
 
-void Applicataion::UpdateWorldBuffer()
+void Applicataion::UpdateWorldBufferCamera1()
 {
     DX::WorldBuffer world_buffer = {};
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera1->GetView());
+    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera1->GetProjection());
+    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+}
+
+void Applicataion::UpdateWorldBufferCamera2()
+{
+    DX::WorldBuffer world_buffer = {};
+    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera2->GetView());
+    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera2->GetProjection());
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }
 
