@@ -21,10 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E}</ProjectGuid>
+    <ProjectGuid>{9D524067-15AA-4A1F-98F4-294209277E08}</ProjectGuid>
     <RootNamespace>_05_Perspective_Camera</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Perspective Camera</ProjectName>
+    <ProjectName>Stencil Outline</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -4,12 +4,12 @@
 #include <SDL.h>
 #include <iostream>
 
-Applicataion::~Applicataion()
+Application::~Application()
 {
     SDLCleanup();
 }
 
-int Applicataion::Execute()
+int Application::Execute()
 {
     // Initialise SDL subsystems and creates the window
     if (!SDLInit())
@@ -54,11 +54,7 @@ int Applicataion::Execute()
                     m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 
                     // Update world constant buffer with new camera view and perspective
-                    DX::WorldBuffer world_buffer = {};
-                    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-                    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-                    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+                    UpdateWorldBuffers();
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
@@ -71,24 +67,16 @@ int Applicataion::Execute()
                     m_DxCamera->Rotate(pitch, yaw);
 
                     // Update world constant buffer with new camera view and perspective
-                    DX::WorldBuffer world_buffer = {};
-                    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-                    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-                    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+                    UpdateWorldBuffers();
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
             {
-                /*auto direction = static_cast<float>(e.wheel.y);
-                m_DxCamera->UpdateFov(-direction);*/
+                auto direction = static_cast<float>(e.wheel.y);
+                m_DxCamera->UpdateFov(-direction);
 
                 // Update world constant buffer with new camera view and perspective
-                DX::WorldBuffer world_buffer = {};
-                world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-                world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-                world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-                m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+                UpdateWorldBuffers();
             }
             else if (e.type == SDL_KEYDOWN)
             {
@@ -121,7 +109,17 @@ int Applicataion::Execute()
     return 0;
 }
 
-bool Applicataion::SDLInit()
+void Application::UpdateWorldBuffers()
+{
+    DX::WorldBuffer world_buffer = {};
+    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
+    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+
+    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+}
+
+bool Application::SDLInit()
 {
     // Initialise SDL subsystems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -133,7 +131,7 @@ bool Applicataion::SDLInit()
 
     // Create SDL Window
     auto window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-    m_SdlWindow = SDL_CreateWindow("DirectX - Orthographic Camera", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+    m_SdlWindow = SDL_CreateWindow("DirectX - Perspective Camera", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
     if (m_SdlWindow == nullptr)
     {
         std::string error = "SDL_CreateWindow failed: "; 
@@ -145,13 +143,13 @@ bool Applicataion::SDLInit()
     return true;
 }
 
-void Applicataion::SDLCleanup()
+void Application::SDLCleanup()
 {
     SDL_DestroyWindow(m_SdlWindow);
     SDL_Quit();
 }
 
-void Applicataion::CalculateFramesPerSecond()
+void Application::CalculateFramesPerSecond()
 {
     // Changes the window title to show the frames per second and average frame time every second
 
@@ -166,7 +164,7 @@ void Applicataion::CalculateFramesPerSecond()
         time = 0.0f;
         frameCount = 0;
 
-        auto title = "DirectX - Orthographic Camera - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
+        auto title = "DirectX - Perspective Camera - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
         SDL_SetWindowTitle(m_SdlWindow, title.c_str());
     }
 }
