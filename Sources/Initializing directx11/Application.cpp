@@ -25,7 +25,6 @@ int Applicataion::Execute()
     SDL_Event e = {};
     while (e.type != SDL_QUIT)
     {
-        m_Timer.Tick();
         if (SDL_PollEvent(&e))
         {
             if (e.type == SDL_WINDOWEVENT)
@@ -39,6 +38,7 @@ int Applicataion::Execute()
         }
         else
         {
+            m_Timer.Tick();
             CalculateFramesPerSecond();
 
             // Clear the buffers

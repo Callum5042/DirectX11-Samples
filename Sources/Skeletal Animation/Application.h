@@ -40,4 +40,7 @@ private:
 
 	// Wireframe rendering
 	bool m_Wireframe = true;
+
+	// Update world buffer
+	void UpdateWorldBuffer();
 };
