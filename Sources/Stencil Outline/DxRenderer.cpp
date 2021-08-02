@@ -32,6 +32,33 @@ void DX::Renderer::Create()
 
 	// Create anistropic texture filter
 	CreateAnisotropicFiltering();
+
+	// Depth stencil
+	{
+		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.StencilEnable = TRUE;
+		dsDesc.StencilReadMask = 0xFF;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;
+		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateMask.GetAddressOf()));
+	}
+
+	// Write to stencil
+	{
+		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.StencilEnable = TRUE;
+		dsDesc.StencilWriteMask = 0xFF;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+
+
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateWrite.GetAddressOf()));
+	}
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -74,6 +101,16 @@ void DX::Renderer::Present()
 	{
 		DX::Check(m_d3dSwapChain->Present(0, 0));
 	}
+}
+
+void DX::Renderer::SetStencilStateMask()
+{
+	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilStateMask.Get(), 1);
+}
+
+void DX::Renderer::SetStencilStateWrite()
+{
+	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilStateWrite.Get(), 1);
 }
 
 void DX::Renderer::CreateDeviceAndContext()
@@ -194,9 +231,8 @@ void DX::Renderer::CreateRenderTargetAndDepthStencilView(int width, int height)
 	depth_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
 	// Create the depth stencil view
-	ComPtr<ID3D11Texture2D> depth_stencil = nullptr;
-	DX::Check(m_d3dDevice->CreateTexture2D(&depth_desc, nullptr, &depth_stencil));
-	DX::Check(m_d3dDevice->CreateDepthStencilView(depth_stencil.Get(), nullptr, m_d3dDepthStencilView.GetAddressOf()));
+	DX::Check(m_d3dDevice->CreateTexture2D(&depth_desc, nullptr, m_DepthStencilTexture.ReleaseAndGetAddressOf()));
+	DX::Check(m_d3dDevice->CreateDepthStencilView(m_DepthStencilTexture.Get(), nullptr, m_d3dDepthStencilView.GetAddressOf()));
 
 	// Binds both the render target and depth stencil to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());

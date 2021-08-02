@@ -91,12 +91,14 @@ int Application::Execute()
             // Clear the buffers
             m_DxRenderer->Clear();
 
-            // Bind stencil outline shader and render model
-            m_DxStencilOutlineShader->Use();
+            // Write to stencil
+            m_DxShader->Use();
+            m_DxRenderer->SetStencilStateWrite();
             m_DxModel->Render();
 
-            // Bind textured shader and render the model
-            m_DxShader->Use();
+            // Bind stencil outline shader and render model
+            m_DxStencilOutlineShader->Use();
+            m_DxRenderer->SetStencilStateMask();
             m_DxModel->Render();
 
             // Display the rendered scene
@@ -116,7 +118,7 @@ void Application::UpdateWorldBuffer()
 
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 
-    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World * DirectX::XMMatrixScaling(1.2f, 1.2f, 1.2f));
+    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World * DirectX::XMMatrixScaling(1.01f, 1.01f, 1.01f));
     m_DxStencilOutlineShader->UpdateWorldConstantBuffer(world_buffer);
 }
 

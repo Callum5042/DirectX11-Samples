@@ -52,6 +52,12 @@ namespace DX
 		// Get the ID3D11 Device Context
 		ID3D11DeviceContext* GetDeviceContext() const { return m_d3dDeviceContext.Get(); }
 
+		// Read to stencil
+		void SetStencilStateMask();
+
+		// Write to stencil
+		void SetStencilStateWrite();
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
@@ -76,5 +82,11 @@ namespace DX
 		// Texture sampler
 		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
 		void CreateAnisotropicFiltering();
+
+		// Depth Stencil
+		ComPtr<ID3D11Texture2D> m_DepthStencilTexture = nullptr;
+
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
 	};
 }
