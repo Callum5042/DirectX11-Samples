@@ -9,11 +9,11 @@
 #include "DxCamera.h"
 #include "DxPlane.h"
 
-class Applicataion
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
 

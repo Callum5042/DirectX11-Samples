@@ -4,12 +4,12 @@
 #include <SDL.h>
 #include <iostream>
 
-Applicataion::~Applicataion()
+Application::~Application()
 {
     SDLCleanup();
 }
 
-int Applicataion::Execute()
+int Application::Execute()
 {
     // Initialise SDL subsystems and creates the window
     if (!SDLInit())
@@ -61,7 +61,7 @@ int Applicataion::Execute()
             }
             else if (e.type == SDL_MOUSEMOTION)
             {
-                if (e.motion.state == SDL_BUTTON_LEFT)
+                if (e.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
                 {
                     // Rotate the world 
                     auto pitch = e.motion.yrel * 0.01f;
@@ -142,7 +142,7 @@ int Applicataion::Execute()
     return 0;
 }
 
-void Applicataion::UpdateWorldBufferCamera1()
+void Application::UpdateWorldBufferCamera1()
 {
     DX::WorldBuffer world_buffer = {};
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
@@ -151,7 +151,7 @@ void Applicataion::UpdateWorldBufferCamera1()
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }
 
-void Applicataion::UpdateWorldBufferCamera2()
+void Application::UpdateWorldBufferCamera2()
 {
     DX::WorldBuffer world_buffer = {};
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
@@ -160,7 +160,7 @@ void Applicataion::UpdateWorldBufferCamera2()
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }
 
-bool Applicataion::SDLInit()
+bool Application::SDLInit()
 {
     // Initialise SDL subsystems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -184,13 +184,13 @@ bool Applicataion::SDLInit()
     return true;
 }
 
-void Applicataion::SDLCleanup()
+void Application::SDLCleanup()
 {
     SDL_DestroyWindow(m_SdlWindow);
     SDL_Quit();
 }
 
-void Applicataion::CalculateFramesPerSecond()
+void Application::CalculateFramesPerSecond()
 {
     // Changes the window title to show the frames per second and average frame time every second
 
