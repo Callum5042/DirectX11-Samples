@@ -12,10 +12,6 @@ namespace DX
 		float x = 0;
 		float y = 0;
 		float z = 0;
-
-		// Texture UV
-		float u = 0;
-		float v = 0;
 	};
 
 	class Model
@@ -36,19 +32,15 @@ namespace DX
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 
-		// Number of indices to draw
-		UINT m_IndexCount = 0;
-
 		// Vertex buffer
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;
 		void CreateVertexBuffer();
 
-		// Index buffer
-		ComPtr<ID3D11Buffer> m_d3dIndexBuffer = nullptr;
-		void CreateIndexBuffer();
-
 		// Texture resource
 		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
 		void LoadTexture();
+
+		// Position
+		Vertex m_Vertex;
 	};
 }

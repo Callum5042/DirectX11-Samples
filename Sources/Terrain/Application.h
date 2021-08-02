@@ -16,6 +16,8 @@ public:
 
 	int Execute();
 
+	void UpdateWorldBuffer();
+
 private:
 	// SDL window
 	bool SDLInit();

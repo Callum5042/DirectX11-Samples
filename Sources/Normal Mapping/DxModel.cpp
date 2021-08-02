@@ -76,10 +76,6 @@ void DX::Model::Render()
 	// Bind the vertex buffer to the Input Assembler
 	d3dDeviceContext->IASetVertexBuffers(0, 1, m_d3dVertexBuffer.GetAddressOf(), &vertex_stride, &vertex_offset);
 
-	// We need the stride and offset for the colour
-	UINT colour_stride = sizeof(DirectX::XMVECTORF32);
-	auto colour_offset = 0u;
-
 	// Bind the index buffer to the Input Assembler
 	d3dDeviceContext->IASetIndexBuffer(m_d3dIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
