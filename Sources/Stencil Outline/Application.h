@@ -16,8 +16,6 @@ public:
 
 	int Execute();
 
-	void UpdateWorldBuffers();
-
 private:
 	// SDL window
 	bool SDLInit();
@@ -39,4 +37,7 @@ private:
 
 	// Direct3D 11 perspective camera
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
+
+	// Update world buffer
+	void UpdateWorldBuffer();
 };

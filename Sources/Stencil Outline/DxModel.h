@@ -6,14 +6,6 @@
 
 namespace DX
 {
-	struct Colour
-	{
-		float r = 0;
-		float g = 0;
-		float b = 0;
-		float a = 0;
-	};
-
 	struct Vertex
 	{
 		// Vertex position
@@ -21,8 +13,9 @@ namespace DX
 		float y = 0;
 		float z = 0;
 
-		// Vertex colour
-		Colour colour = {};
+		// Texture UV
+		float u = 0;
+		float v = 0;
 	};
 
 	class Model
@@ -53,5 +46,9 @@ namespace DX
 		// Index buffer
 		ComPtr<ID3D11Buffer> m_d3dIndexBuffer = nullptr;
 		void CreateIndexBuffer();
+
+		// Texture resource
+		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
+		void LoadTexture();
 	};
 }
