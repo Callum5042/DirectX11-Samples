@@ -1,0 +1,28 @@
+=== Basics ===
+[-] Billboarding
+[-] Render to Texture
+[-] Point Sprite
+[-] Instancing
+[-] Fog
+[-] Point Lighting
+[-] Spot lighting
+
+=== Advanced ===
+[-] Displacement Mapping
+[-] Shadows
+[-] Reflections
+[-] Deferred Shading
+[-] Particles
+[-] Ambient Occlusion (SSAO)
+[-] High-dynamic-range (HDR)
+[-] Anti Aliasing
+
+=== Unknown ===
+[-] Depth of Field
+[-] Blur
+[-] Lens Flare
+[-] Motion Blur
+[-] Volume Rendering?
+[-] Volumic Lighting
+[-] Gamma Correction
+[-] Bloom?

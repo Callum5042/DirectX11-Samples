@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 Advanced", "03 Advanced"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Perspective Camera", "Sources\Orthographic Camera\Orthographic Camera.vcxproj", "{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Render to Texture", "Sources\Render to Texture\Render to Texture.vcxproj", "{0AF767C0-B822-4B95-A620-48AC15BC9386}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -147,6 +149,14 @@ Global
 		{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E}.Release|x64.Build.0 = Release|x64
 		{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E}.Release|x86.ActiveCfg = Release|Win32
 		{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E}.Release|x86.Build.0 = Release|Win32
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Debug|x64.ActiveCfg = Debug|x64
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Debug|x64.Build.0 = Debug|x64
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Debug|x86.ActiveCfg = Debug|Win32
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Debug|x86.Build.0 = Debug|Win32
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Release|x64.ActiveCfg = Release|x64
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Release|x64.Build.0 = Release|x64
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Release|x86.ActiveCfg = Release|Win32
+		{0AF767C0-B822-4B95-A620-48AC15BC9386}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -164,6 +174,7 @@ Global
 		{184D3646-458C-4421-9268-962FC489C852} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{D73311D7-1C29-4377-B9A9-D0C0DD35F0BD} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{77CA9DE3-BFE6-42A1-BB23-4ABD8E9D310E} = {B03A36B0-3D23-4F70-99EE-B573BCEE25AC}
+		{0AF767C0-B822-4B95-A620-48AC15BC9386} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
