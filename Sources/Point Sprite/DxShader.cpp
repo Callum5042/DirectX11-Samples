@@ -21,12 +21,23 @@ void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
 	// Describe the memory layout
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXTURE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
 	DX::Check(d3dDevice->CreateInputLayout(layout, numElements, data.data(), data.size(), m_d3dVertexLayout.ReleaseAndGetAddressOf()));
+}
+
+void DX::Shader::LoadGeometryShader(std::string&& geometry_shader_path)
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Load the binary file into memory
+	std::ifstream file(geometry_shader_path, std::fstream::in | std::fstream::binary);
+	std::vector<char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	// Create pixel shader
+	DX::Check(d3dDevice->CreateGeometryShader(data.data(), data.size(), nullptr, m_d3dGeometryShader.ReleaseAndGetAddressOf()));
 }
 
 void DX::Shader::LoadPixelShader(std::string&& pixel_shader_path)
@@ -51,11 +62,14 @@ void DX::Shader::Use()
 	// Bind the vertex shader to the pipeline's Vertex Shader stage
 	d3dDeviceContext->VSSetShader(m_d3dVertexShader.Get(), nullptr, 0);
 
+	// Bind the geometry shader to the pipeline's Geometry Shader stage
+	d3dDeviceContext->GSSetShader(m_d3dGeometryShader.Get(), nullptr, 0);
+
 	// Bind the pixel shader to the pipeline's Pixel Shader stage
 	d3dDeviceContext->PSSetShader(m_d3dPixelShader.Get(), nullptr, 0);
 
-	// Bind the world constant buffer to the vertex shader
-	d3dDeviceContext->VSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+	// Bind the world constant buffer to the geometry shader
+	d3dDeviceContext->GSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
 }
 
 void DX::Shader::UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer)

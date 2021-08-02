@@ -26,6 +26,7 @@ int Application::Execute()
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
+    m_DxShader->LoadGeometryShader("Shaders/GeometryShader.cso");
     m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
 
     // Initialise and setup the perspective camera
