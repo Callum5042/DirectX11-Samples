@@ -47,10 +47,11 @@ HullConstDataOutput CalcHSPatchConstants(InputPatch<HullInputType, 4> patch, uin
 [maxtessfactor(64.0f)]
 DomainInputType main(InputPatch<HullInputType, 4> patch, uint i : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID)
 {
-	DomainInputType Output;
+	DomainInputType output;
 
 	// Insert code to compute Output here
-	Output.position = patch[i].position;
+	output.position = patch[i].position;
+	output.tex = patch[i].tex;
 
-	return Output;
+	return output;
 }

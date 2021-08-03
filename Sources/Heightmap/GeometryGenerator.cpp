@@ -27,9 +27,15 @@ void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, DX:
 			float x = -halfWidth + j * dx;
 
 			int index = i * n + j;
+
+			// Vertices
 			model->Vertices[index].x = x;
 			model->Vertices[index].y = 0.0f;
 			model->Vertices[index].z = z;
+
+			// Stretch texture over grid.
+			model->Vertices[index].u = j * du;
+			model->Vertices[index].v = i * dv;
 		}
 	}
 

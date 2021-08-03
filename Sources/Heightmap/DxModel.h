@@ -12,6 +12,10 @@ namespace DX
 		float x = 0;
 		float y = 0;
 		float z = 0;
+
+		// Texture
+		float u = 0;
+		float v = 0;
 	};
 
 	class Model
@@ -45,5 +49,8 @@ namespace DX
 		// Index buffer
 		ComPtr<ID3D11Buffer> m_d3dIndexBuffer = nullptr;
 		void CreateIndexBuffer();
+
+		// Heightmap texture
+		ComPtr<ID3D11ShaderResourceView> m_HeightmapTexture = nullptr;
 	};
 }

@@ -9,7 +9,10 @@ HullInputType main(VertexInputType input)
 	output.position = input.position;
 
 	// Transform Y axis from heightmap
+	output.position.y = gHeightmapTexture.SampleLevel(gHeightmapSampler, input.tex, 0).r;
 
+	// Texture UV's
+	output.tex = input.tex;
 
 	return output;
 }
