@@ -21,6 +21,12 @@ namespace DX
 		DirectX::XMMATRIX worldInverse;
 	};
 
+	struct PointLightBuffer
+	{
+		DirectX::XMFLOAT3 position;
+		float padding;
+	};
+
 	class Shader
 	{
 	public:
@@ -42,6 +48,9 @@ namespace DX
 		// Set world constant buffer from camera
 		void UpdateWorldBuffer(const DirectX::XMMATRIX& world);
 
+		// Update camera buffer
+		void UpdatePointLightBuffer(const PointLightBuffer& buffer);
+
 	private:
 		Renderer* m_DxRenderer = nullptr;
 
@@ -61,5 +70,9 @@ namespace DX
 		// World constant buffer
 		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;
 		void CreateWorldConstantBuffer();
+
+		// Point light constant buffer
+		ComPtr<ID3D11Buffer> m_d3dPointLightConstantBuffer = nullptr;
+		void CreatePointLightConstantBuffer();
 	};
 }

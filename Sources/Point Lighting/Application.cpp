@@ -92,6 +92,16 @@ int Applicataion::Execute()
             // Update light source
             MovePointLight();
 
+            // Update light source
+            DX::PointLightBuffer light_buffer = {};
+
+            DirectX::XMVECTOR scale_vector;
+            DirectX::XMVECTOR rotation_vector;
+            DirectX::XMVECTOR position_vector;
+            DirectX::XMMatrixDecompose(&scale_vector, &rotation_vector, &position_vector, m_DxPointLight->World);
+
+            DirectX::XMStoreFloat3(&light_buffer.position, position_vector);
+            m_DxShader->UpdatePointLightBuffer(light_buffer);
 
             // Clear the buffers
             m_DxRenderer->Clear();

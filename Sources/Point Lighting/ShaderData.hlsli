@@ -28,6 +28,12 @@ cbuffer WorldBuffer : register(b1)
 	matrix cWorldInverse;
 }
 
+// Point light buffer
+cbuffer PointLightBuffer : register(b2)
+{
+	float4 cLightPointPosition;
+}
+
 // Directional light value
 //struct DirectionalLight
 //{
