@@ -26,6 +26,9 @@ int Applicataion::Execute()
     m_DxFloor = std::make_unique<DX::Floor>(m_DxRenderer.get());
     m_DxFloor->Create();
 
+    m_DxPointLight = std::make_unique<DX::PointLight>(m_DxRenderer.get());
+    m_DxPointLight->Create();
+
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -100,6 +103,10 @@ int Applicataion::Execute()
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
 
+            // Render the light as a model for visualisation
+            m_DxShader->UpdateWorldBuffer(m_DxPointLight->World);
+            m_DxPointLight->Render();
+
             // Display the rendered scene
             m_DxRenderer->Present();
         }
@@ -110,10 +117,6 @@ int Applicataion::Execute()
 
 void Applicataion::SetCameraBuffer()
 {
-    // World buffer for DxModel
-    //world_buffer_model.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-    //world_buffer_model.worldInverse = DirectX::XMMatrixInverse(nullptr, world_buffer_model.world);
-
     DX::CameraBuffer buffer = {};
     buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());

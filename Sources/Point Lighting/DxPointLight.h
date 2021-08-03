@@ -6,11 +6,11 @@
 
 namespace DX
 {
-	class Floor
+	class PointLight
 	{
 	public:
-		Floor(DX::Renderer* renderer);
-		virtual ~Floor() = default;
+		PointLight(DX::Renderer* renderer);
+		virtual ~PointLight() = default;
 
 		// Create device
 		void Create();

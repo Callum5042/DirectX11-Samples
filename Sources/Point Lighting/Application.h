@@ -9,6 +9,7 @@
 
 #include "DxModel.h"
 #include "DxFloor.h"
+#include "DxPointLight.h"
 
 class Applicataion
 {
@@ -34,6 +35,9 @@ private:
 	// Direct3D 11 model
 	std::unique_ptr<DX::Model> m_DxModel = nullptr;
 	std::unique_ptr<DX::Floor> m_DxFloor = nullptr;
+
+	// Point Light
+	std::unique_ptr<DX::PointLight> m_DxPointLight = nullptr;
 
 	// Direct3D 11 shader
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;

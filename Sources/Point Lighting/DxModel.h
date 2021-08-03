@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DxRenderer.h"
-#include <DirectXColors.h>
+#include <DirectXMath.h>
 #include "Vertex.h"
 
 namespace DX

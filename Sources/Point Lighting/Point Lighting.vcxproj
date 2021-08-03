@@ -204,6 +204,7 @@
     <ClCompile Include="DxCamera.cpp" />
     <ClCompile Include="DxFloor.cpp" />
     <ClCompile Include="DxModel.cpp" />
+    <ClCompile Include="DxPointLight.cpp" />
     <ClCompile Include="DxShader.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="main.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="DxCamera.h" />
     <ClInclude Include="DxFloor.h" />
     <ClInclude Include="DxModel.h" />
+    <ClInclude Include="DxPointLight.h" />
     <ClInclude Include="DxRenderer.h" />
     <ClInclude Include="DxShader.h" />
     <ClInclude Include="GeometryGenerator.h" />
