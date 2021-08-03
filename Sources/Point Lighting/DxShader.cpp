@@ -69,10 +69,19 @@ void DX::Shader::UpdateCameraBuffer(const CameraBuffer& buffer)
 	d3dDeviceContext->UpdateSubresource(m_d3dCameraConstantBuffer.Get(), 0, nullptr, &buffer, 0, 0);
 }
 
-void DX::Shader::UpdateWorldBuffer(const WorldBuffer& buffer)
+void DX::Shader::UpdateWorldBuffer(const DirectX::XMMATRIX& world)
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
-	d3dDeviceContext->UpdateSubresource(m_d3dWorldConstantBuffer.Get(), 0, nullptr, &buffer, 0, 0);
+
+	DX::WorldBuffer buffer = {};
+	buffer.world = DirectX::XMMatrixTranspose(world);
+	buffer.worldInverse = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, world));
+
+	// We use Map/Unmap here over UpdateSubresource for performance
+	D3D11_MAPPED_SUBRESOURCE resource = {};
+	DX::Check(d3dDeviceContext->Map(m_d3dWorldConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource));
+	std::memcpy(resource.pData, &buffer, sizeof(WorldBuffer));
+	d3dDeviceContext->Unmap(m_d3dWorldConstantBuffer.Get(), 0);
 }
 
 void DX::Shader::CreateCameraConstantBuffer()
@@ -92,11 +101,12 @@ void DX::Shader::CreateWorldConstantBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
-	// Create world constant buffer
+	// Create world constant buffer - Must set D3D11_USAGE_DYNAMIC and D3D11_CPU_ACCESS_WRITE to be able to with Map
 	D3D11_BUFFER_DESC bd = {};
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_DYNAMIC;
 	bd.ByteWidth = sizeof(WorldBuffer);
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dWorldConstantBuffer.ReleaseAndGetAddressOf()));
 }

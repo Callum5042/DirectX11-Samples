@@ -40,7 +40,7 @@ namespace DX
 		void UpdateCameraBuffer(const CameraBuffer& buffer);
 
 		// Set world constant buffer from camera
-		void UpdateWorldBuffer(const WorldBuffer& buffer);
+		void UpdateWorldBuffer(const DirectX::XMMATRIX& world);
 
 	private:
 		Renderer* m_DxRenderer = nullptr;

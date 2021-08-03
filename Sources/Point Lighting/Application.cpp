@@ -93,16 +93,11 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
-            DX::WorldBuffer world_buffer = {};
-            world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-            m_DxShader->UpdateWorldBuffer(world_buffer);
-
+            m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
 
             // Render the floor
-            world_buffer.world = DirectX::XMMatrixTranspose(m_DxFloor->World);
-            m_DxShader->UpdateWorldBuffer(world_buffer);
-
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
 
             // Display the rendered scene
