@@ -47,5 +47,7 @@ private:
 
 	// Update buffers
 	void SetCameraBuffer();
-	//void SetLightBuffer();
+
+	// Move point light
+	void MovePointLight();
 };

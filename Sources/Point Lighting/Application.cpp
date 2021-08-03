@@ -89,6 +89,10 @@ int Applicataion::Execute()
             m_Timer.Tick();
             CalculateFramesPerSecond();
 
+            // Update light source
+            MovePointLight();
+
+
             // Clear the buffers
             m_DxRenderer->Clear();
 
@@ -113,6 +117,42 @@ int Applicataion::Execute()
     }
 
     return 0;
+}
+
+void Applicataion::MovePointLight()
+{
+    auto inputs = SDL_GetKeyboardState(nullptr);
+    float delta_time = static_cast<float>(m_Timer.DeltaTime());
+
+    // Move forward/backward along Z-axis
+    if (inputs[SDL_SCANCODE_W])
+    {
+        m_DxPointLight->World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 1.0f * delta_time);
+    }
+    else if (inputs[SDL_SCANCODE_S])
+    {
+        m_DxPointLight->World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, -1.0f * delta_time);
+    }
+
+    // Move left/right along X-axis
+    if (inputs[SDL_SCANCODE_A])
+    {
+        m_DxPointLight->World *= DirectX::XMMatrixTranslation(-1.0f * delta_time, 0.0f, 0.0f);
+    }
+    else if (inputs[SDL_SCANCODE_D])
+    {
+        m_DxPointLight->World *= DirectX::XMMatrixTranslation(1.0f * delta_time, 0.0f, 0.0f);
+    }
+
+    // Move up/down along Y-axis
+    if (inputs[SDL_SCANCODE_E])
+    {
+        m_DxPointLight->World *= DirectX::XMMatrixTranslation(0.0f, 1.0f * delta_time, 0.0f);
+    }
+    else if (inputs[SDL_SCANCODE_Q])
+    {
+        m_DxPointLight->World *= DirectX::XMMatrixTranslation(0.0f, -1.0f * delta_time, 0.0f);
+    }
 }
 
 void Applicataion::SetCameraBuffer()
