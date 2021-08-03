@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Point Sprite", "Sources\Poi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Billboarding", "Sources\Billboarding\Billboarding.vcxproj", "{3A010EA3-907D-4468-9095-855834615B65}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Heightmap", "Sources\Heightmap\Heightmap.vcxproj", "{69486E4B-64C2-40A6-ABE2-506940E4A29C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -187,6 +189,14 @@ Global
 		{3A010EA3-907D-4468-9095-855834615B65}.Release|x64.Build.0 = Release|x64
 		{3A010EA3-907D-4468-9095-855834615B65}.Release|x86.ActiveCfg = Release|Win32
 		{3A010EA3-907D-4468-9095-855834615B65}.Release|x86.Build.0 = Release|Win32
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Debug|x64.ActiveCfg = Debug|x64
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Debug|x64.Build.0 = Debug|x64
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Debug|x86.ActiveCfg = Debug|Win32
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Debug|x86.Build.0 = Debug|Win32
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Release|x64.ActiveCfg = Release|x64
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Release|x64.Build.0 = Release|x64
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Release|x86.ActiveCfg = Release|Win32
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,6 +219,7 @@ Global
 		{40D85E14-09E2-4274-B755-13221DF2433F} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{F5116193-0BF3-4044-B040-EDACC8018866} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{3A010EA3-907D-4468-9095-855834615B65} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
+		{69486E4B-64C2-40A6-ABE2-506940E4A29C} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
