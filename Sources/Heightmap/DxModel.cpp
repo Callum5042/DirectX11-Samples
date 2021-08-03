@@ -40,11 +40,11 @@ void DX::Model::LoadHeightmap(ID3D11Device* d3dDevice)
 
 	// Smooth
 	std::vector<float> dest(heightmap_data.size());
-	for (size_t i = 0; i < heightmap_size; ++i)
+	for (int i = 0; i < heightmap_size; ++i)
 	{
-		for (size_t j = 0; j < heightmap_size; ++j)
+		for (int j = 0; j < heightmap_size; ++j)
 		{
-			dest[i * heightmap_size + j] = Average(i, j, heightmap_data, heightmap_size);
+			dest[static_cast<size_t>(i * heightmap_size + j)] = Average(i, j, heightmap_data, heightmap_size);
 		}
 	}
 
@@ -159,7 +159,7 @@ float DX::Model::Average(int i, int j, std::vector<float>& heightmap_data, int h
 
 			if (in_bounds)
 			{
-				average += heightmap_data[m * heightmap_size + n];
+				average += heightmap_data[static_cast<size_t>(m * heightmap_size + n)];
 				num += 1.0f;
 			}
 		}
