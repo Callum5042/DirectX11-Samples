@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Tessellation", "Sourc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain", "Sources\Terrain\Terrain.vcxproj", "{4FE5F895-5A2E-4DBA-8457-9CF34C69D616}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Sources\Lighting\Lighting.vcxproj", "{3ED80F3C-607F-484C-92D1-182DAEC0B54C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Directional Lighting", "Sources\Directional Lighting\Directional Lighting.vcxproj", "{3ED80F3C-607F-484C-92D1-182DAEC0B54C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Normal Mapping", "Sources\Normal Mapping\Normal Mapping.vcxproj", "{113E74A2-169F-49A1-A9F2-8B460FB24D6E}"
 EndProject

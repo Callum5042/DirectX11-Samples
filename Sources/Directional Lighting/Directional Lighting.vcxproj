@@ -24,7 +24,7 @@
     <ProjectGuid>{3ED80F3C-607F-484C-92D1-182DAEC0B54C}</ProjectGuid>
     <RootNamespace>Texturing</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Lighting</ProjectName>
+    <ProjectName>Directional Lighting</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
