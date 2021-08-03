@@ -7,11 +7,12 @@
 [-] Point Lighting
 [-] Spot lighting
 [x] Stencil Outline
+[-] Alpha Mapping / Multi Mapping
 
 === Advanced ===
-[-] Heightmap
+[x] Heightmap
 [-] Displacement Mapping
-[-] Shadows
+[-] Shadow Mapping
 [-] Reflections
 [-] Deferred Shading
 [-] Particles
@@ -28,3 +29,6 @@
 [-] Volumic Lighting
 [-] Gamma Correction
 [-] Bloom?
+[-] Texture Animations
+[-] Specular Mapping?
+[-] Stencil Shadows - Might be worth ignoring in favour of shadow mapping
