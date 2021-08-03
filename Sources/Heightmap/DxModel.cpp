@@ -19,6 +19,12 @@ void DX::Model::Create()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
+	// Load heightmap data and create shader resource view from it
+	LoadHeightmap(d3dDevice);
+}
+
+void DX::Model::LoadHeightmap(ID3D11Device* d3dDevice)
+{
 	// Load heightmap
 	std::ifstream file("..\\..\\Resources\\terrain\\heightmap_white.raw", std::fstream::in | std::fstream::binary);
 	std::vector<float> heightmap_data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -31,6 +37,18 @@ void DX::Model::Create()
 
 	// Assuming the heightmap is a square texture we can calculate size by sqrt
 	static int heightmap_size = static_cast<int>(std::sqrt(heightmap_data.size()));
+
+	// Smooth
+	std::vector<float> dest(heightmap_data.size());
+	for (size_t i = 0; i < heightmap_size; ++i)
+	{
+		for (size_t j = 0; j < heightmap_size; ++j)
+		{
+			dest[i * heightmap_size + j] = Average(i, j, heightmap_data, heightmap_size);
+		}
+	}
+
+	heightmap_data = dest;
 
 	// Create Direct3D 11 texture from heightmap data
 	D3D11_TEXTURE2D_DESC texture_desc = {};
@@ -115,4 +133,37 @@ void DX::Model::Render()
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
+}
+
+float DX::Model::Average(int i, int j, std::vector<float>& heightmap_data, int heightmap_size)
+{
+	// Function computes the average height of the ij element.
+	// It averages itself with its eight neighbor pixels.  
+	// Note that if a pixel is missing neighbor, we just don't include it in the average. Edge pixels don't have a neighbor pixel.
+	//
+	// ----------
+	// | 1| 2| 3|
+	// ----------
+	// | 4| x| 6|
+	// ----------
+	// | 7| 8| 9|
+	// ----------
+
+	auto average = 0.0f;
+	auto num = 0.0f;
+	for (int m = i - 1; m <= i + 1; ++m)
+	{
+		for (int n = j - 1; n <= j + 1; ++n)
+		{
+			auto in_bounds = (m >= 0 && m < heightmap_size) && (n >= 0 && n < heightmap_size);
+
+			if (in_bounds)
+			{
+				average += heightmap_data[m * heightmap_size + n];
+				num += 1.0f;
+			}
+		}
+	}
+
+	return average / num;
 }

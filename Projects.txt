@@ -9,6 +9,7 @@
 [x] Stencil Outline
 
 === Advanced ===
+[-] Heightmap
 [-] Displacement Mapping
 [-] Shadows
 [-] Reflections

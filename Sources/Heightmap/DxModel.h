@@ -52,5 +52,9 @@ namespace DX
 
 		// Heightmap texture
 		ComPtr<ID3D11ShaderResourceView> m_HeightmapTexture = nullptr;
+		void LoadHeightmap(ID3D11Device* d3dDevice);
+
+		// Average heightmap data
+		float Average(int i, int j, std::vector<float>& heightmap_data, int heightmap_size);
 	};
 }
