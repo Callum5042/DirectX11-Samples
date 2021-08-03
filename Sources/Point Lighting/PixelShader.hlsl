@@ -12,12 +12,12 @@ float4 CalculatePointLighting(float3 position, float3 normal)
 	float4 ambient_light = light_colour * 0.2f;
 
 	// Specular lighting
-	/*float3 viewDir = normalize(mPointLight.mCameraPos - position);
-	float3 reflectDir = reflect(-lightVec, normal);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), mDirectionalLight.mSpecular.w * mMaterial.mSpecular.w);
-	float4 specular_light = float4(spec * mPointLight.mSpecular.xyz * mMaterial.mSpecular.xyz, 1.0f);*/
+	float3 view_direction = normalize(cCameraPosition.xyz - position);
+	float3 reflect_direction = reflect(-light_vector, normal);
+	float spec = pow(max(dot(view_direction, reflect_direction), 0.0), 8.0f);
+	float4 specular_light = float4(spec * light_colour.xyz * 0.2f, 1.0f);
 
-	return diffuse_light + ambient_light;
+	return diffuse_light + ambient_light + specular_light;
 }
 
 // Entry point for the vertex shader - will be executed for each pixel

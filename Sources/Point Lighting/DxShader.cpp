@@ -61,6 +61,7 @@ void DX::Shader::Use()
 	d3dDeviceContext->VSSetConstantBuffers(1, 1, m_d3dWorldConstantBuffer.GetAddressOf());
 
 	// Bind the light constant buffer to pixel shader
+	d3dDeviceContext->PSSetConstantBuffers(0, 1, m_d3dCameraConstantBuffer.GetAddressOf());
 	d3dDeviceContext->PSSetConstantBuffers(2, 1, m_d3dPointLightConstantBuffer.GetAddressOf());
 }
 
