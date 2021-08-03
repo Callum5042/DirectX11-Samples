@@ -4,6 +4,7 @@
 [x] Point Sprite
 [-] Instancing
 [-] Fog? - Looks bad with height camera far plane
+[?] Directional Lighting - Needs improving
 [-] Point Lighting
 [-] Spot lighting
 [x] Stencil Outline
@@ -25,10 +26,10 @@
 [-] Blur
 [-] Lens Flare
 [-] Motion Blur
-[-] Volume Rendering?
+[?] Volume Rendering?
 [-] Volumic Lighting
 [-] Gamma Correction
-[-] Bloom?
+[?] Bloom?
 [-] Texture Animations
-[-] Specular Mapping?
-[-] Stencil Shadows - Might be worth ignoring in favour of shadow mapping
+[?] Specular Mapping
+[?] Stencil Shadows - Might be worth ignoring in favour of shadow mapping
