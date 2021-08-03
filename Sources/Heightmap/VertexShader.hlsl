@@ -8,10 +8,8 @@ HullInputType main(VertexInputType input)
 	// Transform to homogeneous clip space.
 	output.position = input.position;
 
+	// Transform Y axis from heightmap
 
-
-	// Set the vertex colour
-	output.color = input.color;
 
 	return output;
 }

@@ -51,7 +51,6 @@ DomainInputType main(InputPatch<HullInputType, 4> patch, uint i : SV_OutputContr
 
 	// Insert code to compute Output here
 	Output.position = patch[i].position;
-	Output.color = patch[i].color;
 
 	return Output;
 }

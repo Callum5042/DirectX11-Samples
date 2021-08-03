@@ -6,23 +6,12 @@
 
 namespace DX
 {
-	struct Colour
-	{
-		float r = 0;
-		float g = 0;
-		float b = 0;
-		float a = 0;
-	};
-
 	struct Vertex
 	{
 		// Vertex position
 		float x = 0;
 		float y = 0;
 		float z = 0;
-
-		// Vertex colour
-		Colour colour = {};
 	};
 
 	class Model
