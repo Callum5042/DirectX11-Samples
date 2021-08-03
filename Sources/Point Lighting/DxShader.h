@@ -7,27 +7,18 @@
 
 namespace DX
 {
-	struct WorldBuffer
+	struct CameraBuffer
 	{
-		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
-		DirectX::XMMATRIX worldInverse;
-	};
-
-	struct DirectionalLight
-	{
-		DirectX::XMFLOAT4 diffuse;
-		DirectX::XMFLOAT4 ambient;
-		DirectX::XMFLOAT4 specular;
-
 		DirectX::XMFLOAT3 cameraPosition;
 		float padding;
 	};
 
-	struct LightBuffer
+	struct WorldBuffer
 	{
-		DirectionalLight directionalLight;
+		DirectX::XMMATRIX world;
+		DirectX::XMMATRIX worldInverse;
 	};
 
 	class Shader
@@ -45,11 +36,11 @@ namespace DX
 		// Bind the shader to the pipeline
 		void Use();
 
-		// Set world constant buffer from camera
-		void UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer);
+		// Update camera buffer
+		void UpdateCameraBuffer(const CameraBuffer& buffer);
 
-		// Set light constant buffer
-		void UpdateLightConstantBuffer(const LightBuffer& lightBuffer);
+		// Set world constant buffer from camera
+		void UpdateWorldBuffer(const WorldBuffer& buffer);
 
 	private:
 		Renderer* m_DxRenderer = nullptr;
@@ -63,12 +54,12 @@ namespace DX
 		// Pixel shader
 		ComPtr<ID3D11PixelShader> m_d3dPixelShader = nullptr;
 
+		// Camera constant buffer
+		ComPtr<ID3D11Buffer> m_d3dCameraConstantBuffer = nullptr;
+		void CreateCameraConstantBuffer();
+
 		// World constant buffer
 		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;
 		void CreateWorldConstantBuffer();
-
-		// Light constant buffer
-		ComPtr<ID3D11Buffer> m_d3dLightConstantBuffer = nullptr;
-		void CreateLightConstantBuffer();
 	};
 }

@@ -4,6 +4,7 @@
 
 DX::Floor::Floor(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
+	World *= DirectX::XMMatrixTranslation(0.0f, -1.0f, 0.0f);
 }
 
 void DX::Floor::Create()

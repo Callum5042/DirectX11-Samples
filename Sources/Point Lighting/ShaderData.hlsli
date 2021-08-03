@@ -13,30 +13,36 @@ struct VertexOutput
 	float3 normal : NORMAL;
 };
 
-// World constant buffer
-cbuffer WorldBuffer : register(b0)
+// Camera buffer
+cbuffer CameraBuffer : register(b0)
 {
-	matrix cWorld;
 	matrix cView;
 	matrix cProjection;
+	float4 cCameraPosition;
+}
+
+// World buffer
+cbuffer WorldBuffer : register(b1)
+{
+	matrix cWorld;
 	matrix cWorldInverse;
 }
 
 // Directional light value
-struct DirectionalLight
-{
-	float4 diffuse;
-	float4 ambient;
-	float4 specular;
-	//float4 direction;
-
-	// Camera is used for calculating the specular value
-	float3 cameraPosition;
-	float padding;
-};
-
-// Light buffer
-cbuffer LightBuffer : register(b1)
-{
-	DirectionalLight cDirectionalLight;
-}
+//struct DirectionalLight
+//{
+//	float4 diffuse;
+//	float4 ambient;
+//	float4 specular;
+//	//float4 direction;
+//
+//	// Camera is used for calculating the specular value
+//	float3 cameraPosition;
+//	float padding;
+//};
+//
+//// Light buffer
+//cbuffer LightBuffer : register(b2)
+//{
+//	DirectionalLight cDirectionalLight;
+//}

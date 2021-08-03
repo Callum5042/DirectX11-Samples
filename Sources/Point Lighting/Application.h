@@ -42,6 +42,6 @@ private:
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
 
 	// Update buffers
-	void SetLightBuffer();
-	void SetWorldBuffer();
+	void SetCameraBuffer();
+	//void SetLightBuffer();
 };
