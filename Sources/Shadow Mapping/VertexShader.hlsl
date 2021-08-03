@@ -16,5 +16,7 @@ VertexOutput main(VertexInput input)
 	// Transform the normals by the inverse world space
 	output.normal = mul(input.normal, (float3x3)cWorldInverse).xyz;
 
+	output.tex = input.tex;
+
 	return output;
 }

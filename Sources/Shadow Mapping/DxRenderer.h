@@ -3,6 +3,7 @@
 #include <exception>
 #include <SDL_video.h>
 #include <d3d11_1.h>
+#include <vector>
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -52,6 +53,15 @@ namespace DX
 		// Get the ID3D11 Device Context
 		ID3D11DeviceContext* GetDeviceContext() const { return m_d3dDeviceContext.Get(); }
 
+		// Set back buffer as render target
+		void SetRenderTargetBackBuffer();
+
+		// Clear the buffers and set render target to the texture
+		void SetRenderTargetTexture(int i);
+
+		// Get texture
+		//ID3D11ShaderResourceView** GetRenderedTexture() { return m_RenderedTexture.GetAddressOf(); }
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
@@ -76,5 +86,10 @@ namespace DX
 		// Texture sampler
 		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
 		void CreateAnisotropicFiltering();
+
+		// Render to texture
+		std::vector<ComPtr<ID3D11ShaderResourceView>> m_RenderedTextures;
+		std::vector<ComPtr<ID3D11DepthStencilView>> m_TextureDepthStencilViews;
+		void CreateRenderToTextureDepthStencilView(int width, int height);
 	};
 }

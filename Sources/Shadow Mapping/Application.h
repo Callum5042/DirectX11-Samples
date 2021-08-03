@@ -50,4 +50,6 @@ private:
 
 	// Move point light
 	void MovePointLight();
+
+	ComPtr<ID3D11RenderTargetView> m_RenderTargetView = nullptr;
 };

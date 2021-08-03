@@ -29,5 +29,7 @@ float4 main(VertexOutput input) : SV_TARGET
 	// Calculate directional light
 	float4 light_colour = CalculatePointLighting(input.position, input.normal);
 
+	//float4 tex = gShadowMapTexture.Sample(gSamplerAnisotropic, input.tex);
+
 	return light_colour;
 }

@@ -5,35 +5,35 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, DX::Me
 	// Vertices
 	meshData->vertices =
 	{
-		{ -width, -height, -depth, +0.0f, +0.0f, -1.0f },
-		{ -width, +height, -depth, +0.0f, +0.0f, -1.0f },
-		{ +width, +height, -depth, +0.0f, +0.0f, -1.0f },
-		{ +width, -height, -depth, +0.0f, +0.0f, -1.0f },
+		{ -width, -height, -depth, +0.0f, +0.0f, -1.0f, 0.0f, 1.0f },
+		{ -width, +height, -depth, +0.0f, +0.0f, -1.0f, 0.0f, 0.0f },
+		{ +width, +height, -depth, +0.0f, +0.0f, -1.0f, 1.0f, 0.0f },
+		{ +width, -height, -depth, +0.0f, +0.0f, -1.0f, 1.0f, 1.0f },
 
-		{ -width, -height, +depth, +0.0f, +0.0f, +1.0f },
-		{ +width, -height, +depth, +0.0f, +0.0f, +1.0f },
-		{ +width, +height, +depth, +0.0f, +0.0f, +1.0f },
-		{ -width, +height, +depth, +0.0f, +0.0f, +1.0f },
+		{ -width, -height, +depth, +0.0f, +0.0f, +1.0f, 1.0f, 1.0f },
+		{ +width, -height, +depth, +0.0f, +0.0f, +1.0f, 0.0f, 1.0f },
+		{ +width, +height, +depth, +0.0f, +0.0f, +1.0f, 0.0f, 0.0f },
+		{ -width, +height, +depth, +0.0f, +0.0f, +1.0f, 1.0f, 0.0f },
 
-		{ -width, +height, -depth, +0.0f, +1.0f, +0.0f },
-		{ -width, +height, +depth, +0.0f, +1.0f, +0.0f },
-		{ +width, +height, +depth, +0.0f, +1.0f, +0.0f },
-		{ +width, +height, -depth, +0.0f, +1.0f, +0.0f },
+		{ -width, +height, -depth, +0.0f, +1.0f, +0.0f, 0.0f, 1.0f },
+		{ -width, +height, +depth, +0.0f, +1.0f, +0.0f, 0.0f, 0.0f },
+		{ +width, +height, +depth, +0.0f, +1.0f, +0.0f, 1.0f, 0.0f },
+		{ +width, +height, -depth, +0.0f, +1.0f, +0.0f, 1.0f, 1.0f },
 
-		{ -width, -height, -depth, +0.0f, -1.0f, +0.0f },
-		{ +width, -height, -depth, +0.0f, -1.0f, +0.0f },
-		{ +width, -height, +depth, +0.0f, -1.0f, +0.0f },
-		{ -width, -height, +depth, +0.0f, -1.0f, +0.0f },
+		{ -width, -height, -depth, +0.0f, -1.0f, +0.0f, 1.0f, 1.0f },
+		{ +width, -height, -depth, +0.0f, -1.0f, +0.0f, 0.0f, 1.0f },
+		{ +width, -height, +depth, +0.0f, -1.0f, +0.0f, 0.0f, 0.0f },
+		{ -width, -height, +depth, +0.0f, -1.0f, +0.0f, 1.0f, 0.0f },
 
-		{ -width, -height, +depth, -1.0f, +0.0f, +0.0f },
-		{ -width, +height, +depth, -1.0f, +0.0f, +0.0f },
-		{ -width, +height, -depth, -1.0f, +0.0f, +0.0f },
-		{ -width, -height, -depth, -1.0f, +0.0f, +0.0f },
+		{ -width, -height, +depth, -1.0f, +0.0f, +0.0f, 0.0f, 1.0f },
+		{ -width, +height, +depth, -1.0f, +0.0f, +0.0f, 0.0f, 0.0f },
+		{ -width, +height, -depth, -1.0f, +0.0f, +0.0f, 1.0f, 0.0f },
+		{ -width, -height, -depth, -1.0f, +0.0f, +0.0f, 1.0f, 1.0f },
 
-		{ +width, -height, -depth, +1.0f, +0.0f, +0.0f },
-		{ +width, +height, -depth, +1.0f, +0.0f, +0.0f },
-		{ +width, +height, +depth, +1.0f, +0.0f, +0.0f },
-		{ +width, -height, +depth, +1.0f, +0.0f, +0.0f }
+		{ +width, -height, -depth, +1.0f, +0.0f, +0.0f, 0.0f, 1.0f  },
+		{ +width, +height, -depth, +1.0f, +0.0f, +0.0f, 0.0f, 0.0f  },
+		{ +width, +height, +depth, +1.0f, +0.0f, +0.0f, 1.0f, 0.0f  },
+		{ +width, -height, +depth, +1.0f, +0.0f, +0.0f, 1.0f, 1.0f  }
 	};
 
 	// Indices
@@ -64,10 +64,10 @@ void GeometryGenerator::CreatePlane(float width, float depth, DX::MeshData* mesh
 	// Vertices
 	meshData->vertices =
 	{
-		{ -width, -0.0f, +depth, 0.0f, 1.0f, 0.0f  },
-		{ +width, -0.0f, +depth, 0.0f, 1.0f, 0.0f  },
-		{ -width, -0.0f, -depth, 0.0f, 1.0f, 0.0f  },
-		{ +width, -0.0f, -depth, 0.0f, 1.0f, 0.0f  },
+		{ -width, -0.0f, +depth, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f  },
+		{ +width, -0.0f, +depth, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f  },
+		{ -width, -0.0f, -depth, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f  },
+		{ +width, -0.0f, -depth, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f  },
 	};
 
 	// Indices
