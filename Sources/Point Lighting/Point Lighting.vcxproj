@@ -202,6 +202,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DxCamera.cpp" />
+    <ClCompile Include="DxFloor.cpp" />
     <ClCompile Include="DxModel.cpp" />
     <ClCompile Include="DxShader.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
@@ -212,6 +213,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="DxCamera.h" />
+    <ClInclude Include="DxFloor.h" />
     <ClInclude Include="DxModel.h" />
     <ClInclude Include="DxRenderer.h" />
     <ClInclude Include="DxShader.h" />
