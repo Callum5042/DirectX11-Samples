@@ -1,5 +1,5 @@
 === Basics ===
-[-] Billboarding
+[x] Billboarding
 [x] Render to Texture
 [x] Point Sprite
 [-] Instancing
