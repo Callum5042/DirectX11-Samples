@@ -1,22 +1,22 @@
-#include "DxFloor.h"
+#include "DxPointLight.h"
 #include <DirectXMath.h>
 #include "GeometryGenerator.h"
 
-DX::Floor::Floor(DX::Renderer* renderer) : m_DxRenderer(renderer)
+DX::PointLight::PointLight(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, -1.0f, 0.0f);
+	World *= DirectX::XMMatrixTranslation(5.0f, 5.0f, 5.0f);
 }
 
-void DX::Floor::Create()
+void DX::PointLight::Create()
 {
-	GeometryGenerator::CreatePlane(10.0f, 10.0f, &m_MeshData);
+	GeometryGenerator::CreateBox(0.2f, 0.2f, 0.2f, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 }
 
-void DX::Floor::CreateVertexBuffer()
+void DX::PointLight::CreateVertexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
@@ -32,7 +32,7 @@ void DX::Floor::CreateVertexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dVertexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Floor::CreateIndexBuffer()
+void DX::PointLight::CreateIndexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
@@ -48,7 +48,7 @@ void DX::Floor::CreateIndexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Floor::Render()
+void DX::PointLight::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 

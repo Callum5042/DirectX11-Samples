@@ -5,7 +5,7 @@
 [-] Instancing
 [-] Fog? - Looks bad with height camera far plane
 [?] Directional Lighting - Needs improving
-[-] Point Lighting
+[x] Point Lighting
 [-] Spot lighting
 [x] Stencil Outline
 [-] Alpha Mapping / Multi Mapping
