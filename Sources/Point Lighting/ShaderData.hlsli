@@ -33,22 +33,3 @@ cbuffer PointLightBuffer : register(b2)
 {
 	float4 cLightPointPosition;
 }
-
-// Directional light value
-//struct DirectionalLight
-//{
-//	float4 diffuse;
-//	float4 ambient;
-//	float4 specular;
-//	//float4 direction;
-//
-//	// Camera is used for calculating the specular value
-//	float3 cameraPosition;
-//	float padding;
-//};
-//
-//// Light buffer
-//cbuffer LightBuffer : register(b2)
-//{
-//	DirectionalLight cDirectionalLight;
-//}

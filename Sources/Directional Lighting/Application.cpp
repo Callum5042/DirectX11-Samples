@@ -155,6 +155,11 @@ void Applicataion::MoveDirectionalLight()
     {
         m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, -1.0f * delta_time, 0.0f);
     }
+
+    // Update buffer
+    DX::DirectionalLightBuffer buffer = {};
+    buffer.direction = DirectX::XMFLOAT4(0.57735f, -0.57735f, 0.57735f, 1.0f);
+    m_DxShader->UpdateDirectionalLightBuffer(buffer);
 }
 
 void Applicataion::SetCameraBuffer()

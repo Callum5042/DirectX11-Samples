@@ -6,6 +6,7 @@ DX::Shader::Shader(Renderer* renderer) : m_DxRenderer(renderer)
 {
 	CreateCameraConstantBuffer();
 	CreateWorldConstantBuffer();
+	CreateDirectionalLightConstantBuffer();
 }
 
 void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
@@ -61,6 +62,7 @@ void DX::Shader::Use()
 
 	// Bind the light constant buffer to pixel shader
 	d3dDeviceContext->PSSetConstantBuffers(0, 1, m_d3dCameraConstantBuffer.GetAddressOf());
+	d3dDeviceContext->PSSetConstantBuffers(2, 1, m_d3dDirectionalLightConstantBuffer.GetAddressOf());
 }
 
 void DX::Shader::UpdateCameraBuffer(const CameraBuffer& buffer)
@@ -82,6 +84,12 @@ void DX::Shader::UpdateWorldBuffer(const DirectX::XMMATRIX& world)
 	DX::Check(d3dDeviceContext->Map(m_d3dWorldConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource));
 	std::memcpy(resource.pData, &buffer, sizeof(WorldBuffer));
 	d3dDeviceContext->Unmap(m_d3dWorldConstantBuffer.Get(), 0);
+}
+
+void DX::Shader::UpdateDirectionalLightBuffer(const DirectionalLightBuffer& buffer)
+{
+	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
+	d3dDeviceContext->UpdateSubresource(m_d3dDirectionalLightConstantBuffer.Get(), 0, nullptr, &buffer, 0, 0);
 }
 
 void DX::Shader::CreateCameraConstantBuffer()
@@ -109,4 +117,17 @@ void DX::Shader::CreateWorldConstantBuffer()
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dWorldConstantBuffer.ReleaseAndGetAddressOf()));
+}
+
+void DX::Shader::CreateDirectionalLightConstantBuffer()
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Create light constant buffer
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(DirectionalLightBuffer);
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dDirectionalLightConstantBuffer.ReleaseAndGetAddressOf()));
 }

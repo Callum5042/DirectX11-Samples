@@ -28,15 +28,8 @@ cbuffer WorldBuffer : register(b1)
 	matrix cWorldInverse;
 }
 
-// Directional light value
-struct DirectionalLight
+// Point light buffer
+cbuffer DirectionalLightBuffer : register(b2)
 {
-	float4 diffuse;
-	float4 ambient;
-	float4 specular;
-	//float4 direction;
-
-	// Camera is used for calculating the specular value
-	float3 cameraPosition;
-	float padding;
-};
+	float4 cLightDirection;
+}
