@@ -62,5 +62,7 @@ float4 main(VertexOutput input) : SV_TARGET
 	float4 texture_colour = gTextureDiffuse.Sample(gSamplerAnisotropic, input.tex);
 
 	// Combine colours
-	return light_colour * texture_colour;
+	float4 colour = light_colour * texture_colour;
+
+	return colour;
 }
