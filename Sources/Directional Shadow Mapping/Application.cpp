@@ -91,8 +91,12 @@ int Applicataion::Execute()
 
             MoveDirectionalLight();
 
-            // Clear the buffers
-            m_DxRenderer->Clear();
+            // 
+            // Render to shadow map
+            //
+
+            // Set render target to the shadow map
+            m_DxRenderer->SetRenderTargetShadowMap();
 
             // Bind the shader to the pipeline
             m_DxShader->Use();
@@ -104,6 +108,22 @@ int Applicataion::Execute()
             // Render the floor
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
+
+
+            //
+            // Render to back buffer
+            //
+
+            // Set render target to the back buffer
+            m_DxRenderer->SetRenderTargetBackBuffer();
+            m_DxRenderer->SetViewport(window_width, window_height);
+
+            // Bind the shader to the pipeline
+            m_DxShader->Use();
+
+            // Render the model
+            m_DxShader->UpdateWorldBuffer(m_DxModel->World);
+            m_DxModel->Render();
 
             // Render the floor
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);

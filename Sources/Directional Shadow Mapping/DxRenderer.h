@@ -40,9 +40,6 @@ namespace DX
 		// Resizing
 		void Resize(int width, int height);
 
-		// Clear the buffers
-		void Clear();
-
 		// Display the rendered scene
 		void Present();
 
@@ -51,6 +48,15 @@ namespace DX
 
 		// Get the ID3D11 Device Context
 		ID3D11DeviceContext* GetDeviceContext() const { return m_d3dDeviceContext.Get(); }
+
+		// Set render target back buffer
+		void SetRenderTargetBackBuffer();
+
+		// Void render target texture
+		void SetRenderTargetShadowMap();
+
+		// Viewport
+		void SetViewport(int width, int height);
 
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
@@ -70,11 +76,14 @@ namespace DX
 		ComPtr<ID3D11DepthStencilView> m_d3dDepthStencilView = nullptr;
 		void CreateRenderTargetAndDepthStencilView(int width, int height);
 
-		// Viewport
-		void SetViewport(int width, int height);
-
 		// Texture sampler
 		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
 		void CreateAnisotropicFiltering();
+
+		// Render to texture
+		ComPtr<ID3D11DepthStencilView> m_ShadowMapDepthStencilView = nullptr;
+		ComPtr<ID3D11ShaderResourceView> m_ShadowMapTexture = nullptr;
+		void CreateTextureDepthStencilView();
+		int m_ShadowMapTextureSize = 1024;
 	};
 }

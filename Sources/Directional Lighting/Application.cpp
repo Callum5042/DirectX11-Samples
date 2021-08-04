@@ -105,10 +105,6 @@ int Applicataion::Execute()
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
 
-            // Render the floor
-            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
-            m_DxFloor->Render();
-
             // Render the light as a model for visualisation
             m_DxShader->UpdateWorldBuffer(m_DxDirectionalLight->World);
             m_DxDirectionalLight->Render();

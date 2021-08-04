@@ -32,6 +32,9 @@ void DX::Renderer::Create()
 
 	// Create anistropic texture filter
 	CreateAnisotropicFiltering();
+
+	// Create render to texture depth stencil
+	CreateTextureDepthStencilView();
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -50,7 +53,7 @@ void DX::Renderer::Resize(int width, int height)
 	SetViewport(width, height);
 }
 
-void DX::Renderer::Clear()
+void DX::Renderer::SetRenderTargetBackBuffer()
 {
 	// Clear the render target view to the chosen colour
 	m_d3dDeviceContext->ClearRenderTargetView(m_d3dRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
@@ -58,6 +61,28 @@ void DX::Renderer::Clear()
 
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
+}
+
+void DX::Renderer::SetRenderTargetShadowMap()
+{
+	// Clear the render target view to the chosen colour
+	m_d3dDeviceContext->ClearDepthStencilView(m_ShadowMapDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	// Bind the render target view to the pipeline's output merger stage
+	ID3D11RenderTargetView* render_target_views[1] = { nullptr };
+	m_d3dDeviceContext->OMSetRenderTargets(1, render_target_views, m_ShadowMapDepthStencilView.Get());
+
+	// Describe the viewport
+	D3D11_VIEWPORT viewport = {};
+	viewport.Width = static_cast<float>(m_ShadowMapTextureSize);
+	viewport.Height = static_cast<float>(m_ShadowMapTextureSize);
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+
+	// Bind viewport to the pipline's rasterization stage
+	m_d3dDeviceContext->RSSetViewports(1, &viewport);
 }
 
 void DX::Renderer::Present()
@@ -197,9 +222,6 @@ void DX::Renderer::CreateRenderTargetAndDepthStencilView(int width, int height)
 	ComPtr<ID3D11Texture2D> depth_stencil = nullptr;
 	DX::Check(m_d3dDevice->CreateTexture2D(&depth_desc, nullptr, &depth_stencil));
 	DX::Check(m_d3dDevice->CreateDepthStencilView(depth_stencil.Get(), nullptr, m_d3dDepthStencilView.GetAddressOf()));
-
-	// Binds both the render target and depth stencil to the pipeline's output merger stage
-	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
 }
 
 void DX::Renderer::SetViewport(int width, int height)
@@ -234,4 +256,37 @@ void DX::Renderer::CreateAnisotropicFiltering()
 
 	// Bind to pipeline
 	m_d3dDeviceContext->PSSetSamplers(0, 1, m_AnisotropicSampler.GetAddressOf());
+}
+
+void DX::Renderer::CreateTextureDepthStencilView()
+{
+	// Create texture
+	D3D11_TEXTURE2D_DESC texture_desc = {};
+	texture_desc.Width = m_ShadowMapTextureSize;
+	texture_desc.Height = m_ShadowMapTextureSize;
+	texture_desc.ArraySize = 1;
+	texture_desc.SampleDesc.Count = 1;
+	texture_desc.SampleDesc.Quality = 0;
+	texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	texture_desc.Usage = D3D11_USAGE_DEFAULT;
+	texture_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+
+	ComPtr<ID3D11Texture2D> texture = nullptr;
+	DX::Check(m_d3dDevice->CreateTexture2D(&texture_desc, 0, texture.GetAddressOf()));
+
+	// Create depth stencil view
+	D3D11_DEPTH_STENCIL_VIEW_DESC depth_view_desc = {};
+	depth_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depth_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
+	DX::Check(m_d3dDevice->CreateDepthStencilView(texture.Get(), &depth_view_desc, m_ShadowMapDepthStencilView.GetAddressOf()));
+
+	// Create shadow resource
+	D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
+	shader_resource_view_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
+	shader_resource_view_desc.Texture2D.MipLevels = 1;
+
+	DX::Check(m_d3dDevice->CreateShaderResourceView(texture.Get(), &shader_resource_view_desc, m_ShadowMapTexture.GetAddressOf()));
 }
