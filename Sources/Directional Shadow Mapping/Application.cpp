@@ -66,8 +66,8 @@ int Applicataion::Execute()
                     // Rotate the world 
                     auto pitch = e.motion.yrel * 0.01f;
                     auto yaw = e.motion.xrel * 0.01f;
-                    //m_DxCamera->Rotate(pitch, yaw);
-                    m_DxCamera->Rotate(0, 0);
+                    
+                    m_DxCamera->Rotate(pitch, yaw);
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
@@ -109,6 +109,7 @@ int Applicataion::Execute()
             // Render to back buffer
             //
             m_DxRenderer->SetRasterBackCull();
+
             // Set render target to the back buffer
             m_DxRenderer->SetRenderTargetBackBuffer();
             m_DxRenderer->SetViewport(window_width, window_height);
