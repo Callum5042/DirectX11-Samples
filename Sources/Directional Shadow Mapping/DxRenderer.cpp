@@ -256,10 +256,10 @@ void DX::Renderer::CreateShadowFiltering()
 {
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = 1000.0f;
 
@@ -286,7 +286,7 @@ void DX::Renderer::CreateRasterModeBackCullShadow()
 	rasterizerState.FillMode = D3D11_FILL_SOLID;
 	rasterizerState.DepthClipEnable = true;
 
-	rasterizerState.DepthBias = 1000;
+	rasterizerState.DepthBias = 10000;
 	rasterizerState.DepthBiasClamp = 0.0f;
 	rasterizerState.SlopeScaledDepthBias = 1.0f;
 

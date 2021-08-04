@@ -98,6 +98,6 @@ namespace DX
 		ComPtr<ID3D11DepthStencilView> m_ShadowMapDepthStencilView = nullptr;
 		ComPtr<ID3D11ShaderResourceView> m_ShadowMapTexture = nullptr;
 		void CreateTextureDepthStencilView();
-		float m_ShadowMapTextureSize = 1024.0f;
+		float m_ShadowMapTextureSize = 4096.0f;
 	};
 }
