@@ -1,9 +1,9 @@
 #include "ShaderData.hlsli"
 
 // Entry point for the vertex shader - will be executed for each vertex
-VertexOutput main(VertexInput input)
+PixelInput main(VertexInput input)
 {
-	VertexOutput output;
+	PixelInput output;
 
 	// Transform to homogeneous clip space.
 	output.positionClipSpace = mul(float4(input.position, 1.0f), cWorld);
@@ -15,6 +15,11 @@ VertexOutput main(VertexInput input)
 
 	// Transform the normals by the inverse world space
 	output.normal = mul(input.normal, (float3x3)cWorldInverse).xyz;
+
+	// Light position
+	output.lightViewPosition = mul(float4(input.position, 1.0f), cWorld);
+	output.lightViewPosition = mul(output.lightViewPosition, cLightView);
+	output.lightViewPosition = mul(output.lightViewPosition, cLightProjection);
 
 	return output;
 }

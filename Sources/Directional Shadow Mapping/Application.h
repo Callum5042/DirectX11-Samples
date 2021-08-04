@@ -53,4 +53,8 @@ private:
 
 	// Move directional light
 	void MoveDirectionalLight();
+
+	// Shadow camera
+	DirectX::XMMATRIX m_ShadowCameraView;
+	DirectX::XMMATRIX m_ShadowCameraProjection;
 };

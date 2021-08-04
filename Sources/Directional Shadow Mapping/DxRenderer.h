@@ -58,6 +58,9 @@ namespace DX
 		// Viewport
 		void SetViewport(int width, int height);
 
+		// Get texture
+		ID3D11ShaderResourceView** GetShadowMapTexture() { return m_ShadowMapTexture.GetAddressOf(); }
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 

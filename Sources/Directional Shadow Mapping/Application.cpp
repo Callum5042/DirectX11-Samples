@@ -113,6 +113,10 @@ int Applicataion::Execute()
             // Bind the shader to the pipeline
             m_DxShader->Use();
 
+            // Apply shadow map texture
+            auto context = m_DxRenderer->GetDeviceContext();
+            context->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture());
+
             // Render the model
             m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
@@ -181,7 +185,10 @@ void Applicataion::MoveDirectionalLight()
 
     // Update buffer
     DX::DirectionalLightBuffer buffer = {};
+    buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
+    buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
     DirectX::XMStoreFloat4(&buffer.direction, direction);
+
     m_DxShader->UpdateDirectionalLightBuffer(buffer);
 }
 
@@ -207,15 +214,15 @@ void Applicataion::SetOrthoCameraBuffer()
     auto eye = position;
     auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
     auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-    auto view = DirectX::XMMatrixLookAtLH(eye, at, up);
+    m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
 
     // Calculate projection
-    auto projection = DirectX::XMMatrixOrthographicLH(1024, 1024, 1.0f, 100.0f);
+    m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(1024, 1024, 1.0f, 100.0f);
 
     // Set buffer
     DX::CameraBuffer buffer = {};
-    buffer.view = DirectX::XMMatrixTranspose(view);
-    buffer.projection = DirectX::XMMatrixTranspose(projection);
+    buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
+    buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
     buffer.cameraPosition = m_DxCamera->GetPosition();
 
     m_DxShader->UpdateCameraBuffer(buffer);

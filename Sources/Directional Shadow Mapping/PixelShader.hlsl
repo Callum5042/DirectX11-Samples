@@ -28,7 +28,7 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal)
 }
 
 // Entry point for the vertex shader - will be executed for each pixel
-float4 main(VertexOutput input) : SV_TARGET
+float4 main(PixelInput input) : SV_TARGET
 {
 	// Interpolating normal can unnormalize it, so normalize it.
 	input.normal = normalize(input.normal);

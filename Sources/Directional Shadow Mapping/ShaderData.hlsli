@@ -6,11 +6,12 @@ struct VertexInput
 };
 
 // Vertex output / pixel input structure
-struct VertexOutput
+struct PixelInput
 {
 	float4 positionClipSpace : SV_POSITION;
 	float3 position : POSITION;
 	float3 normal : NORMAL;
+	float4 lightViewPosition : TEXCOORD1;
 };
 
 // Camera buffer
@@ -31,5 +32,11 @@ cbuffer WorldBuffer : register(b1)
 // Point light buffer
 cbuffer DirectionalLightBuffer : register(b2)
 {
+	matrix cLightView;
+	matrix cLightProjection;
 	float4 cLightDirection;
 }
+
+// Shadow map
+Texture2D gShadowMap : register(t0);
+SamplerComparisonState gShadowSampler : register(s0);
