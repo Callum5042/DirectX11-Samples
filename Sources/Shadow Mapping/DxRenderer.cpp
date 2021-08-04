@@ -256,113 +256,6 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 	m_TextureDepthStencilViews.resize(6);
 	
 	// Create texture
-	//D3D11_TEXTURE2D_DESC texture_desc = {};
-	//texture_desc.Width = cubeMapSize;
-	//texture_desc.Height = cubeMapSize;
-	//texture_desc.MipLevels = 1;
-	//texture_desc.ArraySize = 6;
-	//texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-	//texture_desc.SampleDesc.Count = 1;
-	//texture_desc.SampleDesc.Quality = 0;
-	//texture_desc.Usage = D3D11_USAGE_DEFAULT;
-	//texture_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-	//texture_desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
-
-	//static ComPtr<ID3D11Texture2D> texture = nullptr;
-	//DX::Check(m_d3dDevice->CreateTexture2D(&texture_desc, nullptr, texture.ReleaseAndGetAddressOf()));
-
-	//// Create depth stencil view
-	//D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	//dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	//dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-	//dsvDesc.Texture2DArray.ArraySize = 1;
-	//dsvDesc.Texture2DArray.MipSlice = 0;
-
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	dsvDesc.Texture2DArray.FirstArraySlice = i;
-	//	DX::Check(m_d3dDevice->CreateDepthStencilView(texture.Get(), &dsvDesc, m_TextureDepthStencilViews[i].ReleaseAndGetAddressOf()));
-	//}
-
-	//// Create shader resource view
-	//D3D11_SHADER_RESOURCE_VIEW_DESC view_desc = {};
-	//view_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	//view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-	//view_desc.TextureCube.MostDetailedMip = 0;
-	//view_desc.TextureCube.MipLevels = -1;
-
-	//DX::Check(m_d3dDevice->CreateShaderResourceView(texture.Get(), &view_desc, m_ShadowCubeMap.ReleaseAndGetAddressOf()));
-
-
-	//
-	// Other
-	//
-	//D3D11_TEXTURE2D_DESC texDesc;
-	//texDesc.Width = cubeMapSize;
-	//texDesc.Height = cubeMapSize;
-	//texDesc.MipLevels = 0;
-	//texDesc.ArraySize = 6;
-	//texDesc.SampleDesc.Count = 1;
-	//texDesc.SampleDesc.Quality = 0;
-	//texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//texDesc.Usage = D3D11_USAGE_DEFAULT;
-	//texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	//texDesc.CPUAccessFlags = 0;
-	//texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS | D3D11_RESOURCE_MISC_TEXTURECUBE;
-
-	//ComPtr<ID3D11Texture2D> cubeTex = nullptr;
-	//DX::Check(m_d3dDevice->CreateTexture2D(&texDesc, 0, cubeTex.GetAddressOf()));
-
-
-	//D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-	//rtvDesc.Format = texDesc.Format;
-	//rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-	//rtvDesc.Texture2DArray.ArraySize = 1;
-	//rtvDesc.Texture2DArray.MipSlice = 0;
-
-	//m_TextureRenderTargetViews.resize(6);
-	//for (int i = 0; i < 6; ++i)
-	//{
-	//	rtvDesc.Texture2DArray.FirstArraySlice = i;
-	//	DX::Check(m_d3dDevice->CreateRenderTargetView(cubeTex.Get(), &rtvDesc, m_TextureRenderTargetViews[i].GetAddressOf()));
-	//}
-
-	//D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	//srvDesc.Format = texDesc.Format;
-	//srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-	//srvDesc.TextureCube.MostDetailedMip = 0;
-	//srvDesc.TextureCube.MipLevels = -1;
-
-	//DX::Check(m_d3dDevice->CreateShaderResourceView(cubeTex.Get(), &srvDesc, m_ShadowCubeMap.GetAddressOf()));
-
-
-	//D3D11_TEXTURE2D_DESC depthTexDesc;
-	//depthTexDesc.Width = cubeMapSize;
-	//depthTexDesc.Height = cubeMapSize;
-	//depthTexDesc.MipLevels = 1;
-	//depthTexDesc.ArraySize = 1;
-	//depthTexDesc.SampleDesc.Count = 1;
-	//depthTexDesc.SampleDesc.Quality = 0;
-	//depthTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	//depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-	//depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	//depthTexDesc.CPUAccessFlags = 0;
-	//depthTexDesc.MiscFlags = 0;
-
-	//ID3D11Texture2D* depthTex = 0;
-	//DX::Check(m_d3dDevice->CreateTexture2D(&depthTexDesc, 0, &depthTex));
-
-	//// Create the depth stencil view for the entire cube
-	//D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-	//dsvDesc.Format = depthTexDesc.Format;
-	//dsvDesc.Flags = 0;
-	//dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	//dsvDesc.Texture2D.MipSlice = 0;
-	//DX::Check(m_d3dDevice->CreateDepthStencilView(depthTex, &dsvDesc, m_TextureDepthStencilView.GetAddressOf()));
-
-
-
-
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	texDesc.Width = cubeMapSize;
 	texDesc.Height = cubeMapSize;
@@ -379,7 +272,7 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 	ComPtr<ID3D11Texture2D> cubeTex = nullptr;
 	DX::Check(m_d3dDevice->CreateTexture2D(&texDesc, 0, cubeTex.GetAddressOf()));
 
-
+	// Create depth stencil view for each side (6 faces)
 	D3D11_DEPTH_STENCIL_VIEW_DESC rtvDesc = {};
 	rtvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	rtvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
@@ -393,6 +286,7 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 		DX::Check(m_d3dDevice->CreateDepthStencilView(cubeTex.Get(), &rtvDesc, m_TextureDepthStencilViews[i].GetAddressOf()));
 	}
 
+	// Create shader resource view
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
@@ -400,32 +294,6 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 	srvDesc.TextureCube.MipLevels = -1;
 
 	DX::Check(m_d3dDevice->CreateShaderResourceView(cubeTex.Get(), &srvDesc, m_ShadowCubeMap.GetAddressOf()));
-
-
-
-	//D3D11_TEXTURE2D_DESC depthTexDesc;
-	//depthTexDesc.Width = cubeMapSize;
-	//depthTexDesc.Height = cubeMapSize;
-	//depthTexDesc.MipLevels = 1;
-	//depthTexDesc.ArraySize = 1;
-	//depthTexDesc.SampleDesc.Count = 1;
-	//depthTexDesc.SampleDesc.Quality = 0;
-	//depthTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	//depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-	//depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	//depthTexDesc.CPUAccessFlags = 0;
-	//depthTexDesc.MiscFlags = 0;
-
-	//ID3D11Texture2D* depthTex = 0;
-	//DX::Check(m_d3dDevice->CreateTexture2D(&depthTexDesc, 0, &depthTex));
-
-	//// Create the depth stencil view for the entire cube
-	//D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-	//dsvDesc.Format = depthTexDesc.Format;
-	//dsvDesc.Flags = 0;
-	//dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	//dsvDesc.Texture2D.MipSlice = 0;
-	//DX::Check(m_d3dDevice->CreateDepthStencilView(depthTex, &dsvDesc, m_TextureDepthStencilView.GetAddressOf()));
 }
 
 void DX::Renderer::SetRenderTargetTexture(int i)
@@ -436,11 +304,6 @@ void DX::Renderer::SetRenderTargetTexture(int i)
 	// Bind the render target view to the pipeline's output merger stage
 	ID3D11RenderTargetView* target[1] = { nullptr };
 	m_d3dDeviceContext->OMSetRenderTargets(1, target, m_TextureDepthStencilViews[i].Get());
-
-	/*m_d3dDeviceContext->ClearRenderTargetView(m_TextureRenderTargetViews[i].Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
-	m_d3dDeviceContext->ClearDepthStencilView(m_TextureDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	m_d3dDeviceContext->OMSetRenderTargets(1, m_TextureRenderTargetViews[i].GetAddressOf(), m_TextureDepthStencilView.Get());*/
 
 	SetViewport(1024, 1024);
 }
