@@ -39,8 +39,6 @@ void DX::Model::CreateIndexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
-	m_IndexCount = static_cast<UINT>(Indices.size());
-
 	// Create index buffer
 	D3D11_BUFFER_DESC index_buffer_desc = {};
 	index_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -87,6 +85,6 @@ void DX::Model::Render()
 	d3dDeviceContext->PSSetShaderResources(1, 1, m_NormalTexture.GetAddressOf());
 
 	// Render geometry
-	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
 }
  

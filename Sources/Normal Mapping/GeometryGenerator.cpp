@@ -3,7 +3,7 @@
 void GeometryGenerator::CreateBox(float width, float height, float depth, DX::Model* model)
 {
 	// Vertices
-	DX::Vertex vertices[] =
+	std::vector<DX::Vertex> vertices =
 	{
 		{ -width, -height, -depth, +0.0f, +0.0f, -1.0f, +0.0f, +1.0f, +1.0f, +0.0f, 0.0f  },
 		{ -width, +height, -depth, +0.0f, +0.0f, -1.0f, +0.0f, +0.0f, +1.0f, +0.0f, 0.0f  },
@@ -37,7 +37,7 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, DX::Mo
 	};
 
 	// Indices
-	unsigned int indices[] =
+	std::vector<UINT> indices =
 	{
 		0, 1, 2,
 		0, 2, 3,
@@ -58,6 +58,6 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, DX::Mo
 		20, 22, 23,
 	};
 
-	model->Vertices.assign(&vertices[0], &vertices[24]);
-	model->Indices.assign(&indices[0], &indices[36]);
+	model->Vertices.assign(vertices.begin(), vertices.end());
+	model->Indices.assign(indices.begin(), indices.end());
 }

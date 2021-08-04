@@ -66,7 +66,8 @@ int Applicataion::Execute()
                     // Rotate the world 
                     auto pitch = e.motion.yrel * 0.01f;
                     auto yaw = e.motion.xrel * 0.01f;
-                    m_DxCamera->Rotate(pitch, yaw);
+                    //m_DxCamera->Rotate(pitch, yaw);
+                    m_DxCamera->Rotate(0, 0);
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)

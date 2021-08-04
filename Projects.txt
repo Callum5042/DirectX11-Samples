@@ -3,8 +3,7 @@
 [x] Render to Texture
 [x] Point Sprite
 [-] Instancing
-[-] Fog? - Looks bad with height camera far plane
-[?] Directional Lighting - Needs improving
+[x] Directional Lighting
 [x] Point Lighting
 [-] Spot lighting
 [x] Stencil Outline
@@ -13,7 +12,7 @@
 === Advanced ===
 [x] Heightmap
 [-] Displacement Mapping
-[-] Directional Shadow Mapping
+[x] Directional Shadow Mapping
 [-] Omnidirectional Shadow Mapping
 [-] Reflections
 [-] Deferred Shading
@@ -34,3 +33,4 @@
 [-] Texture Animations
 [?] Specular Mapping
 [?] Stencil Shadows - Might be worth ignoring in favour of shadow mapping
+[?] Fog? - Looks bad with height camera far plane

@@ -2,22 +2,25 @@
 
 float4 CalculateDirectionalLighting(float3 position, float3 normal)
 {
+	float4 diffuse_light_colour = float4(0.6f, 0.6f, 0.6f, 1.0f);
+	float4 ambient_light_colour = float4(0.4f, 0.4f, 0.4f, 1.0f);
+	float4 specular_light_colour = float4(0.6f, 0.6f, 0.6f, 1.0f);
+
 	// Light direction
-	float3 light_direction = float3(1.0f, -0.7f, 0.4f);
+	float3 light_direction = float3(0.00593046332, -0.489380002, -0.872050464);
 
 	// Diffuse lighting
-	float4 diffuse_light = saturate(dot(-light_direction, normal)) * cDirectionalLight.diffuse;
+	float4 diffuse_light = saturate(dot(-light_direction, normal)) * diffuse_light_colour;
 
 	// Ambient lighting
-	float4 ambient_light = cDirectionalLight.ambient;
+	float4 ambient_light = ambient_light_colour;
 
 	// Specular lighting
 	float3 viewDirection = normalize(cDirectionalLight.cameraPosition - position);
 	float3 reflectDirection = reflect(light_direction, normal);
 
-	float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), cDirectionalLight.specular.w);
-	float spec_strength = 0.5;
-	float4 specular_light = float4(spec * cDirectionalLight.specular.xyz * spec_strength, 1.0f);
+	float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), 16.0f);
+	float4 specular_light = float4(spec * specular_light_colour.xyz, 1.0f);
 
 	// Combine the lights
 	return diffuse_light + ambient_light + specular_light;

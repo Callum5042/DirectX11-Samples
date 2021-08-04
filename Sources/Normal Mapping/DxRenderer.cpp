@@ -219,18 +219,18 @@ void DX::Renderer::SetViewport(int width, int height)
 
 void DX::Renderer::CreateAnisotropicFiltering()
 {
-	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MipLODBias = 0;
-	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = 1000.0f;
+	D3D11_SAMPLER_DESC sampler_desc = {};
+	sampler_desc.Filter = D3D11_FILTER_ANISOTROPIC;
+	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampler_desc.MipLODBias = 0;
+	sampler_desc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	sampler_desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	sampler_desc.MinLOD = 0;
+	sampler_desc.MaxLOD = 1000.0f;
 
-	DX::Check(m_d3dDevice->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
+	DX::Check(m_d3dDevice->CreateSamplerState(&sampler_desc, &m_AnisotropicSampler));
 
 	// Bind to pipeline
 	m_d3dDeviceContext->PSSetSamplers(0, 1, m_AnisotropicSampler.GetAddressOf());
