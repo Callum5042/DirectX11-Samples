@@ -156,22 +156,20 @@ void Applicataion::MoveDirectionalLight()
         m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, -1.0f * delta_time, 0.0f);
     }
 
-    // Update buffer
-
-
-    DX::DirectionalLightBuffer buffer = {};
-
+    // Decompose matrix for position
     DirectX::XMVECTOR scale;
     DirectX::XMVECTOR rotation;
     DirectX::XMVECTOR position;
     DirectX::XMMatrixDecompose(&scale, &rotation, &position, m_DxDirectionalLight->World);
 
+    // Calculate direction (direction looking at the center of the scene)
     DirectX::XMVECTOR center = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
     auto direction = DirectX::XMVectorSubtract(center, position);
     direction = DirectX::XMVector4Normalize(direction);
 
+    // Update buffer
+    DX::DirectionalLightBuffer buffer = {};
     DirectX::XMStoreFloat4(&buffer.direction, direction);
-
     m_DxShader->UpdateDirectionalLightBuffer(buffer);
 }
 
