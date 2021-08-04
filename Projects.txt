@@ -13,7 +13,8 @@
 === Advanced ===
 [x] Heightmap
 [-] Displacement Mapping
-[-] Shadow Mapping
+[-] Directional Shadow Mapping
+[-] Omnidirectional Shadow Mapping
 [-] Reflections
 [-] Deferred Shading
 [-] Particles
