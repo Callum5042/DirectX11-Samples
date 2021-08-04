@@ -146,7 +146,7 @@ void Applicataion::MoveDirectionalLight()
         m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(1.0f * delta_time, 0.0f, 0.0f);
     }
 
-    // Move up/down along Y-axis
+    // Move up/down along Y-axis v
     if (inputs[SDL_SCANCODE_E])
     {
         m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, 1.0f * delta_time, 0.0f);
@@ -157,8 +157,21 @@ void Applicataion::MoveDirectionalLight()
     }
 
     // Update buffer
+
+
     DX::DirectionalLightBuffer buffer = {};
-    buffer.direction = DirectX::XMFLOAT4(0.57735f, -0.57735f, 0.57735f, 1.0f);
+
+    DirectX::XMVECTOR scale;
+    DirectX::XMVECTOR rotation;
+    DirectX::XMVECTOR position;
+    DirectX::XMMatrixDecompose(&scale, &rotation, &position, m_DxDirectionalLight->World);
+
+    DirectX::XMVECTOR center = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+    auto direction = DirectX::XMVectorSubtract(center, position);
+    direction = DirectX::XMVector4Normalize(direction);
+
+    DirectX::XMStoreFloat4(&buffer.direction, direction);
+
     m_DxShader->UpdateDirectionalLightBuffer(buffer);
 }
 
