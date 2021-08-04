@@ -27,6 +27,7 @@ void DX::Camera::Rotate(float pitch_radians, float yaw_radians)
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(eye, at, up);
 
+	// Calculate camera position
 	DirectX::XMStoreFloat4(&m_Position, position);
 }
 
