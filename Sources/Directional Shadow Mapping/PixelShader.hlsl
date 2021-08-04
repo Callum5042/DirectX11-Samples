@@ -18,18 +18,38 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	shadowTexCoords.y = -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
 	float pixelDepth = input.lightViewPosition.z / input.lightViewPosition.w;
 
-	float lighting = 1;
-
 	const float dx = SMAP_DX;
 	//float bias = 0.001f;
-	//float bias = max(0.05f * (1.0 - dot(-light_direction, normal)), 0.005f);
+	////float bias = max(0.05f * (1.0 - dot(-light_direction, normal)), 0.005f);
 
-	// Check if the pixel texture coordinate is in the view frustum of the 
-	// light before doing any shadow work.
+	//// Check if the pixel texture coordinate is in the view frustum of the 
+	//// light before doing any shadow work.
+
+	//float lighting = 1;
+	//if ((saturate(shadowTexCoords.x) == shadowTexCoords.x) && (saturate(shadowTexCoords.y) == shadowTexCoords.y) && (pixelDepth > 0))
+	//{
+	//	lighting = gShadowMap.SampleCmpLevelZero(gShadowSampler, shadowTexCoords, pixelDepth).r;
+	//}
+
+	float lighting = 1;
 	if ((saturate(shadowTexCoords.x) == shadowTexCoords.x) && (saturate(shadowTexCoords.y) == shadowTexCoords.y) && (pixelDepth > 0))
 	{
-		lighting = gShadowMap.SampleCmpLevelZero(gShadowSampler, shadowTexCoords, pixelDepth).r;
+		const float2 offsets[9] =
+		{
+			float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+			float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+			float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+		};
+
+		[unroll]
+		for (int i = 0; i < 9; ++i)
+		{
+			lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, shadowTexCoords.xy + offsets[i], pixelDepth).r;
+		}
+
+		lighting /= 9.0f;
 	}
+
 
 	// Diffuse lighting
 	float4 diffuse_light = saturate(dot(-light_direction, normal)) * diffuse_light_colour * lighting;
@@ -54,8 +74,8 @@ float4 main(PixelInput input) : SV_TARGET
 	// Interpolating normal can unnormalize it, so normalize it.
 	input.normal = normalize(input.normal);
 
-	// Calculate directional light
-	float4 light_colour = CalculateDirectionalLighting(input.position.xyz, input.normal, input);
+// Calculate directional light
+float4 light_colour = CalculateDirectionalLighting(input.position.xyz, input.normal, input);
 
-	return light_colour;
+return light_colour;
 }

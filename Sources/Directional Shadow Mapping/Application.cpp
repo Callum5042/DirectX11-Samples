@@ -229,7 +229,7 @@ void Applicataion::SetOrthoCameraBuffer()
     float size_y = depht_s * z;
     float size_x = depht_s * z * screenAspect;*/
 
-    m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(20.0f, 20.0f, 1.0f, 100.0f);
+    m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(40.0f, 40.0f, 1.0f, 100.0f);
 
     // Set buffer
     DX::CameraBuffer buffer = {};
