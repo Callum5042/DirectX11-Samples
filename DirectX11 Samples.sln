@@ -47,7 +47,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Heightmap", "Sources\Height
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Point Lighting", "Sources\Point Lighting\Point Lighting.vcxproj", "{7F3F62E8-5566-49E7-8464-3B56B37B64F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shadow Mapping", "Sources\Shadow Mapping\Shadow Mapping.vcxproj", "{BC0D0A9D-2235-44B4-92E1-4444A9F50BBF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Omnidirectional Shadow Mapping", "Sources\Omnidirectional Shadow Mapping\Omnidirectional Shadow Mapping.vcxproj", "{BC0D0A9D-2235-44B4-92E1-4444A9F50BBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
