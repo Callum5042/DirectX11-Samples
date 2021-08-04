@@ -26,6 +26,9 @@ int Applicataion::Execute()
     m_DxFloor = std::make_unique<DX::Floor>(m_DxRenderer.get());
     m_DxFloor->Create();
 
+    m_DxDirectionalLight = std::make_unique<DX::DirectionalLight>(m_DxRenderer.get());
+    m_DxDirectionalLight->Create();
+
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -86,6 +89,8 @@ int Applicataion::Execute()
             m_Timer.Tick();
             CalculateFramesPerSecond();
 
+            MoveDirectionalLight();
+
             // Clear the buffers
             m_DxRenderer->Clear();
 
@@ -100,12 +105,56 @@ int Applicataion::Execute()
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
 
+            // Render the floor
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+            m_DxFloor->Render();
+
+            // Render the light as a model for visualisation
+            m_DxShader->UpdateWorldBuffer(m_DxDirectionalLight->World);
+            m_DxDirectionalLight->Render();
+
             // Display the rendered scene
             m_DxRenderer->Present();
         }
     }
 
     return 0;
+}
+
+void Applicataion::MoveDirectionalLight()
+{
+    auto inputs = SDL_GetKeyboardState(nullptr);
+    float delta_time = static_cast<float>(m_Timer.DeltaTime());
+
+    // Move forward/backward along Z-axis
+    if (inputs[SDL_SCANCODE_W])
+    {
+        m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 1.0f * delta_time);
+    }
+    else if (inputs[SDL_SCANCODE_S])
+    {
+        m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, -1.0f * delta_time);
+    }
+
+    // Move left/right along X-axis
+    if (inputs[SDL_SCANCODE_A])
+    {
+        m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(-1.0f * delta_time, 0.0f, 0.0f);
+    }
+    else if (inputs[SDL_SCANCODE_D])
+    {
+        m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(1.0f * delta_time, 0.0f, 0.0f);
+    }
+
+    // Move up/down along Y-axis
+    if (inputs[SDL_SCANCODE_E])
+    {
+        m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, 1.0f * delta_time, 0.0f);
+    }
+    else if (inputs[SDL_SCANCODE_Q])
+    {
+        m_DxDirectionalLight->World *= DirectX::XMMatrixTranslation(0.0f, -1.0f * delta_time, 0.0f);
+    }
 }
 
 void Applicataion::SetCameraBuffer()
