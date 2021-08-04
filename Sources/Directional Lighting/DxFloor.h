@@ -6,11 +6,11 @@
 
 namespace DX
 {
-	class Model
+	class Floor
 	{
 	public:
-		Model(DX::Renderer* renderer);
-		virtual ~Model() = default;
+		Floor(DX::Renderer* renderer);
+		virtual ~Floor() = default;
 
 		// Create device
 		void Create();

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "DxModel.h"
+#include "Vertex.h"
 
 namespace GeometryGenerator
 {
-	void CreateBox(float width, float height, float depth, DX::Model* model);
+	void CreateBox(float width, float height, float depth, DX::MeshData* meshData);
+
+	void CreatePlane(float width, float depth, DX::MeshData* meshData);
 }

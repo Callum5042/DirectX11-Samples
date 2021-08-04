@@ -13,12 +13,18 @@ struct VertexOutput
 	float3 normal : NORMAL;
 };
 
-// World constant buffer
-cbuffer WorldBuffer : register(b0)
+// Camera buffer
+cbuffer CameraBuffer : register(b0)
 {
-	matrix cWorld;
 	matrix cView;
 	matrix cProjection;
+	float4 cCameraPosition;
+}
+
+// World buffer
+cbuffer WorldBuffer : register(b1)
+{
+	matrix cWorld;
 	matrix cWorldInverse;
 }
 
@@ -34,9 +40,3 @@ struct DirectionalLight
 	float3 cameraPosition;
 	float padding;
 };
-
-// Light buffer
-cbuffer LightBuffer : register(b1)
-{
-	DirectionalLight cDirectionalLight;
-}

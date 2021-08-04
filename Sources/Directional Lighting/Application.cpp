@@ -23,6 +23,9 @@ int Applicataion::Execute()
     m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
     m_DxModel->Create();
 
+    m_DxFloor = std::make_unique<DX::Floor>(m_DxRenderer.get());
+    m_DxFloor->Create();
+
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -34,9 +37,6 @@ int Applicataion::Execute()
     SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
 
     m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
-
-    // Set the light direction
-    SetLightBuffer();
 
     // Starts the timer
     m_Timer.Start();
@@ -56,7 +56,7 @@ int Applicataion::Execute()
                     m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 
                     // Update world constant buffer with new camera view and perspective
-                    SetWorldBuffer();
+                    SetCameraBuffer();
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
@@ -69,10 +69,7 @@ int Applicataion::Execute()
                     m_DxCamera->Rotate(pitch, yaw);
 
                     // Update world constant buffer with new camera view and perspective
-                    SetWorldBuffer();
-
-                    // Update light buffer with new camera position
-                    SetLightBuffer();
+                    SetCameraBuffer();
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
@@ -81,7 +78,7 @@ int Applicataion::Execute()
                 m_DxCamera->UpdateFov(-direction);
 
                 // Update world constant buffer with new camera view and perspective
-                SetWorldBuffer();
+                SetCameraBuffer();
             }
         }
         else
@@ -96,7 +93,12 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
+            m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
+
+            // Render the floor
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+            m_DxFloor->Render();
 
             // Display the rendered scene
             m_DxRenderer->Present();
@@ -106,29 +108,14 @@ int Applicataion::Execute()
     return 0;
 }
 
-void Applicataion::SetLightBuffer()
+void Applicataion::SetCameraBuffer()
 {
-    DX::LightBuffer light_buffer = {};
-    light_buffer.directionalLight.diffuse = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 1.0f);
-    light_buffer.directionalLight.ambient = DirectX::XMFLOAT4(0.2f, 0.0f, 0.0f, 1.0f);
-    light_buffer.directionalLight.specular = DirectX::XMFLOAT4(0.6f, 0.0f, 0.0f, 8.0f);
+    DX::CameraBuffer buffer = {};
+    buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+    buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    buffer.cameraPosition = m_DxCamera->GetPosition();
 
-    // Camera position
-    auto position = m_DxCamera->GetPosition();
-    light_buffer.directionalLight.cameraPosition = position;
-
-    m_DxShader->UpdateLightConstantBuffer(light_buffer);
-}
-
-void Applicataion::SetWorldBuffer()
-{
-    DX::WorldBuffer world_buffer = {};
-    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-    world_buffer.worldInverse = DirectX::XMMatrixInverse(nullptr, world_buffer.world);
-
-    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+    m_DxShader->UpdateCameraBuffer(buffer);
 }
 
 bool Applicataion::SDLInit()
