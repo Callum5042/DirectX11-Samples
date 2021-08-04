@@ -60,7 +60,10 @@ namespace DX
 		void SetRenderTargetTexture(int i);
 
 		// Get texture
-		//ID3D11ShaderResourceView** GetRenderedTexture() { return m_RenderedTexture.GetAddressOf(); }
+		ID3D11ShaderResourceView** GetShadowCubeMap() { return m_ShadowCubeMap.GetAddressOf(); }
+
+		// Viewport
+		void SetViewport(int width, int height);
 
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
@@ -80,16 +83,17 @@ namespace DX
 		ComPtr<ID3D11DepthStencilView> m_d3dDepthStencilView = nullptr;
 		void CreateRenderTargetAndDepthStencilView(int width, int height);
 
-		// Viewport
-		void SetViewport(int width, int height);
-
 		// Texture sampler
 		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
 		void CreateAnisotropicFiltering();
 
 		// Render to texture
-		std::vector<ComPtr<ID3D11ShaderResourceView>> m_RenderedTextures;
+		ComPtr<ID3D11ShaderResourceView> m_ShadowCubeMap = nullptr;
 		std::vector<ComPtr<ID3D11DepthStencilView>> m_TextureDepthStencilViews;
+
+		/*std::vector<ComPtr<ID3D11RenderTargetView>> m_TextureRenderTargetViews;
+		ComPtr<ID3D11DepthStencilView> m_TextureDepthStencilView;*/
+
 		void CreateRenderToTextureDepthStencilView(int width, int height);
 	};
 }

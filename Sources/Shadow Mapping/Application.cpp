@@ -172,12 +172,13 @@ int Applicataion::Execute()
 
 
 			// Bind the shader to the pipeline
+			m_DxRenderer->SetViewport(window_width, window_height);
 			m_DxRenderer->SetRenderTargetBackBuffer();
 			SetCameraBuffer();
 
-			//auto shadowmap = m_DxRenderer->GetRenderedTexture();
-			/*auto deviceContext = m_DxRenderer->GetDeviceContext();
-			deviceContext->PSSetShaderResources(0, 1, shadowmap);*/
+			auto shadowmap = m_DxRenderer->GetShadowCubeMap();
+			auto deviceContext = m_DxRenderer->GetDeviceContext();
+			deviceContext->PSSetShaderResources(0, 1, shadowmap);
 
 			// Render the model
 			m_DxShader->UpdateWorldBuffer(m_DxModel->World);
