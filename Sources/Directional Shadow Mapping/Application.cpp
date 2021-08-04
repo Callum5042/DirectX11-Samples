@@ -88,6 +88,7 @@ int Applicataion::Execute()
 
             // Set render target to the shadow map
             m_DxRenderer->SetRenderTargetShadowMap();
+            SetOrthoCameraBuffer();
 
             // Bind the shader to the pipeline
             m_DxShader->Use();
@@ -217,7 +218,16 @@ void Applicataion::SetOrthoCameraBuffer()
     m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
 
     // Calculate projection
-    m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(1024, 1024, 1.0f, 100.0f);
+    /*float fieldOfView = DirectX::XMConvertToRadians(m_FOV);
+    float screenAspect = (float)m_WindowWidth / (float)m_WindowHeight;
+
+    float depht_s = std::tan(m_FOV / 2.0 * DirectX::XM_PI / 180.0) * 2.0;
+
+    float z = std::abs(position.z);
+    float size_y = depht_s * z;
+    float size_x = depht_s * z * screenAspect;*/
+
+    m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(20.0f, 20.0f, 1.0f, 100.0f);
 
     // Set buffer
     DX::CameraBuffer buffer = {};

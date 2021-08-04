@@ -7,7 +7,6 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal)
 	float4 specular_light_colour = float4(0.2f, 0.2f, 0.2f, 1.0f);
 
 	// Light direction
-	//float3 light_direction = float3(0.57735f, -0.57735f, 0.57735f);
 	float3 light_direction = cLightDirection.xyz;
 
 	// Diffuse lighting

@@ -7,6 +7,26 @@ DX::Shader::Shader(Renderer* renderer) : m_DxRenderer(renderer)
 	CreateCameraConstantBuffer();
 	CreateWorldConstantBuffer();
 	CreateDirectionalLightConstantBuffer();
+
+	// Shadow sampler
+	D3D11_SAMPLER_DESC comparisonSamplerDesc = {};
+	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.BorderColor[0] = 0.0f;
+	comparisonSamplerDesc.BorderColor[1] = 0.0f;
+	comparisonSamplerDesc.BorderColor[2] = 0.0f;
+	comparisonSamplerDesc.BorderColor[3] = 0.0f;
+	comparisonSamplerDesc.MinLOD = 0.f;
+	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	comparisonSamplerDesc.MipLODBias = 0.f;
+	comparisonSamplerDesc.MaxAnisotropy = 0;
+	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+
+	ComPtr<ID3D11SamplerState> shadow_sampler = nullptr;
+	m_DxRenderer->GetDevice()->CreateSamplerState(&comparisonSamplerDesc, shadow_sampler.GetAddressOf());
+	m_DxRenderer->GetDeviceContext()->PSSetSamplers(0, 1, shadow_sampler.GetAddressOf());
 }
 
 void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
@@ -63,6 +83,7 @@ void DX::Shader::Use()
 
 	// Bind the light constant buffer to pixel shader
 	d3dDeviceContext->PSSetConstantBuffers(0, 1, m_d3dCameraConstantBuffer.GetAddressOf());
+	d3dDeviceContext->PSSetConstantBuffers(1, 1, m_d3dWorldConstantBuffer.GetAddressOf());
 	d3dDeviceContext->PSSetConstantBuffers(2, 1, m_d3dDirectionalLightConstantBuffer.GetAddressOf());
 }
 
