@@ -4,7 +4,7 @@
 
 DX::DirectionalLight::DirectionalLight(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
-	World *= DirectX::XMMatrixTranslation(5.0f, 5.0f, 5.0f);
+	World *= DirectX::XMMatrixTranslation(5.0f, 4.0f, 6.0f);
 }
 
 void DX::DirectionalLight::Create()
