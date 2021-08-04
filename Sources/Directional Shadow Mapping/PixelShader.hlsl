@@ -1,6 +1,6 @@
 #include "ShaderData.hlsli"
 
-static const float SMAP_SIZE =1024.0f;
+static const float SMAP_SIZE = 1024.0f;
 static const float SMAP_DX = 1.0f / SMAP_SIZE;
 
 float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput input)
@@ -8,6 +8,9 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	float4 diffuse_light_colour = float4(0.6f, 0.6f, 0.6f, 1.0f);
 	float4 ambient_light_colour = float4(0.1f, 0.1f, 0.1f, 1.0f);
 	float4 specular_light_colour = float4(0.2f, 0.2f, 0.2f, 1.0f);
+
+	// Light direction
+	float3 light_direction = cLightDirection.xyz;
 
 	// Shadow map?
 	float2 shadowTexCoords;
@@ -18,17 +21,15 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	float lighting = 1;
 
 	const float dx = SMAP_DX;
-	float bias = 0.001f;
+	//float bias = 0.001f;
+	//float bias = max(0.05f * (1.0 - dot(-light_direction, normal)), 0.005f);
 
 	// Check if the pixel texture coordinate is in the view frustum of the 
 	// light before doing any shadow work.
 	if ((saturate(shadowTexCoords.x) == shadowTexCoords.x) && (saturate(shadowTexCoords.y) == shadowTexCoords.y) && (pixelDepth > 0))
 	{
-		lighting = gShadowMap.SampleCmpLevelZero(gShadowSampler, shadowTexCoords, pixelDepth - bias).r;
+		lighting = gShadowMap.SampleCmpLevelZero(gShadowSampler, shadowTexCoords, pixelDepth).r;
 	}
-
-	// Light direction
-	float3 light_direction = cLightDirection.xyz;
 
 	// Diffuse lighting
 	float4 diffuse_light = saturate(dot(-light_direction, normal)) * diffuse_light_colour * lighting;

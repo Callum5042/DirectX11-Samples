@@ -82,6 +82,8 @@ int Applicataion::Execute()
 
             MoveDirectionalLight();
 
+            m_DxRenderer->SetRasterBackCullShadow();
+
             // 
             // Render to shadow map
             //
@@ -105,7 +107,7 @@ int Applicataion::Execute()
             //
             // Render to back buffer
             //
-
+            m_DxRenderer->SetRasterBackCull();
             // Set render target to the back buffer
             m_DxRenderer->SetRenderTargetBackBuffer();
             m_DxRenderer->SetViewport(window_width, window_height);

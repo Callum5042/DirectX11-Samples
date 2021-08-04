@@ -30,11 +30,14 @@ void DX::Renderer::Create()
 	CreateRenderTargetAndDepthStencilView(window_width, window_height);
 	SetViewport(window_width, window_height);
 
-	// Create anistropic texture filter
-	CreateAnisotropicFiltering();
+	// Create shadow filter
+	CreateShadowFiltering();
 
 	// Create render to texture depth stencil
 	CreateTextureDepthStencilView();
+
+	CreateRasterModeBackCull();
+	CreateRasterModeBackCullShadow();
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -239,31 +242,63 @@ void DX::Renderer::SetViewport(int width, int height)
 	m_d3dDeviceContext->RSSetViewports(1, &viewport);
 }
 
-void DX::Renderer::CreateAnisotropicFiltering()
+void DX::Renderer::SetRasterBackCull()
+{
+	m_d3dDeviceContext->RSSetState(m_RasterModelBack.Get());
+}
+
+void DX::Renderer::SetRasterBackCullShadow()
+{
+	m_d3dDeviceContext->RSSetState(m_RasterModelBackShadow.Get());
+}
+
+void DX::Renderer::CreateShadowFiltering()
 {
 	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MipLODBias = 0;
-	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = 1000.0f;
 
-	DX::Check(m_d3dDevice->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
+	DX::Check(m_d3dDevice->CreateSamplerState(&samplerDesc, m_ShadowSampler.GetAddressOf()));
 
 	// Bind to pipeline
-	m_d3dDeviceContext->PSSetSamplers(0, 1, m_AnisotropicSampler.GetAddressOf());
+	m_d3dDeviceContext->PSSetSamplers(0, 1, m_ShadowSampler.GetAddressOf());
+}
+
+void DX::Renderer::CreateRasterModeBackCull()
+{
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.CullMode = D3D11_CULL_BACK;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.DepthClipEnable = true;
+
+	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterModelBack.ReleaseAndGetAddressOf()));
+}
+
+void DX::Renderer::CreateRasterModeBackCullShadow()
+{
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.CullMode = D3D11_CULL_BACK;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.DepthClipEnable = true;
+
+	rasterizerState.DepthBias = 1000;
+	rasterizerState.DepthBiasClamp = 0.0f;
+	rasterizerState.SlopeScaledDepthBias = 1.0f;
+
+	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterModelBackShadow.ReleaseAndGetAddressOf()));
 }
 
 void DX::Renderer::CreateTextureDepthStencilView()
 {
 	// Create texture
 	D3D11_TEXTURE2D_DESC texture_desc = {};
-	texture_desc.Width = m_ShadowMapTextureSize;
-	texture_desc.Height = m_ShadowMapTextureSize;
+	texture_desc.Width = static_cast<UINT>(m_ShadowMapTextureSize);
+	texture_desc.Height = static_cast<UINT>(m_ShadowMapTextureSize);
 	texture_desc.ArraySize = 1;
 	texture_desc.SampleDesc.Count = 1;
 	texture_desc.SampleDesc.Quality = 0;

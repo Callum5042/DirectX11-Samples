@@ -61,6 +61,10 @@ namespace DX
 		// Get texture
 		ID3D11ShaderResourceView** GetShadowMapTexture() { return m_ShadowMapTexture.GetAddressOf(); }
 
+		// Set cull mode
+		void SetRasterBackCull();
+		void SetRasterBackCullShadow();
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
@@ -79,14 +83,21 @@ namespace DX
 		ComPtr<ID3D11DepthStencilView> m_d3dDepthStencilView = nullptr;
 		void CreateRenderTargetAndDepthStencilView(int width, int height);
 
-		// Texture sampler
-		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
-		void CreateAnisotropicFiltering();
+		// Shadow sampler
+		ComPtr<ID3D11SamplerState> m_ShadowSampler = nullptr;
+		void CreateShadowFiltering();
+
+		// Raster modes
+		void CreateRasterModeBackCull();
+		ComPtr<ID3D11RasterizerState> m_RasterModelBack = nullptr;
+
+		void CreateRasterModeBackCullShadow();
+		ComPtr<ID3D11RasterizerState> m_RasterModelBackShadow = nullptr;
 
 		// Render to texture
 		ComPtr<ID3D11DepthStencilView> m_ShadowMapDepthStencilView = nullptr;
 		ComPtr<ID3D11ShaderResourceView> m_ShadowMapTexture = nullptr;
 		void CreateTextureDepthStencilView();
-		int m_ShadowMapTextureSize = 1024;
+		float m_ShadowMapTextureSize = 1024.0f;
 	};
 }
