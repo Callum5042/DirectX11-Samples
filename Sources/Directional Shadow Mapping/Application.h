@@ -48,6 +48,9 @@ private:
 	// Update buffers
 	void SetCameraBuffer();
 
+	// Update buffers
+	void SetOrthoCameraBuffer();
+
 	// Move directional light
 	void MoveDirectionalLight();
 };

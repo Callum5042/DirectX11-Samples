@@ -57,9 +57,6 @@ int Applicataion::Execute()
                 {
                     m_DxRenderer->Resize(e.window.data1, e.window.data2);
                     m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
-
-                    // Update world constant buffer with new camera view and perspective
-                    SetCameraBuffer();
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
@@ -70,18 +67,12 @@ int Applicataion::Execute()
                     auto pitch = e.motion.yrel * 0.01f;
                     auto yaw = e.motion.xrel * 0.01f;
                     m_DxCamera->Rotate(pitch, yaw);
-
-                    // Update world constant buffer with new camera view and perspective
-                    SetCameraBuffer();
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
             {
                 auto direction = static_cast<float>(e.wheel.y);
                 m_DxCamera->UpdateFov(-direction);
-
-                // Update world constant buffer with new camera view and perspective
-                SetCameraBuffer();
             }
         }
         else
@@ -117,6 +108,7 @@ int Applicataion::Execute()
             // Set render target to the back buffer
             m_DxRenderer->SetRenderTargetBackBuffer();
             m_DxRenderer->SetViewport(window_width, window_height);
+            SetCameraBuffer();
 
             // Bind the shader to the pipeline
             m_DxShader->Use();
@@ -198,6 +190,32 @@ void Applicataion::SetCameraBuffer()
     DX::CameraBuffer buffer = {};
     buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    buffer.cameraPosition = m_DxCamera->GetPosition();
+
+    m_DxShader->UpdateCameraBuffer(buffer);
+}
+
+void Applicataion::SetOrthoCameraBuffer()
+{
+    // Decompose matrix for position
+    DirectX::XMVECTOR scale;
+    DirectX::XMVECTOR rotation;
+    DirectX::XMVECTOR position;
+    DirectX::XMMatrixDecompose(&scale, &rotation, &position, m_DxDirectionalLight->World);
+
+    // Calculate view
+    auto eye = position;
+    auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+    auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    auto view = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+    // Calculate projection
+    auto projection = DirectX::XMMatrixOrthographicLH(1024, 1024, 1.0f, 100.0f);
+
+    // Set buffer
+    DX::CameraBuffer buffer = {};
+    buffer.view = DirectX::XMMatrixTranspose(view);
+    buffer.projection = DirectX::XMMatrixTranspose(projection);
     buffer.cameraPosition = m_DxCamera->GetPosition();
 
     m_DxShader->UpdateCameraBuffer(buffer);
