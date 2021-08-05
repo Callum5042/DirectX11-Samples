@@ -5,35 +5,36 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, DX::Mo
 	// Vertices
 	std::vector<DX::Vertex> vertices =
 	{
-		{ -width, -height, -depth, +0.0f, +0.0f, -1.0f, +0.0f, +1.0f, +1.0f, +0.0f, 0.0f  },
-		{ -width, +height, -depth, +0.0f, +0.0f, -1.0f, +0.0f, +0.0f, +1.0f, +0.0f, 0.0f  },
-		{ +width, +height, -depth, +0.0f, +0.0f, -1.0f, +1.0f, +0.0f, +1.0f, +0.0f, 0.0f  },
-		{ +width, -height, -depth, +0.0f, +0.0f, -1.0f, +1.0f, +1.0f, +1.0f, +0.0f, 0.0f  },
+		// Position				|  Texture UV |  Normals		   |   Tangents
+		{ -width, -height, -depth, +0.0f, +1.0f, +0.0f, +0.0f, -1.0f, +1.0f, +0.0f, 0.0f  },
+		{ -width, +height, -depth, +0.0f, +0.0f, +0.0f, +0.0f, -1.0f, +1.0f, +0.0f, 0.0f  },
+		{ +width, +height, -depth, +1.0f, +0.0f, +0.0f, +0.0f, -1.0f, +1.0f, +0.0f, 0.0f  },
+		{ +width, -height, -depth, +1.0f, +1.0f, +0.0f, +0.0f, -1.0f, +1.0f, +0.0f, 0.0f  },
 
-		{ -width, -height, +depth, +0.0f, +0.0f, +1.0f, +1.0f, +1.0f, -1.0f, +0.0f, 0.0f },
-		{ +width, -height, +depth, +0.0f, +0.0f, +1.0f, +0.0f, +1.0f, -1.0f, +0.0f, 0.0f },
-		{ +width, +height, +depth, +0.0f, +0.0f, +1.0f, +0.0f, +0.0f, -1.0f, +0.0f, 0.0f },
-		{ -width, +height, +depth, +0.0f, +0.0f, +1.0f, +1.0f, +0.0f, -1.0f, +0.0f, 0.0f },
+		{ -width, -height, +depth, +1.0f, +1.0f, +0.0f, +0.0f, +1.0f, -1.0f, +0.0f, 0.0f },
+		{ +width, -height, +depth, +0.0f, +1.0f, +0.0f, +0.0f, +1.0f, -1.0f, +0.0f, 0.0f },
+		{ +width, +height, +depth, +0.0f, +0.0f, +0.0f, +0.0f, +1.0f, -1.0f, +0.0f, 0.0f },
+		{ -width, +height, +depth, +1.0f, +0.0f, +0.0f, +0.0f, +1.0f, -1.0f, +0.0f, 0.0f },
 
-		{ -width, +height, -depth, +0.0f, +1.0f, +0.0f, +0.0f, +1.0f, +1.0f, +0.0f, +0.0f },
-		{ -width, +height, +depth, +0.0f, +1.0f, +0.0f, +0.0f, +0.0f, +1.0f, +0.0f, +0.0f },
-		{ +width, +height, +depth, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +0.0f },
-		{ +width, +height, -depth, +0.0f, +1.0f, +0.0f, +1.0f, +1.0f, +1.0f, +0.0f, +0.0f },
+		{ -width, +height, -depth, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +0.0f },
+		{ -width, +height, +depth, +0.0f, +0.0f, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +0.0f },
+		{ +width, +height, +depth, +1.0f, +0.0f, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +0.0f },
+		{ +width, +height, -depth, +1.0f, +1.0f, +0.0f, +1.0f, +0.0f, +1.0f, +0.0f, +0.0f },
 
-		{ -width, -height, -depth, +0.0f, -1.0f, +0.0f, +1.0f, +1.0f, -1.0f, +0.0f, +0.0f },
-		{ +width, -height, -depth, +0.0f, -1.0f, +0.0f, +0.0f, +1.0f, -1.0f, +0.0f, +0.0f },
-		{ +width, -height, +depth, +0.0f, -1.0f, +0.0f, +0.0f, +0.0f, -1.0f, +0.0f, +0.0f },
-		{ -width, -height, +depth, +0.0f, -1.0f, +0.0f, +1.0f, +0.0f, -1.0f, +0.0f, +0.0f },
+		{ -width, -height, -depth, +1.0f, +1.0f, +0.0f, -1.0f, +0.0f, -1.0f, +0.0f, +0.0f },
+		{ +width, -height, -depth, +0.0f, +1.0f, +0.0f, -1.0f, +0.0f, -1.0f, +0.0f, +0.0f },
+		{ +width, -height, +depth, +0.0f, +0.0f, +0.0f, -1.0f, +0.0f, -1.0f, +0.0f, +0.0f },
+		{ -width, -height, +depth, +1.0f, +0.0f, +0.0f, -1.0f, +0.0f, -1.0f, +0.0f, +0.0f },
 
-		{ -width, -height, +depth, -1.0f, +0.0f, +0.0f, +0.0f, +1.0f, -0.0f, +0.0f, -1.0f },
-		{ -width, +height, +depth, -1.0f, +0.0f, +0.0f, +0.0f, +0.0f, -0.0f, +0.0f, -1.0f },
-		{ -width, +height, -depth, -1.0f, +0.0f, +0.0f, +1.0f, +0.0f, -0.0f, +0.0f, -1.0f },
-		{ -width, -height, -depth, -1.0f, +0.0f, +0.0f, +1.0f, +1.0f, -0.0f, +0.0f, -1.0f },
+		{ -width, -height, +depth, +0.0f, +1.0f, -1.0f, +0.0f, +0.0f, -0.0f, +0.0f, -1.0f },
+		{ -width, +height, +depth, +0.0f, +0.0f, -1.0f, +0.0f, +0.0f, -0.0f, +0.0f, -1.0f },
+		{ -width, +height, -depth, +1.0f, +0.0f, -1.0f, +0.0f, +0.0f, -0.0f, +0.0f, -1.0f },
+		{ -width, -height, -depth, +1.0f, +1.0f, -1.0f, +0.0f, +0.0f, -0.0f, +0.0f, -1.0f },
 
-		{ +width, -height, -depth, +1.0f, +0.0f, +0.0f, +0.0f, +1.0f, +0.0f, +0.0f, +1.0f },
-		{ +width, +height, -depth, +1.0f, +0.0f, +0.0f, +0.0f, +0.0f, +0.0f, +0.0f, +1.0f },
-		{ +width, +height, +depth, +1.0f, +0.0f, +0.0f, +1.0f, +0.0f, +0.0f, +0.0f, +1.0f },
-		{ +width, -height, +depth, +1.0f, +0.0f, +0.0f, +1.0f, +1.0f, +0.0f, +0.0f, +1.0f }
+		{ +width, -height, -depth, +0.0f, +1.0f, +1.0f, +0.0f, +0.0f, +0.0f, +0.0f, +1.0f },
+		{ +width, +height, -depth, +0.0f, +0.0f, +1.0f, +0.0f, +0.0f, +0.0f, +0.0f, +1.0f },
+		{ +width, +height, +depth, +1.0f, +0.0f, +1.0f, +0.0f, +0.0f, +0.0f, +0.0f, +1.0f },
+		{ +width, -height, +depth, +1.0f, +1.0f, +1.0f, +0.0f, +0.0f, +0.0f, +0.0f, +1.0f }
 	};
 
 	// Indices

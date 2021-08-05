@@ -26,9 +26,9 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal)
 	return diffuse_light + ambient_light + specular_light;
 }
 
-float3 CalculateNormalsFromNormalMap(float3 normal, float2 tex, float3 tangent)
+float3 CalculateNormalsFromNormalMap(float3 normal, float2 texture_uv, float3 tangent)
 {
-	float3 normalMapSample = gTextureNormal.Sample(gSamplerAnisotropic, tex).rgb;
+	float3 normalMapSample = gTextureNormal.Sample(gSamplerAnisotropic, texture_uv).rgb;
 
 	// Uncompress each component from [0,1] to [-1,1].
 	float3 normalT = normalize(normalMapSample * 2.0f - 1.0f);

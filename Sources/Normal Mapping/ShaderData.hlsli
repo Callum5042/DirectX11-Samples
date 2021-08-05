@@ -2,8 +2,8 @@
 struct VertexInput
 {
 	float3 position : POSITION;
-	float3 normal : NORMAL;
 	float2 tex : TEXTURE;
+	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 };
 
@@ -12,8 +12,8 @@ struct VertexOutput
 {
 	float4 positionClipSpace : SV_POSITION;
 	float3 position : POSITION;
-	float3 normal : NORMAL;
 	float2 tex : TEXTURE;
+	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 };
 
