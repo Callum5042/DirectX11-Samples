@@ -34,16 +34,16 @@ float3 CalculateNormalsFromNormalMap(float3 normal, float2 texture_uv, float3 ta
 	float3 normalT = normalize(normalMapSample * 2.0f - 1.0f);
 
 	// Build orthonormal basis.
-	float3 N = normal;
-	float3 T = normalize(tangent - dot(tangent, N) * N);
-	float3 B = cross(N, T);
+	float3 N = normal; // Normal
+	float3 T = normalize(tangent - dot(tangent, N) * N); // Tangent
+	float3 B = cross(N, T); // Bi-Tangent
 
 	float3x3 TBN = float3x3(T, B, N);
 
 	// Transform from tangent space to world space.
 	float3 bumpedNormalW = mul(normalT, TBN);
 
-	return bumpedNormalW;
+	return normal;
 }
 
 // Entry point for the vertex shader - will be executed for each pixel

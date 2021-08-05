@@ -1,69 +1,55 @@
-#include "DxModel.h"
+#include "DxDirectionalLight.h"
 #include <DirectXMath.h>
 #include "GeometryGenerator.h"
-#include "DDSTextureLoader.h"
 
-DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
+DX::DirectionalLight::DirectionalLight(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
+	//World *= DirectX::XMMatrixTranslation(0.0f, 4.0f, 5.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, -4.0f, 5.0f);
 }
 
-void DX::Model::Create()
+void DX::DirectionalLight::Create()
 {
-	GeometryGenerator::CreateBox(1.0f, 1.0f, 1.0f, this);
+	GeometryGenerator::CreateBox(0.2f, 0.2f, 0.2f, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
-
-	// Create texture resource
-	LoadTexture();
 }
 
-void DX::Model::CreateVertexBuffer()
+void DX::DirectionalLight::CreateVertexBuffer() 
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
 	// Create index buffer
 	D3D11_BUFFER_DESC vertex_buffer_desc = {};
 	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * Vertices.size());
+	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(Vertex) * m_MeshData.vertices.size());
 	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 	D3D11_SUBRESOURCE_DATA vertex_subdata = {};
-	vertex_subdata.pSysMem = Vertices.data();
+	vertex_subdata.pSysMem = m_MeshData.vertices.data();
 
 	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dVertexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Model::CreateIndexBuffer()
+void DX::DirectionalLight::CreateIndexBuffer()
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
 	// Create index buffer
 	D3D11_BUFFER_DESC index_buffer_desc = {};
 	index_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	index_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * Indices.size());
+	index_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * m_MeshData.indices.size());
 	index_buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 	D3D11_SUBRESOURCE_DATA index_subdata = {};
-	index_subdata.pSysMem = Indices.data();
+	index_subdata.pSysMem = m_MeshData.indices.data();
 
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Model::LoadTexture()
-{
-	auto d3dDevice = m_DxRenderer->GetDevice();
-
-	ComPtr<ID3D11Resource> resource = nullptr;
-	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\brickwall_diffuse.dds",
-		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
-
-	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\brickwall_normal.dds",
-		resource.ReleaseAndGetAddressOf(), m_NormalTexture.ReleaseAndGetAddressOf()));
-}
-
-void DX::Model::Render()
+void DX::DirectionalLight::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 
@@ -80,11 +66,6 @@ void DX::Model::Render()
 	// Bind the geometry topology to the Input Assembler
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Bind texture to the pixel shader
-	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
-	d3dDeviceContext->PSSetShaderResources(1, 1, m_NormalTexture.GetAddressOf());
-
 	// Render geometry
-	d3dDeviceContext->DrawIndexed(static_cast<UINT>(Indices.size()), 0, 0);
+	d3dDeviceContext->DrawIndexed(static_cast<UINT>(m_MeshData.indices.size()), 0, 0);
 }
- 
