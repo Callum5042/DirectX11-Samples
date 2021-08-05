@@ -43,7 +43,7 @@ float3 CalculateNormalsFromNormalMap(float3 normal, float2 texture_uv, float3 ta
 	// Transform from tangent space to world space.
 	float3 bumpedNormalW = mul(normalT, TBN);
 
-	return normal;
+	return bumpedNormalW;
 }
 
 // Entry point for the vertex shader - will be executed for each pixel
