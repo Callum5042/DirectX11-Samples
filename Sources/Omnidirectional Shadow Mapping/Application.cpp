@@ -100,11 +100,8 @@ int Applicataion::Execute()
 			DirectX::XMVECTOR position_vector;
 			DirectX::XMMatrixDecompose(&scale_vector, &rotation_vector, &position_vector, m_DxPointLight->World);
 
-			DirectX::XMStoreFloat3(&light_buffer.position, position_vector);
+			DirectX::XMStoreFloat4(&light_buffer.position, position_vector);
 			m_DxShader->UpdatePointLightBuffer(light_buffer);
-
-			// Clear the buffers
-			//m_DxRenderer->Clear();
 
 
 			//
@@ -115,7 +112,7 @@ int Applicataion::Execute()
 
 			auto projection = DirectX::XMMatrixPerspectiveFovLH(0.5f * DirectX::XM_PI, static_cast<float>(window_width) / window_height, 1.0f, 100.0f);
 
-			DirectX::XMFLOAT3 center = light_buffer.position;
+			DirectX::XMFLOAT4 center = light_buffer.position;
 			DirectX::XMFLOAT3 worldUp(0.0f, 1.0f, 0.0f);
 
 			DirectX::XMFLOAT3 targets[6] =
@@ -146,7 +143,7 @@ int Applicataion::Execute()
 
 				// Configure camera
 				
-				DirectX::XMVECTOR eye = DirectX::XMLoadFloat3(&center);
+				DirectX::XMVECTOR eye = DirectX::XMLoadFloat4(&center);
 				DirectX::XMVECTOR at = DirectX::XMLoadFloat3(&targets[i]);
 				DirectX::XMVECTOR up = DirectX::XMLoadFloat3(&ups[i]);
 				auto view = DirectX::XMMatrixLookAtLH(eye, at, up);

@@ -16,10 +16,6 @@ namespace DX
 		float nx = 0;
 		float ny = 0;
 		float nz = 0;
-
-		// Texture UV's
-		float u = 0;
-		float v = 0;
 	};
 
 	struct MeshData

@@ -3,16 +3,14 @@ struct VertexInput
 {
 	float3 position : POSITION;
 	float3 normal : NORMAL;
-	float2 tex : TEXTURE;
 };
 
 // Vertex output / pixel input structure
-struct VertexOutput
+struct PixelInput
 {
 	float4 positionClipSpace : SV_POSITION;
 	float3 position : POSITION;
 	float3 normal : NORMAL;
-	float2 tex : TEXTURE;
 };
 
 // Camera buffer

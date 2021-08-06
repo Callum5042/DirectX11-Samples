@@ -21,7 +21,7 @@ float4 CalculatePointLighting(float3 position, float3 normal)
 }
 
 // Entry point for the vertex shader - will be executed for each pixel
-float4 main(VertexOutput input) : SV_TARGET
+float4 main(PixelInput input) : SV_TARGET
 {
 	// Interpolating normal can unnormalize it, so normalize it.
 	input.normal = normalize(input.normal);
@@ -29,7 +29,7 @@ float4 main(VertexOutput input) : SV_TARGET
 	// Calculate directional light
 	float4 light_colour = CalculatePointLighting(input.position, input.normal);
 
-	float4 tex = gShadowMapTexture.Sample(gSamplerAnisotropic, input.position);
+	//float4 tex = gShadowMapTexture.Sample(gSamplerAnisotropic, input.position);
 
 	return light_colour;
 }
