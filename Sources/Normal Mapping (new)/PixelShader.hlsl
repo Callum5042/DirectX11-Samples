@@ -12,29 +12,19 @@ float4 CalculateDirectionalLighting(PixelInput input, float3 bumpedNormal)
 	// Ambient lighting
 	float4 ambient_light = ambient_light_colour;
 
-	float diffuseFactor = saturate(dot(-light_direction, bumpedNormal));
+	// Diffuse lighting
+	float4 diffuse_light = saturate(dot(-light_direction, bumpedNormal)) * diffuse_light_colour;
 
-	[flatten]
-	if (diffuseFactor > 0.0f)
-	{
-		// Diffuse lighting
-		float4 diffuse_light = saturate(dot(-light_direction, bumpedNormal)) * diffuse_light_colour;
+	// Specular lighting
+	float3 view_direction = normalize(cCameraPosition.xyz - input.position.xyz);
+	float3 reflect_direction = reflect(light_direction, bumpedNormal);
 
-		// Specular lighting
-		float3 view_direction = normalize(cCameraPosition.xyz - input.position.xyz);
-		float3 reflect_direction = reflect(light_direction, bumpedNormal);
+	float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0), 32.0f);
+	float specular_strength = 5.0f;
+	float4 specular_light = float4(specular_factor * specular_light_colour) * specular_strength;
 
-		float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0), 32.0f);
-		float specular_strength = 5.0f;
-		float4 specular_light = float4(specular_factor * specular_light_colour) * specular_strength;
-
-		// Combine the lights
-		return diffuse_light + ambient_light + specular_light;
-	}
-	else
-	{
-		return ambient_light;
-	}
+	// Combine the lights
+	return diffuse_light + ambient_light + specular_light;
 }
 
 float3 CalculateNormalsFromNormalMap(PixelInput input)

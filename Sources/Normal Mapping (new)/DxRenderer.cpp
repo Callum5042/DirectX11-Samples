@@ -179,6 +179,7 @@ void DX::Renderer::CreateRenderTargetAndDepthStencilView(int width, int height)
 	// Create the render target view
 	ComPtr<ID3D11Texture2D> back_buffer = nullptr;
 	DX::Check(m_d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(back_buffer.GetAddressOf())));
+
 	DX::Check(m_d3dDevice->CreateRenderTargetView(back_buffer.Get(), nullptr, m_d3dRenderTargetView.GetAddressOf()));
 
 	// Describe the depth stencil view
