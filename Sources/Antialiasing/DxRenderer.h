@@ -92,7 +92,7 @@ namespace DX
 		void CreateRasterStateWireframe();
 
 		// Render to texture
-		void CreateMsaaRendeTargetView(int width, int height);
+		void CreateMsaaRenderTargetView(int width, int height);
 		ComPtr<ID3D11Texture2D> m_MsaaTexture = nullptr;
 		ComPtr<ID3D11RenderTargetView> m_MsaaRenderTargetView = nullptr;
 

@@ -308,7 +308,7 @@ void DX::Renderer::CreateRasterStateWireframe()
 	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterStateWireframe.ReleaseAndGetAddressOf()));
 }
 
-void DX::Renderer::CreateMsaaRendeTargetView(int width, int height)
+void DX::Renderer::CreateMsaaRenderTargetView(int width, int height)
 {
 	// Render targets
 	D3D11_TEXTURE2D_DESC texture_desc = {};
