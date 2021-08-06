@@ -2,7 +2,7 @@
 [x] Billboarding
 [x] Render to Texture
 [x] Point Sprite
-[-] Instancing
+[x] Instancing
 [x] Directional Lighting
 [x] Point Lighting
 [-] Spot lighting

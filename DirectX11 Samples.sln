@@ -55,6 +55,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Normal Mapping (new)", "Sou
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Instancing", "Sources\Instancing\Instancing.vcxproj", "{5CB4D330-FC90-47B0-95BA-C4539682D36D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Antialiasing", "Sources\Antialiasing\Antialiasing.vcxproj", "{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -247,6 +249,14 @@ Global
 		{5CB4D330-FC90-47B0-95BA-C4539682D36D}.Release|x64.Build.0 = Release|x64
 		{5CB4D330-FC90-47B0-95BA-C4539682D36D}.Release|x86.ActiveCfg = Release|Win32
 		{5CB4D330-FC90-47B0-95BA-C4539682D36D}.Release|x86.Build.0 = Release|Win32
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Debug|x64.ActiveCfg = Debug|x64
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Debug|x64.Build.0 = Debug|x64
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Debug|x86.ActiveCfg = Debug|Win32
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Debug|x86.Build.0 = Debug|Win32
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Release|x64.ActiveCfg = Release|x64
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Release|x64.Build.0 = Release|x64
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Release|x86.ActiveCfg = Release|Win32
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +285,7 @@ Global
 		{C13B48CF-C86E-4C41-B06A-B756456E527E} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 		{AB430953-716F-4926-990B-A33F0787EBAD} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 		{5CB4D330-FC90-47B0-95BA-C4539682D36D} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
+		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
