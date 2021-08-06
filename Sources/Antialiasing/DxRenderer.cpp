@@ -43,7 +43,7 @@ void DX::Renderer::Create()
 	ToggleWireframe(false);
 
 	// Render to texture
-	CreateMsaaRendeTargetView(window_width, window_height);
+	CreateMsaaRenderTargetView(window_width, window_height);
 	CreateMsaaDepthStencilView(window_width, window_height); 
 }
 
