@@ -58,9 +58,6 @@ namespace DX
 		// Toggle wireframe
 		void ToggleWireframe(bool wireframe);
 
-		// Get texture
-		ID3D11ShaderResourceView* GetRenderedTexture() { return m_RenderedTexture.Get(); }
-
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
@@ -94,15 +91,16 @@ namespace DX
 		void CreateRasterStateWireframe();
 
 		// Render to texture
-		ComPtr<ID3D11ShaderResourceView> m_RenderedTexture = nullptr;
 		ComPtr<ID3D11Texture2D> m_Texture = nullptr;
-
 		ComPtr<ID3D11RenderTargetView> m_TextureRenderTargetView = nullptr;
 		ComPtr<ID3D11DepthStencilView> m_TextureDepthStencilView = nullptr;
 
 		void CreateRenderToTextureTargetView(int width, int height);
 		void CreateRenderToTextureDepthStencilView(int width, int height);
 		void CreateTextureShaderResource(int width, int height);
+
+		// Backbuffer
+		ComPtr<ID3D11Texture2D> m_BackBuffer = nullptr;
 
 		// Antialiasing
 		UINT m_4xMsaaQuality = 0;

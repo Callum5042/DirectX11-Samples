@@ -20,7 +20,7 @@
 [-] Particles
 [-] Ambient Occlusion (SSAO)
 [-] High-dynamic-range (HDR)
-[-] Anti Aliasing
+[x] Anti Aliasing
 
 === Unknown ===
 [-] Depth of Field

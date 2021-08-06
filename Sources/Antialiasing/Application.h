@@ -38,12 +38,10 @@ private:
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;
 
 	// Direct3D 11 perspective camera
-	std::unique_ptr<DX::Camera> m_DxCamera1 = nullptr;
-	std::unique_ptr<DX::Camera> m_DxCamera2 = nullptr;
+	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
 
 	// Update buffers
-	void UpdateWorldBufferCamera1();
-	void UpdateWorldBufferCamera2();
+	void UpdateWorldBufferCamera();
 
 	// Wireframe
 	bool m_EnableWireframe = false;

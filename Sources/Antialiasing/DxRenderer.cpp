@@ -45,7 +45,6 @@ void DX::Renderer::Create()
 	// Render to texture
 	CreateRenderToTextureTargetView(window_width, window_height);
 	CreateRenderToTextureDepthStencilView(window_width, window_height); 
-	CreateTextureShaderResource(window_width, window_height);
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -55,6 +54,7 @@ void DX::Renderer::Resize(int width, int height)
 	m_d3dRenderTargetView.ReleaseAndGetAddressOf();
 
 	// Resize the swapchain
+	m_BackBuffer.ReleaseAndGetAddressOf();
 	DX::Check(m_d3dSwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING));
 
 	// Creates a new render target and depth stencil view with the new window size
@@ -72,12 +72,14 @@ void DX::Renderer::SetRenderTargetBackBuffer()
 
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
+
+	m_d3dDeviceContext->ResolveSubresource(m_BackBuffer.Get(), 0, m_Texture.Get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 }
 
 void DX::Renderer::SetRenderTargetTexture()
 {
 	// Clear the render target view to the chosen colour
-	m_d3dDeviceContext->ClearRenderTargetView(m_TextureRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::DarkGreen));
+	m_d3dDeviceContext->ClearRenderTargetView(m_TextureRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
 	m_d3dDeviceContext->ClearDepthStencilView(m_TextureDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Bind the render target view to the pipeline's output merger stage
@@ -201,9 +203,8 @@ void DX::Renderer::CreateSwapChain(int width, int height)
 void DX::Renderer::CreateRenderTargetAndDepthStencilView(int width, int height)
 {
 	// Create the render target view
-	ComPtr<ID3D11Texture2D> back_buffer = nullptr;
-	DX::Check(m_d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(back_buffer.GetAddressOf())));
-	DX::Check(m_d3dDevice->CreateRenderTargetView(back_buffer.Get(), nullptr, m_d3dRenderTargetView.GetAddressOf()));
+	DX::Check(m_d3dSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(m_BackBuffer.ReleaseAndGetAddressOf())));
+	DX::Check(m_d3dDevice->CreateRenderTargetView(m_BackBuffer.Get(), nullptr, m_d3dRenderTargetView.GetAddressOf()));
 
 	// Describe the depth stencil view
 	D3D11_TEXTURE2D_DESC depth_desc = {};
@@ -314,11 +315,11 @@ void DX::Renderer::CreateRenderToTextureTargetView(int width, int height)
 	texture_desc.Height = height;
 	texture_desc.MipLevels = 1;
 	texture_desc.ArraySize = 1;
-	texture_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texture_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	texture_desc.SampleDesc.Count = 4;
 	texture_desc.SampleDesc.Quality = m_4xMsaaQuality - 1;
 	texture_desc.Usage = D3D11_USAGE_DEFAULT;
-	texture_desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	texture_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
 	texture_desc.CPUAccessFlags = 0;
 	texture_desc.MiscFlags = 0;
 
@@ -349,15 +350,4 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 	ComPtr<ID3D11Texture2D> texture = nullptr;
 	DX::Check(m_d3dDevice->CreateTexture2D(&texture_desc, nullptr, texture.ReleaseAndGetAddressOf()));
 	DX::Check(m_d3dDevice->CreateDepthStencilView(texture.Get(), nullptr, m_TextureDepthStencilView.ReleaseAndGetAddressOf()));
-}
-
-void DX::Renderer::CreateTextureShaderResource(int width, int height)
-{
-	D3D11_SHADER_RESOURCE_VIEW_DESC view_desc = {};
-	view_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-	view_desc.Texture2D.MostDetailedMip = 0;
-	view_desc.Texture2D.MipLevels = 1;
-
-	DX::Check(m_d3dDevice->CreateShaderResourceView(m_Texture.Get(), &view_desc, m_RenderedTexture.ReleaseAndGetAddressOf()));
 }
