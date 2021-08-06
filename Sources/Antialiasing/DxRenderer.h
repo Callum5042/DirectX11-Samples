@@ -75,6 +75,7 @@ namespace DX
 		ComPtr<ID3D11RenderTargetView> m_d3dRenderTargetView = nullptr;
 		ComPtr<ID3D11DepthStencilView> m_d3dDepthStencilView = nullptr;
 		void CreateRenderTargetAndDepthStencilView(int width, int height);
+		ComPtr<ID3D11Texture2D> m_BackBuffer = nullptr;
 
 		// Viewport
 		void SetViewport(int width, int height);
@@ -91,16 +92,12 @@ namespace DX
 		void CreateRasterStateWireframe();
 
 		// Render to texture
-		ComPtr<ID3D11Texture2D> m_Texture = nullptr;
-		ComPtr<ID3D11RenderTargetView> m_TextureRenderTargetView = nullptr;
-		ComPtr<ID3D11DepthStencilView> m_TextureDepthStencilView = nullptr;
+		void CreateMsaaRendeTargetView(int width, int height);
+		ComPtr<ID3D11Texture2D> m_MsaaTexture = nullptr;
+		ComPtr<ID3D11RenderTargetView> m_MsaaRenderTargetView = nullptr;
 
-		void CreateRenderToTextureTargetView(int width, int height);
-		void CreateRenderToTextureDepthStencilView(int width, int height);
-		void CreateTextureShaderResource(int width, int height);
-
-		// Backbuffer
-		ComPtr<ID3D11Texture2D> m_BackBuffer = nullptr;
+		void CreateMsaaDepthStencilView(int width, int height);
+		ComPtr<ID3D11DepthStencilView> m_MsaaDepthStencilView = nullptr;
 
 		// Antialiasing
 		UINT m_4xMsaaQuality = 0;
