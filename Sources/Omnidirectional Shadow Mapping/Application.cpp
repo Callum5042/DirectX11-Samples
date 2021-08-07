@@ -3,6 +3,7 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+#include "DDSTextureLoader.h"
 
 Applicataion::~Applicataion()
 {
@@ -52,6 +53,12 @@ int Applicataion::Execute()
 	SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
 
 	m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
+
+
+	ComPtr<ID3D11ShaderResourceView> skyboxTexture = nullptr;
+	ComPtr<ID3D11Resource> resource = nullptr;
+	DX::Check(DirectX::CreateDDSTextureFromFile(m_DxRenderer->GetDevice(), L"..\\..\\Resources\\Textures\\grass_cubemap.dds",
+		resource.ReleaseAndGetAddressOf(), skyboxTexture.ReleaseAndGetAddressOf()));
 
 	// Starts the timer
 	m_Timer.Start();
@@ -226,6 +233,7 @@ int Applicataion::Execute()
 
 			m_DxSkyShader->UpdateWorldConstantBuffer(sky_buffer);
 
+			//m_DxRenderer->GetDeviceContext()->PSSetShaderResources(0, 1, skyboxTexture.GetAddressOf());
 			m_DxRenderer->GetDeviceContext()->PSSetShaderResources(0, 1, shadowmap);
 			m_DxSky->Render();
 

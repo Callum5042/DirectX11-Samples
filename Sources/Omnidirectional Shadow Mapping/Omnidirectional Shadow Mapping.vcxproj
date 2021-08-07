@@ -201,6 +201,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DxCamera.cpp" />
     <ClCompile Include="DxFloor.cpp" />
     <ClCompile Include="DxModel.cpp" />
@@ -215,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DxCamera.h" />
     <ClInclude Include="DxFloor.h" />
     <ClInclude Include="DxModel.h" />

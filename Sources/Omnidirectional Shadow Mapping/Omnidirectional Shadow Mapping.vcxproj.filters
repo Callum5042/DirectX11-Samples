@@ -25,6 +25,9 @@
     <Filter Include="Shader Files\Skybox">
       <UniqueIdentifier>{cf2078d0-cb7f-48d2-bace-9a931e2b50f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third-Party">
+      <UniqueIdentifier>{b17c70b7-7dff-425d-9eb5-3602717fd81a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,6 +66,9 @@
     <ClCompile Include="DxSkyShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Third-Party</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -100,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="DxSkyShader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Third-Party</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

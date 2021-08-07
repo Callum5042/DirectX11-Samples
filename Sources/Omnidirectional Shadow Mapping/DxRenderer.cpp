@@ -284,11 +284,11 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	texDesc.Width = cubeMapSize;
 	texDesc.Height = cubeMapSize;
-	texDesc.MipLevels = 0;
+	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 6;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
-	texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
@@ -299,7 +299,7 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 
 	// Create depth stencil view for each side (6 faces)
 	D3D11_DEPTH_STENCIL_VIEW_DESC rtvDesc = {};
-	rtvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	rtvDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	rtvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 	rtvDesc.Texture2DArray.ArraySize = 1;
 	rtvDesc.Texture2DArray.MipSlice = 0;
@@ -313,7 +313,7 @@ void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
 
 	// Create shader resource view
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 	srvDesc.TextureCube.MostDetailedMip = 0;
 	srvDesc.TextureCube.MipLevels = -1;
@@ -331,4 +331,18 @@ void DX::Renderer::SetRenderTargetTexture(int i)
 	m_d3dDeviceContext->OMSetRenderTargets(1, target, m_TextureDepthStencilViews[i].Get());
 
 	SetViewport(1024, 1024);
+
+	// Normal raster
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.AntialiasedLineEnable = true;
+	rasterizerState.CullMode = D3D11_CULL_BACK;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.DepthClipEnable = true;
+	rasterizerState.FrontCounterClockwise = false;
+	rasterizerState.MultisampleEnable = false;
+
+	ComPtr<ID3D11RasterizerState> rasterState = nullptr;
+	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, rasterState.GetAddressOf()));
+
+	m_d3dDeviceContext->RSSetState(rasterState.Get());
 }
