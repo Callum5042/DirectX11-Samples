@@ -16,6 +16,15 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{c5ce5fbc-7fad-4f62-b162-d52b928dbe4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Default">
+      <UniqueIdentifier>{148e9d47-2826-4e9c-924e-496067d241ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\ShadowMap">
+      <UniqueIdentifier>{4d76b927-d43d-4cac-a0a8-8f6a86853387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Skybox">
+      <UniqueIdentifier>{cf2078d0-cb7f-48d2-bace-9a931e2b50f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -46,6 +55,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DxPointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxSky.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxSkyShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,18 +95,39 @@
     <ClInclude Include="DxPointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DxSky.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DxSkyShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\Default</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shader Files\Default</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapPixelShader.hlsl">
+      <Filter>Shader Files\ShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapVertexShader.hlsl">
+      <Filter>Shader Files\ShadowMap</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxPixelShader.hlsl">
+      <Filter>Shader Files\Skybox</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxVertexShader.hlsl">
+      <Filter>Shader Files\Skybox</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderData.hlsli">
       <Filter>Shader Files</Filter>
+    </None>
+    <None Include="SkyboxShaderData.hlsli">
+      <Filter>Shader Files\Skybox</Filter>
     </None>
   </ItemGroup>
 </Project>

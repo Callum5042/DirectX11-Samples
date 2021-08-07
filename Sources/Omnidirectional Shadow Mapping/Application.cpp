@@ -33,6 +33,18 @@ int Applicataion::Execute()
 	m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
 	m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
 	m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
+	
+	m_DxShadowMapShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
+	m_DxShadowMapShader->LoadVertexShader("Shaders/VertexShader.cso");
+	m_DxShadowMapShader->LoadPixelShader("Shaders/PixelShader.cso");
+
+	// Initialise and create the DirectX 11 sky
+	m_DxSky = std::make_unique<DX::Sky>(m_DxRenderer.get());
+	m_DxSky->Create();
+
+	m_DxSkyShader = std::make_unique<DX::SkyShader>(m_DxRenderer.get());
+	m_DxSkyShader->LoadVertexShader("Shaders/SkyboxVertexShader.cso");
+	m_DxSkyShader->LoadPixelShader("Shaders/SkyboxPixelShader.cso");
 
 	// Initialise and setup the perspective camera
 	auto window_width = 0;
@@ -108,6 +120,7 @@ int Applicataion::Execute()
 			DirectX::XMMatrixDecompose(&scale_vector, &rotation_vector, &position_vector, m_DxPointLight->World);
 
 			DirectX::XMStoreFloat4(&light_buffer.position, position_vector);
+			m_DxShadowMapShader->UpdatePointLightBuffer(light_buffer);
 			m_DxShader->UpdatePointLightBuffer(light_buffer);
 
 
@@ -115,7 +128,8 @@ int Applicataion::Execute()
 			// Render to depth buffer for shadows
 			// 
 
-			m_DxShader->Use();
+			m_DxShadowMapShader->Use();
+			
 
 			auto projection = DirectX::XMMatrixPerspectiveFovLH(0.5f * DirectX::XM_PI, static_cast<float>(window_width) / window_height, 1.0f, 100.0f);
 
@@ -160,13 +174,13 @@ int Applicataion::Execute()
 				buffer.projection = DirectX::XMMatrixTranspose(projection);
 				DirectX::XMStoreFloat3(&buffer.cameraPosition, position_vector);
 
-				m_DxShader->UpdateCameraBuffer(buffer);
+				m_DxShadowMapShader->UpdateCameraBuffer(buffer);
 
 				// Render scene
-				m_DxShader->UpdateWorldBuffer(m_DxModel->World);
+				m_DxShadowMapShader->UpdateWorldBuffer(m_DxModel->World);
 				m_DxModel->Render();
 
-				m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+				m_DxShadowMapShader->UpdateWorldBuffer(m_DxFloor->World);
 				m_DxFloor->Render();
 			}
 
@@ -176,6 +190,8 @@ int Applicataion::Execute()
 
 
 			// Bind the shader to the pipeline
+			m_DxShader->Use();
+
 			m_DxRenderer->SetViewport(window_width, window_height);
 			m_DxRenderer->SetRenderTargetBackBuffer();
 			SetCameraBuffer();
@@ -195,6 +211,22 @@ int Applicataion::Execute()
 			// Render the light as a model for visualisation
 			m_DxShader->UpdateWorldBuffer(m_DxPointLight->World);
 			m_DxPointLight->Render();
+
+			// sky
+			m_DxSkyShader->Use();
+
+			DX::SkyWorldBuffer sky_buffer = {};
+
+			auto camera_position = m_DxCamera->GetPosition();
+			auto sky_world = DirectX::XMMatrixTranslation(camera_position.x, camera_position.y, camera_position.z);
+
+			sky_buffer.world = DirectX::XMMatrixTranspose(sky_world);
+			sky_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+			sky_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+
+			m_DxSkyShader->UpdateWorldConstantBuffer(sky_buffer);
+
+			m_DxSky->Render();
 
 			// Display the rendered scene
 			m_DxRenderer->Present();
@@ -248,6 +280,7 @@ void Applicataion::SetCameraBuffer()
 	buffer.cameraPosition = m_DxCamera->GetPosition();
 
 	m_DxShader->UpdateCameraBuffer(buffer);
+	m_DxShadowMapShader->UpdateCameraBuffer(buffer);
 }
 
 bool Applicataion::SDLInit()

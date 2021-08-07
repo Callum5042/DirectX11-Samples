@@ -35,15 +35,15 @@ float CalculateShadowFactor(PixelInput input)
 
 	//return lighting / 9;
 
-	float3 light_vector = normalize(cLightPointPosition.xyz - input.position);
-	float lightVecLength = length(light_vector);
+	float3 fragToLight = input.position - cLightPointPosition.xyz;
 
-	float depthBias = 0.009f;
-	float shadowFactor = gShadowMapTexture.SampleCmp(gShadowSampler, -light_vector, lightVecLength / 100.0f).r;
+	float closestDepth = gShadowMapTexture.Sample(gShadowSampler1, fragToLight).r;
 
+	float currentDepth = length(fragToLight);
 
-
-	return shadowFactor;
+	float bias = 0.05;
+	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+	return shadow;
 }
 
 float4 CalculatePointLighting(PixelInput input)

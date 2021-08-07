@@ -38,3 +38,4 @@ cbuffer PointLightBuffer : register(b2)
 // Shadow map
 TextureCube gShadowMapTexture : register(t0);
 SamplerComparisonState gShadowSampler : register(s0);
+SamplerState gShadowSampler1 : register(s1);

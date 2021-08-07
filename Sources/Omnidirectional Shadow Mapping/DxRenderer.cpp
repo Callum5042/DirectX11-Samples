@@ -61,6 +61,8 @@ void DX::Renderer::Clear()
 
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
+
+	
 }
 
 void DX::Renderer::Present()
@@ -87,6 +89,20 @@ void DX::Renderer::SetRenderTargetBackBuffer()
 
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
+
+	// Normal raster
+	D3D11_RASTERIZER_DESC rasterizerState = {};
+	rasterizerState.AntialiasedLineEnable = true;
+	rasterizerState.CullMode = D3D11_CULL_BACK;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.DepthClipEnable = true;
+	rasterizerState.FrontCounterClockwise = false;
+	rasterizerState.MultisampleEnable = false;
+
+	ComPtr<ID3D11RasterizerState> rasterState = nullptr;
+	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, rasterState.GetAddressOf()));
+
+	m_d3dDeviceContext->RSSetState(rasterState.Get());
 }
 
 void DX::Renderer::CreateDeviceAndContext()
