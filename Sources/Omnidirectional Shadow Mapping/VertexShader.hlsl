@@ -17,8 +17,15 @@ PixelInput main(VertexInput input)
 	output.normal = mul(input.normal, (float3x3)cWorldInverse).xyz;
 
 	// Calculate shadow
-	float4 world = mul(float4(input.position, 1.0f), cWorld);
-	output.shadowHomoPos = mul(world, cView);
+	/*float4 world = mul(float4(input.position, 1.0f), cWorld);
+	output.shadowHomoPos = mul(world, cView);*/
+
+	// Transform to homogeneous clip space.
+	output.shadowHomoPos = mul(float4(input.position, 1.0f), cWorld);
+	output.shadowHomoPos = mul(output.shadowHomoPos, cView);
+
+	// Set z = w so that z/w = 1 (i.e., skydome always on far plane).
+	output.shadowHomoPos = mul(output.shadowHomoPos, cProjection).xyww;
 
 	return output;
 }

@@ -1,49 +1,28 @@
 #include "ShaderData.hlsli"
 
-static const float zf = 100.0f;
-static const float zn = 0.5f;
-static const float c1 = zf / (zf - zn);
-static const float c0 = -zn * zf / (zf - zn);
-
 float CalculateShadowFactor(PixelInput input)
 {
-	// Calculate shadow texture coordinates
-	//float2 tex_coords;
-	//tex_coords.x = +input.lightViewProjection.x / input.lightViewProjection.w / 2.0f + 0.5f;
-	//tex_coords.y = -input.lightViewProjection.y / input.lightViewProjection.w / 2.0f + 0.5f;
-
-	//// Calculate pixels depth
-	//float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
-
-	//// Kernel for soft shadows
-	//const float dx = SMAP_DX;
-	//const float2 offsets[9] =
-	//{
-	//	float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
-	//	float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-	//	float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
-	//};
-
-	//// Sample and average shadow map for shadow factor
-	//float lighting = 1.0f;
-
-	//[unroll]
-	//for (int i = 0; i < 9; ++i)
-	//{
-	//	lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
-	//}
-
-	//return lighting / 9;
+	float far_plane = 100.0f;
 
 	float3 fragToLight = input.position - cLightPointPosition.xyz;
 
-	float closestDepth = gShadowMapTexture.Sample(gShadowSampler1, fragToLight).r;
-
+	// now get current linear depth as the length between the fragment and light position
 	float currentDepth = length(fragToLight);
 
-	float bias = 0.05;
-	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-	return shadow;
+	// ise the fragment to light vector to sample from the depth map    
+	float closestDepth = gShadowMapTexture.Sample(gShadowSampler1, normalize(fragToLight)).r;
+	//float closestDepth = gShadowMapTexture.SampleCmpLevelZero(gShadowSampler, fragToLight, currentDepth / far_plane).r;
+
+	// it is currently in linear range between [0,1], let's re-transform it back to original depth value
+	closestDepth *= far_plane;
+
+	
+
+	// test for shadows
+	float bias = 0.05; // we use a much larger bias since depth is now in [near_plane, far_plane] range
+
+	float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+	return shadow + 0.5f;
 }
 
 float4 CalculatePointLighting(PixelInput input)

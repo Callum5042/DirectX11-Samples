@@ -4,7 +4,7 @@
 
 DX::PointLight::PointLight(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
-	World *= DirectX::XMMatrixTranslation(5.0f, 5.0f, 5.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, 2.0f, 0.0f);
 }
 
 void DX::PointLight::Create()
