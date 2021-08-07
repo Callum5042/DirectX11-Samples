@@ -83,10 +83,6 @@ namespace DX
 		ComPtr<ID3D11DepthStencilView> m_d3dDepthStencilView = nullptr;
 		void CreateRenderTargetAndDepthStencilView(int width, int height);
 
-		// Shadow sampler
-		ComPtr<ID3D11SamplerState> m_ShadowSampler = nullptr;
-		void CreateShadowFiltering();
-
 		// Raster modes
 		void CreateRasterModeBackCull();
 		ComPtr<ID3D11RasterizerState> m_RasterModelBack = nullptr;

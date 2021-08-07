@@ -30,9 +30,6 @@ void DX::Renderer::Create()
 	CreateRenderTargetAndDepthStencilView(window_width, window_height);
 	SetViewport(window_width, window_height);
 
-	// Create shadow filter
-	CreateShadowFiltering();
-
 	// Create render to texture depth stencil
 	CreateTextureDepthStencilView();
 
@@ -250,23 +247,6 @@ void DX::Renderer::SetRasterBackCull()
 void DX::Renderer::SetRasterBackCullShadow()
 {
 	m_d3dDeviceContext->RSSetState(m_RasterModelBackShadow.Get());
-}
-
-void DX::Renderer::CreateShadowFiltering()
-{
-	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = 1000.0f;
-
-	DX::Check(m_d3dDevice->CreateSamplerState(&samplerDesc, m_ShadowSampler.GetAddressOf()));
-
-	// Bind to pipeline
-	m_d3dDeviceContext->PSSetSamplers(0, 1, m_ShadowSampler.GetAddressOf());
 }
 
 void DX::Renderer::CreateRasterModeBackCull()
