@@ -138,7 +138,7 @@ int Applicataion::Execute()
 			m_DxShadowMapShader->Use();
 			
 
-			auto projection = DirectX::XMMatrixPerspectiveFovLH(0.5f * DirectX::XM_PI, static_cast<float>(window_width) / window_height, 1.0f, 100.0f);
+			auto projection = DirectX::XMMatrixPerspectiveFovLH(0.5f * DirectX::XM_PI, static_cast<float>(1024) / 1024, 1.0f, 100.0f);
 
 			DirectX::XMFLOAT4 center = light_buffer.position;
 			DirectX::XMFLOAT3 worldUp(0.0f, 1.0f, 0.0f);
