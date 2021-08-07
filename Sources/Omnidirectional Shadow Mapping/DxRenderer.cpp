@@ -30,8 +30,8 @@ void DX::Renderer::Create()
 	CreateRenderTargetAndDepthStencilView(window_width, window_height);
 	SetViewport(window_width, window_height);
 
-	// Create anistropic texture filter
-	CreateAnisotropicFiltering();
+	// Create shadow filter
+	CreateShadowFiltering();
 
 	// Render to texture
 	CreateRenderToTextureDepthStencilView(window_width, window_height);
@@ -230,23 +230,32 @@ void DX::Renderer::SetViewport(int width, int height)
 	m_d3dDeviceContext->RSSetViewports(1, &viewport);
 }
 
-void DX::Renderer::CreateAnisotropicFiltering()
+void DX::Renderer::Dump()
 {
-	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MipLODBias = 0;
-	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = 1000.0f;
 
-	DX::Check(m_d3dDevice->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
+}
 
-	// Bind to pipeline
-	m_d3dDeviceContext->PSSetSamplers(0, 1, m_AnisotropicSampler.GetAddressOf());
+void DX::Renderer::CreateShadowFiltering()
+{
+	D3D11_SAMPLER_DESC comparisonSamplerDesc = {};
+	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.BorderColor[0] = 0.0f;
+	comparisonSamplerDesc.BorderColor[1] = 0.0f;
+	comparisonSamplerDesc.BorderColor[2] = 0.0f;
+	comparisonSamplerDesc.BorderColor[3] = 0.0f;
+	comparisonSamplerDesc.MinLOD = 0.f;
+	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	comparisonSamplerDesc.MipLODBias = 0.f;
+	comparisonSamplerDesc.MaxAnisotropy = 0;
+	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+
+	ComPtr<ID3D11SamplerState> shadow_sampler = nullptr;
+	m_d3dDevice->CreateSamplerState(&comparisonSamplerDesc, shadow_sampler.GetAddressOf());
+
+	m_d3dDeviceContext->PSSetSamplers(0, 1, shadow_sampler.GetAddressOf());
 }
 
 void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)

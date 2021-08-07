@@ -65,6 +65,9 @@ namespace DX
 		// Viewport
 		void SetViewport(int width, int height);
 
+		// Dump cubemap
+		void Dump();
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
@@ -83,17 +86,13 @@ namespace DX
 		ComPtr<ID3D11DepthStencilView> m_d3dDepthStencilView = nullptr;
 		void CreateRenderTargetAndDepthStencilView(int width, int height);
 
-		// Texture sampler
-		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
-		void CreateAnisotropicFiltering();
+		// Shadow sampler
+		ComPtr<ID3D11SamplerState> m_ShadowSampler = nullptr;
+		void CreateShadowFiltering();
 
 		// Render to texture
 		ComPtr<ID3D11ShaderResourceView> m_ShadowCubeMap = nullptr;
 		std::vector<ComPtr<ID3D11DepthStencilView>> m_TextureDepthStencilViews;
-
-		/*std::vector<ComPtr<ID3D11RenderTargetView>> m_TextureRenderTargetViews;
-		ComPtr<ID3D11DepthStencilView> m_TextureDepthStencilView;*/
-
 		void CreateRenderToTextureDepthStencilView(int width, int height);
 	};
 }

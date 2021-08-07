@@ -1,21 +1,70 @@
 #include "ShaderData.hlsli"
 
-float4 CalculatePointLighting(float3 position, float3 normal)
+static const float zf = 100.0f;
+static const float zn = 0.5f;
+static const float c1 = zf / (zf - zn);
+static const float c0 = -zn * zf / (zf - zn);
+
+float CalculateShadowFactor(PixelInput input)
+{
+	// Calculate shadow texture coordinates
+	//float2 tex_coords;
+	//tex_coords.x = +input.lightViewProjection.x / input.lightViewProjection.w / 2.0f + 0.5f;
+	//tex_coords.y = -input.lightViewProjection.y / input.lightViewProjection.w / 2.0f + 0.5f;
+
+	//// Calculate pixels depth
+	//float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
+
+	//// Kernel for soft shadows
+	//const float dx = SMAP_DX;
+	//const float2 offsets[9] =
+	//{
+	//	float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+	//	float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+	//	float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+	//};
+
+	//// Sample and average shadow map for shadow factor
+	//float lighting = 1.0f;
+
+	//[unroll]
+	//for (int i = 0; i < 9; ++i)
+	//{
+	//	lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
+	//}
+
+	//return lighting / 9;
+
+	float3 light_vector = normalize(cLightPointPosition.xyz - input.position);
+	float lightVecLength = length(light_vector);
+
+	float depthBias = 0.009f;
+	float shadowFactor = gShadowMapTexture.SampleCmp(gShadowSampler, -light_vector, lightVecLength / 100.0f).r;
+
+
+
+	return shadowFactor;
+}
+
+float4 CalculatePointLighting(PixelInput input)
 {
 	float4 light_colour = float4(0.6f, 0.6f, 0.6f, 1.0f);
 
+	// Shadow map?
+	float shadow_factor = CalculateShadowFactor(input);
+
 	// Diffuse lighting
-	float3 light_vector = normalize(cLightPointPosition.xyz - position);
-	float4 diffuse_light = saturate(dot(light_vector, normal)) * light_colour;
+	float3 light_vector = normalize(cLightPointPosition.xyz - input.position);
+	float4 diffuse_light = saturate(dot(light_vector, input.normal)) * light_colour * shadow_factor;
 
 	// Ambient lighting
 	float4 ambient_light = light_colour * 0.2f;
 
 	// Specular lighting
-	float3 view_direction = normalize(cCameraPosition.xyz - position);
-	float3 reflect_direction = reflect(-light_vector, normal);
+	float3 view_direction = normalize(cCameraPosition.xyz - input.position);
+	float3 reflect_direction = reflect(-light_vector, input.normal);
 	float spec = pow(max(dot(view_direction, reflect_direction), 0.0), 8.0f);
-	float4 specular_light = float4(spec * light_colour.xyz * 0.2f, 1.0f);
+	float4 specular_light = float4(spec * light_colour.xyz * 0.2f, 1.0f) * shadow_factor;
 
 	return diffuse_light + ambient_light + specular_light;
 }
@@ -27,9 +76,7 @@ float4 main(PixelInput input) : SV_TARGET
 	input.normal = normalize(input.normal);
 
 	// Calculate directional light
-	float4 light_colour = CalculatePointLighting(input.position, input.normal);
-
-	//float4 tex = gShadowMapTexture.Sample(gSamplerAnisotropic, input.position);
+	float4 light_colour = CalculatePointLighting(input);
 
 	return light_colour;
 }

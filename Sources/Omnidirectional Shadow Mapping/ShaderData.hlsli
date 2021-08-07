@@ -11,6 +11,7 @@ struct PixelInput
 	float4 positionClipSpace : SV_POSITION;
 	float3 position : POSITION;
 	float3 normal : NORMAL;
+	float4 shadowHomoPos : ShadowPosition;
 };
 
 // Camera buffer
@@ -36,4 +37,4 @@ cbuffer PointLightBuffer : register(b2)
 
 // Shadow map
 TextureCube gShadowMapTexture : register(t0);
-SamplerState gSamplerAnisotropic : register(s0);
+SamplerComparisonState gShadowSampler : register(s0);

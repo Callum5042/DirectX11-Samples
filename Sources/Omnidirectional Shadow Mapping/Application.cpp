@@ -83,6 +83,13 @@ int Applicataion::Execute()
 				// Update world constant buffer with new camera view and perspective
 				//SetCameraBuffer();
 			}
+			else if (e.type == SDL_KEYDOWN)
+			{
+				if (e.key.keysym.scancode == SDL_SCANCODE_SPACE)
+				{
+					m_DxRenderer->Dump();
+				}
+			}
 		}
 		else
 		{
