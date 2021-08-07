@@ -15,14 +15,13 @@ void DX::Sky::Create()
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
-	// Create texture resource
-	LoadTexture();
-
 	// Create raster states
 	CreateRasterState();
 
 	// Create depth stencil
 	CreateDepthStencilState();
+
+	CreateAnisotropicFiltering();
 }
 
 void DX::Sky::CreateVertexBuffer()
@@ -55,13 +54,6 @@ void DX::Sky::CreateIndexBuffer()
 	index_subdata.pSysMem = m_Indices.data();
 
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
-}
-
-void DX::Sky::LoadTexture()
-{
-	auto d3dDevice = m_DxRenderer->GetDevice();
-
-
 }
 
 void DX::Sky::CreateDepthStencilState()
@@ -190,6 +182,25 @@ void DX::Sky::GenerateSphere(float radius, UINT sliceCount, UINT stackCount)
 	}
 }
 
+void DX::Sky::CreateAnisotropicFiltering()
+{
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0;
+	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = 1000.0f;
+
+	DX::Check(m_DxRenderer->GetDevice()->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
+
+	// Bind to pipeline
+	
+}
+
 void DX::Sky::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
@@ -213,8 +224,7 @@ void DX::Sky::Render()
 	// Bind the geometry topology to the Input Assembler
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Bind texture to the pixel shader
-	//d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
+	m_DxRenderer->GetDeviceContext()->PSSetSamplers(0, 1, m_AnisotropicSampler.GetAddressOf());
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(m_Indices.size()), 0, 0);

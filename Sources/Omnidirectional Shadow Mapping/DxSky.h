@@ -44,10 +44,6 @@ namespace DX
 		ComPtr<ID3D11Buffer> m_d3dIndexBuffer = nullptr;
 		void CreateIndexBuffer();
 
-		// Texture resource
-		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
-		void LoadTexture();
-
 		// Depth stencil
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilState = nullptr;
 		void CreateDepthStencilState();
@@ -58,5 +54,10 @@ namespace DX
 
 		// Generate sphere
 		void GenerateSphere(float radius, UINT sliceCount, UINT stackCount);
+
+
+		// Texture sampler
+		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
+		void CreateAnisotropicFiltering();
 	};
 }

@@ -226,6 +226,7 @@ int Applicataion::Execute()
 
 			m_DxSkyShader->UpdateWorldConstantBuffer(sky_buffer);
 
+			m_DxRenderer->GetDeviceContext()->PSSetShaderResources(0, 1, shadowmap);
 			m_DxSky->Render();
 
 			// Display the rendered scene
