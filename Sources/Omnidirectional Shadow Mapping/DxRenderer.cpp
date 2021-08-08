@@ -30,9 +30,6 @@ void DX::Renderer::Create()
 	CreateRenderTargetAndDepthStencilView(window_width, window_height);
 	SetViewport(window_width, window_height);
 
-	// Create shadow filter
-	CreateShadowFiltering();
-
 	// Render to texture
 	CreateRenderToTextureDepthStencilView(window_width, window_height);
 }
@@ -103,6 +100,8 @@ void DX::Renderer::SetRenderTargetBackBuffer()
 	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, rasterState.GetAddressOf()));
 
 	m_d3dDeviceContext->RSSetState(rasterState.Get());
+
+	CreateShadowFiltering();
 }
 
 void DX::Renderer::CreateDeviceAndContext()
@@ -253,6 +252,7 @@ void DX::Renderer::Dump()
 
 void DX::Renderer::CreateShadowFiltering()
 {
+	// Slot 0
 	D3D11_SAMPLER_DESC comparisonSamplerDesc = {};
 	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
 	comparisonSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
@@ -272,6 +272,23 @@ void DX::Renderer::CreateShadowFiltering()
 	m_d3dDevice->CreateSamplerState(&comparisonSamplerDesc, shadow_sampler.GetAddressOf());
 
 	m_d3dDeviceContext->PSSetSamplers(0, 1, shadow_sampler.GetAddressOf());
+
+	// Slot 1
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0;
+	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = 1000.0f;
+
+	ComPtr<ID3D11SamplerState> shadow_sampler1 = nullptr;
+	m_d3dDevice->CreateSamplerState(&samplerDesc, shadow_sampler1.GetAddressOf());
+
+	m_d3dDeviceContext->PSSetSamplers(1, 1, shadow_sampler1.GetAddressOf());
 }
 
 void DX::Renderer::CreateRenderToTextureDepthStencilView(int width, int height)
@@ -334,12 +351,9 @@ void DX::Renderer::SetRenderTargetTexture(int i)
 
 	// Normal raster
 	D3D11_RASTERIZER_DESC rasterizerState = {};
-	rasterizerState.AntialiasedLineEnable = true;
 	rasterizerState.CullMode = D3D11_CULL_BACK;
 	rasterizerState.FillMode = D3D11_FILL_SOLID;
 	rasterizerState.DepthClipEnable = true;
-	rasterizerState.FrontCounterClockwise = false;
-	rasterizerState.MultisampleEnable = false;
 
 	rasterizerState.DepthBias = 10000;
 	rasterizerState.DepthBiasClamp = 0.0f;
@@ -349,4 +363,6 @@ void DX::Renderer::SetRenderTargetTexture(int i)
 	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, rasterState.GetAddressOf()));
 
 	m_d3dDeviceContext->RSSetState(rasterState.Get());
+
+	CreateShadowFiltering();
 }
