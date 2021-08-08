@@ -48,7 +48,9 @@ namespace DX
 		void CreateIndexBuffer();
 
 		// Texture resource
-		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
+		ComPtr<ID3D11ShaderResourceView> m_GrassTexture = nullptr;
+		ComPtr<ID3D11ShaderResourceView> m_BrickTexture = nullptr;
+		ComPtr<ID3D11ShaderResourceView> m_AlphaTexture = nullptr;
 		void LoadTexture();
 	};
 }

@@ -74,8 +74,14 @@ void DX::Model::LoadTexture()
 	auto d3dDevice = m_DxRenderer->GetDevice();
 
 	ComPtr<ID3D11Resource> resource = nullptr;
-	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds", 
-	resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\grass_diffuse.dds", 
+	resource.ReleaseAndGetAddressOf(), m_GrassTexture.ReleaseAndGetAddressOf()));
+	
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\brickwall_diffuse.dds", 
+	resource.ReleaseAndGetAddressOf(), m_BrickTexture.ReleaseAndGetAddressOf()));
+
+	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\alpha_map.dds", 
+	resource.ReleaseAndGetAddressOf(), m_AlphaTexture.ReleaseAndGetAddressOf()));
 }
 
 void DX::Model::Render()
@@ -96,7 +102,9 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Bind texture to the pixel shader
-	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
+	d3dDeviceContext->PSSetShaderResources(0, 1, m_GrassTexture.GetAddressOf());
+	d3dDeviceContext->PSSetShaderResources(1, 1, m_BrickTexture.GetAddressOf());
+	d3dDeviceContext->PSSetShaderResources(2, 1, m_AlphaTexture.GetAddressOf());
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);

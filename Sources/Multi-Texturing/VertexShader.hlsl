@@ -10,7 +10,7 @@ VertexOutput main(VertexInput input)
 	output.position = mul(output.position, cView);
 	output.position = mul(output.position, cProjection);
 
-	// Set the vertex colour
+	// Set the vertex colour - multiply by size of the plane, in this case its hardcoded to 10 units
 	output.tex = input.tex;
 
 	return output;

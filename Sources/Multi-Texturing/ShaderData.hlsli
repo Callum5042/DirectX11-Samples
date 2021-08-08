@@ -24,4 +24,6 @@ cbuffer WorldBuffer : register(b0)
 SamplerState gSamplerAnisotropic : register(s0);
 
 // Textures
-Texture2D gTextureDiffuse : register(t0);
+Texture2D gTetureGrass : register(t0);
+Texture2D gTextureBrick : register(t1);
+Texture2D gTexturAlpha : register(t2);

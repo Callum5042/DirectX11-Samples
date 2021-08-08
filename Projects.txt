@@ -7,7 +7,8 @@
 [x] Point Lighting
 [-] Spot lighting
 [x] Stencil Outline
-[-] Alpha Mapping / Multi Mapping
+[-] Alpha Mapping
+[x] Multi-Texturing
 
 === Advanced ===
 [x] Heightmap
