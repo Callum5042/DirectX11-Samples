@@ -40,8 +40,12 @@ namespace DX
 		// Resizing
 		void Resize(int width, int height);
 
-		// Clear the buffers
-		void Clear();
+		// Set render target to the back buffer
+		void SetRenderTarget();
+
+		// 
+		void SetReflections();
+		void DisableReflections();
 
 		// Display the rendered scene
 		void Present();
@@ -76,5 +80,9 @@ namespace DX
 		// Texture sampler
 		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
 		void CreateAnisotropicFiltering();
+
+		// Stencils
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
 	};
 }

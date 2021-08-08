@@ -9,7 +9,6 @@
 
 #include "DxModel.h"
 #include "DxFloor.h"
-#include "DxDirectionalLight.h"
 
 class Applicataion
 {

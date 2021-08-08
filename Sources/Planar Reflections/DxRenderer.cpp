@@ -32,6 +32,32 @@ void DX::Renderer::Create()
 
 	// Create anistropic texture filter
 	CreateAnisotropicFiltering();
+
+	// Depth stencil
+	{
+		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.StencilEnable = TRUE;
+		dsDesc.StencilReadMask = 0xFF;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;
+		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateMask.GetAddressOf()));
+	}
+
+	// Write to stencil
+	{
+		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.StencilEnable = TRUE;
+		dsDesc.StencilWriteMask = 0xFF;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateWrite.GetAddressOf()));
+	}
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -50,14 +76,32 @@ void DX::Renderer::Resize(int width, int height)
 	SetViewport(width, height);
 }
 
-void DX::Renderer::Clear()
+void DX::Renderer::SetRenderTarget()
 {
 	// Clear the render target view to the chosen colour
 	m_d3dDeviceContext->ClearRenderTargetView(m_d3dRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
-	m_d3dDeviceContext->ClearDepthStencilView(m_d3dDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	m_d3dDeviceContext->ClearDepthStencilView(m_d3dDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
+}
+
+void DX::Renderer::SetReflections()
+{
+	// Set raster state
+	//m_d3dDeviceContext->RSSetState(m_RasterStateReflection);
+
+	// Set depth stencil
+	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilStateWrite.Get(), 1);
+}
+
+void DX::Renderer::DisableReflections()
+{
+	// Set raster state
+	//m_d3dDeviceContext->RSSetState(m_RasterStateReflection);
+
+	// Set depth stencil
+	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilStateMask.Get(), 1);
 }
 
 void DX::Renderer::Present()

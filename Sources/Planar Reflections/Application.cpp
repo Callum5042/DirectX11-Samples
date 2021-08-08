@@ -86,23 +86,37 @@ int Applicataion::Execute()
             m_Timer.Tick();
             CalculateFramesPerSecond();
 
-            // Clear the buffers
-            m_DxRenderer->Clear();
-
-
-
-
-
             // Bind the shader to the pipeline
             m_DxShader->Use();
+
+            // Set back buffer as render target view
+            m_DxRenderer->SetRenderTarget();
+
+            // Reflections
+            {
+                m_DxRenderer->SetReflections();
+
+                auto world = DirectX::XMMatrixTranslation(0.0f, -4.0f, 0.0f);
+                /*auto mirror_plane = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+                world *= DirectX::XMMatrixReflect(mirror_plane);*/
+
+                m_DxShader->UpdateWorldBuffer(world);
+                m_DxModel->Render();
+
+                m_DxRenderer->DisableReflections();
+            }
+
+            // Render the floor
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+            m_DxFloor->Render();
+
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 0);
 
             // Render the model
             m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
 
-            // Render the floor
-            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
-            m_DxFloor->Render();
+            
 
             // Display the rendered scene
             m_DxRenderer->Present();
