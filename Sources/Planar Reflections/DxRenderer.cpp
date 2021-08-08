@@ -144,7 +144,7 @@ void DX::Renderer::SetEmptyRenderTarget()
 
 void DX::Renderer::WriteToMirrorStencil()
 {
-	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilMirrorWrite.Get(), 1);
+	//m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilMirrorWrite.Get(), 1);
 }
 
 void DX::Renderer::Present()
