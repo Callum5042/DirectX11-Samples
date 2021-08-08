@@ -16,7 +16,8 @@
 [x] Normal Mapping - This works, but it feels wrong?
 [x] Directional Shadow Mapping
 [-] Omnidirectional Shadow Mapping
-[-] Reflections
+[-] Planar Reflections
+[-] Reflection Mapping / Environment Mapping
 [-] Deferred Shading
 [-] Particles
 [-] Ambient Occlusion (SSAO)
@@ -38,6 +39,7 @@
 [?] Stencil Shadows - Might be worth ignoring in favour of shadow mapping
 [?] Fog? - Looks bad with an skybox - needs redoing
 [-] Cascaded Shadow Maps
+[?] Screen Space Reflections
 
 -Volumetric Lights resources
 http://what-when-how.com/Tutorial/topic-547pjramj8/GPU-Pro-Advanced-Rendering-Techniques-152.html

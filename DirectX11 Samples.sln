@@ -59,6 +59,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Antialiasing", "Sources\Ant
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Multi-Texturing", "Sources\Multi-Texturing\Multi-Texturing.vcxproj", "{8412F1D7-1628-408E-910D-AEE7E80F4C53}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Planar Reflections", "Sources\Planar Reflections\Planar Reflections.vcxproj", "{E851CC0C-1706-4601-B682-262AFB724D27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -267,6 +269,14 @@ Global
 		{8412F1D7-1628-408E-910D-AEE7E80F4C53}.Release|x64.Build.0 = Release|x64
 		{8412F1D7-1628-408E-910D-AEE7E80F4C53}.Release|x86.ActiveCfg = Release|Win32
 		{8412F1D7-1628-408E-910D-AEE7E80F4C53}.Release|x86.Build.0 = Release|Win32
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Debug|x64.ActiveCfg = Debug|x64
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Debug|x64.Build.0 = Debug|x64
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Debug|x86.ActiveCfg = Debug|Win32
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Debug|x86.Build.0 = Debug|Win32
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x64.ActiveCfg = Release|x64
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x64.Build.0 = Release|x64
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x86.ActiveCfg = Release|Win32
+		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -297,6 +307,7 @@ Global
 		{5CB4D330-FC90-47B0-95BA-C4539682D36D} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 		{8412F1D7-1628-408E-910D-AEE7E80F4C53} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
+		{E851CC0C-1706-4601-B682-262AFB724D27} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
