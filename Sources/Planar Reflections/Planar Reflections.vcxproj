@@ -203,7 +203,6 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DxCamera.cpp" />
-    <ClCompile Include="DxDirectionalLight.cpp" />
     <ClCompile Include="DxFloor.cpp" />
     <ClCompile Include="DxModel.cpp" />
     <ClCompile Include="DxShader.cpp" />
@@ -216,7 +215,6 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DxCamera.h" />
-    <ClInclude Include="DxDirectionalLight.h" />
     <ClInclude Include="DxModel.h" />
     <ClInclude Include="DxFloor.h" />
     <ClInclude Include="DxRenderer.h" />

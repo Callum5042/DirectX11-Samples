@@ -26,9 +26,6 @@ int Applicataion::Execute()
     m_DxFloor = std::make_unique<DX::Floor>(m_DxRenderer.get());
     m_DxFloor->Create();
 
-    m_DxDirectionalLight = std::make_unique<DX::DirectionalLight>(m_DxRenderer.get());
-    m_DxDirectionalLight->Create();
-
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -91,6 +88,10 @@ int Applicataion::Execute()
 
             // Clear the buffers
             m_DxRenderer->Clear();
+
+
+
+
 
             // Bind the shader to the pipeline
             m_DxShader->Use();

@@ -36,9 +36,6 @@ private:
 	std::unique_ptr<DX::Model> m_DxModel = nullptr;
 	std::unique_ptr<DX::Floor> m_DxFloor = nullptr;
 
-	// Directional Light
-	std::unique_ptr<DX::DirectionalLight> m_DxDirectionalLight = nullptr;
-
 	// Direct3D 11 shader
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;
 
@@ -47,7 +44,4 @@ private:
 
 	// Update buffers
 	void SetCameraBuffer();
-
-	// Move directional light
-	void MoveDirectionalLight();
 };
