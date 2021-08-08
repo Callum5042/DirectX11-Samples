@@ -94,6 +94,7 @@ int Applicataion::Execute()
 
             // Render model
             m_DxRenderer->SetRenderTarget();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
             m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
 
@@ -110,11 +111,19 @@ int Applicataion::Execute()
             m_DxShader->UpdateWorldBuffer(mirror_world);
             m_DxModel->Render();
 
+            // Write mirror model to stencil
+            m_DxRenderer->SetEmptyRenderTarget();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateWrite.Get(), 1);
+            m_DxShader->UpdateWorldBuffer(mirror_world);
+            m_DxModel->Render();
+
             // Render floor
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
-            /*m_DxRenderer->SetRenderTarget();
+            m_DxRenderer->SetRenderTarget();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateMask.Get(), 1);
+            
+            m_DxRenderer->SetRenderTarget();
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
-            m_DxFloor->Render();*/
+            m_DxFloor->Render();
 
             // Display the rendered scene
             m_DxRenderer->Present();

@@ -56,6 +56,9 @@ namespace DX
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilMirrorWrite = nullptr;
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilMirrorMask = nullptr;
 
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
+
 		// Display the rendered scene
 		void Present();
 
@@ -91,8 +94,7 @@ namespace DX
 		void CreateAnisotropicFiltering();
 
 		// Stencils
-		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
-		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
+		
 
 
 		
