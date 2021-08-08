@@ -2,15 +2,15 @@
 struct VertexInput
 {
 	float3 position : POSITION;
-	float3 normal : NORMAL;
+	float2 tex : TEXCOORD;
 };
 
 // Vertex output / pixel input structure
-struct VertexOutput
+struct PixelInput
 {
 	float4 positionClipSpace : SV_POSITION;
 	float3 position : POSITION;
-	float3 normal : NORMAL;
+	float2 tex : TEXCOORD;
 };
 
 // Camera buffer
@@ -26,10 +26,4 @@ cbuffer WorldBuffer : register(b1)
 {
 	matrix cWorld;
 	matrix cWorldInverse;
-}
-
-// Point light buffer
-cbuffer DirectionalLightBuffer : register(b2)
-{
-	float4 cLightDirection;
 }

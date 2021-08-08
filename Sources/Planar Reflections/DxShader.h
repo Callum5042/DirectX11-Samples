@@ -21,11 +21,6 @@ namespace DX
 		DirectX::XMMATRIX worldInverse;
 	};
 
-	struct DirectionalLightBuffer
-	{
-		DirectX::XMFLOAT4 direction;
-	};
-
 	class Shader
 	{
 	public:
@@ -47,9 +42,6 @@ namespace DX
 		// Set world constant buffer from camera
 		void UpdateWorldBuffer(const DirectX::XMMATRIX& world);
 
-		// Update camera buffer
-		void UpdateDirectionalLightBuffer(const DirectionalLightBuffer& buffer);
-
 	private:
 		Renderer* m_DxRenderer = nullptr;
 
@@ -69,9 +61,5 @@ namespace DX
 		// World constant buffer
 		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;
 		void CreateWorldConstantBuffer();
-
-		// Light constant buffer
-		ComPtr<ID3D11Buffer> m_d3dDirectionalLightConstantBuffer = nullptr;
-		void CreateDirectionalLightConstantBuffer();
 	};
 }
