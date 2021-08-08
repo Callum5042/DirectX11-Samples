@@ -16,10 +16,6 @@ PixelInput main(VertexInput input)
 	// Transform the normals by the inverse world space
 	output.normal = mul(input.normal, (float3x3)cWorldInverse).xyz;
 
-	// Calculate shadow
-	/*float4 world = mul(float4(input.position, 1.0f), cWorld);
-	output.shadowHomoPos = mul(world, cView);*/
-
 	// Transform to homogeneous clip space.
 	output.shadowHomoPos = mul(float4(input.position, 1.0f), cWorld);
 	output.shadowHomoPos = mul(output.shadowHomoPos, cView);

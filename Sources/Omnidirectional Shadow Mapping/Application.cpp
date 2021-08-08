@@ -36,8 +36,8 @@ int Applicataion::Execute()
 	m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
 	
 	m_DxShadowMapShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
-	m_DxShadowMapShader->LoadVertexShader("Shaders/VertexShader.cso");
-	m_DxShadowMapShader->LoadPixelShader("Shaders/PixelShader.cso");
+	m_DxShadowMapShader->LoadVertexShader("Shaders/ShadowMapVertexShader.cso");
+	m_DxShadowMapShader->LoadPixelShader("Shaders/ShadowMapPixelShader.cso");
 
 	// Initialise and create the DirectX 11 sky
 	m_DxSky = std::make_unique<DX::Sky>(m_DxRenderer.get());

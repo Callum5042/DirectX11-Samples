@@ -341,6 +341,10 @@ void DX::Renderer::SetRenderTargetTexture(int i)
 	rasterizerState.FrontCounterClockwise = false;
 	rasterizerState.MultisampleEnable = false;
 
+	rasterizerState.DepthBias = 10000;
+	rasterizerState.DepthBiasClamp = 0.0f;
+	rasterizerState.SlopeScaledDepthBias = 1.0f;
+
 	ComPtr<ID3D11RasterizerState> rasterState = nullptr;
 	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, rasterState.GetAddressOf()));
 
