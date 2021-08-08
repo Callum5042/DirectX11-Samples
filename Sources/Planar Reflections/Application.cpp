@@ -95,24 +95,26 @@ int Applicataion::Execute()
             // Render model
             m_DxRenderer->SetRenderTarget();
             m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 2);
             m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
 
             // Write floor to the stencil only
             m_DxRenderer->SetEmptyRenderTarget();
-            m_DxRenderer->WriteToMirrorStencil();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilMirrorWrite.Get(), 2);
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
 
             // Render model - mirrored
             m_DxRenderer->SetRenderTarget();
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilMirrorMask.Get(), 1);
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilMirrorMask.Get(), 2);
             auto mirror_world = DirectX::XMMatrixTranslation(0.0f, -4.0f, 0.0f);
             m_DxShader->UpdateWorldBuffer(mirror_world);
             m_DxModel->Render();
 
-            // Write mirror model to stencil
+            // Write model to stencil
             m_DxRenderer->SetEmptyRenderTarget();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 2);
             m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateWrite.Get(), 1);
             m_DxShader->UpdateWorldBuffer(mirror_world);
             m_DxModel->Render();
@@ -121,7 +123,6 @@ int Applicataion::Execute()
             m_DxRenderer->SetRenderTarget();
             m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateMask.Get(), 1);
             
-            m_DxRenderer->SetRenderTarget();
             m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
             m_DxFloor->Render();
 
