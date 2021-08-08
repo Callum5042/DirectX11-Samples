@@ -58,6 +58,53 @@ void DX::Renderer::Create()
 
 		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateWrite.GetAddressOf()));
 	}
+
+
+	{
+		D3D11_DEPTH_STENCIL_DESC mirrorDesc = {};
+		mirrorDesc.DepthEnable = true;
+		mirrorDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		mirrorDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		mirrorDesc.StencilEnable = true;
+		mirrorDesc.StencilReadMask = 0xff;
+		mirrorDesc.StencilWriteMask = 0xff;
+
+		mirrorDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+		mirrorDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		// We are not rendering backfacing polygons, so these settings do not matter.
+		mirrorDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+		mirrorDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&mirrorDesc, m_DepthStencilMirrorWrite.GetAddressOf()));
+	}
+
+	{
+		D3D11_DEPTH_STENCIL_DESC mirrorDesc;
+		mirrorDesc.DepthEnable = true;
+		mirrorDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		mirrorDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		mirrorDesc.StencilEnable = true;
+		mirrorDesc.StencilReadMask = 0xff;
+		mirrorDesc.StencilWriteMask = 0xff;
+
+		mirrorDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+
+		// We are not rendering backfacing polygons, so these settings do not matter.
+		mirrorDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		mirrorDesc.BackFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&mirrorDesc, m_DepthStencilMirrorMask.GetAddressOf()));
+	}
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -76,32 +123,28 @@ void DX::Renderer::Resize(int width, int height)
 	SetViewport(width, height);
 }
 
-void DX::Renderer::SetRenderTarget()
+void DX::Renderer::ClearScreen()
 {
 	// Clear the render target view to the chosen colour
 	m_d3dDeviceContext->ClearRenderTargetView(m_d3dRenderTargetView.Get(), reinterpret_cast<const float*>(&DirectX::Colors::SteelBlue));
 	m_d3dDeviceContext->ClearDepthStencilView(m_d3dDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
 
+void DX::Renderer::SetRenderTarget()
+{
 	// Bind the render target view to the pipeline's output merger stage
 	m_d3dDeviceContext->OMSetRenderTargets(1, m_d3dRenderTargetView.GetAddressOf(), m_d3dDepthStencilView.Get());
 }
 
-void DX::Renderer::SetReflections()
+void DX::Renderer::SetEmptyRenderTarget()
 {
-	// Set raster state
-	//m_d3dDeviceContext->RSSetState(m_RasterStateReflection);
-
-	// Set depth stencil
-	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilStateWrite.Get(), 1);
+	ID3D11RenderTargetView* targets[1] = { nullptr };
+	m_d3dDeviceContext->OMSetRenderTargets(1, targets, m_d3dDepthStencilView.Get());
 }
 
-void DX::Renderer::DisableReflections()
+void DX::Renderer::WriteToMirrorStencil()
 {
-	// Set raster state
-	//m_d3dDeviceContext->RSSetState(m_RasterStateReflection);
-
-	// Set depth stencil
-	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilStateMask.Get(), 1);
+	m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilMirrorWrite.Get(), 1);
 }
 
 void DX::Renderer::Present()

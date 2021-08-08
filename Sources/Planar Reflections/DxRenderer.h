@@ -40,12 +40,21 @@ namespace DX
 		// Resizing
 		void Resize(int width, int height);
 
+		// Clear back buffers
+		void ClearScreen();
+
 		// Set render target to the back buffer
 		void SetRenderTarget();
 
-		// 
-		void SetReflections();
-		void DisableReflections();
+		// Empty render target
+		void SetEmptyRenderTarget();
+
+		// Set mirror write stencil
+		void WriteToMirrorStencil();
+
+		// Set 
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilMirrorWrite = nullptr;
+		ComPtr<ID3D11DepthStencilState> m_DepthStencilMirrorMask = nullptr;
 
 		// Display the rendered scene
 		void Present();
@@ -84,5 +93,8 @@ namespace DX
 		// Stencils
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
+
+
+		
 	};
 }

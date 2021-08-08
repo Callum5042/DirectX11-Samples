@@ -89,34 +89,32 @@ int Applicataion::Execute()
             // Bind the shader to the pipeline
             m_DxShader->Use();
 
-            // Set back buffer as render target view
+            // Clears the back buffer
+            m_DxRenderer->ClearScreen();
+
+            // Render model
             m_DxRenderer->SetRenderTarget();
-
-            // Reflections
-            {
-                m_DxRenderer->SetReflections();
-
-                auto world = DirectX::XMMatrixTranslation(0.0f, -4.0f, 0.0f);
-                /*auto mirror_plane = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-                world *= DirectX::XMMatrixReflect(mirror_plane);*/
-
-                m_DxShader->UpdateWorldBuffer(world);
-                m_DxModel->Render();
-
-                m_DxRenderer->DisableReflections();
-            }
-
-            // Render the floor
-            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
-            m_DxFloor->Render();
-
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 0);
-
-            // Render the model
             m_DxShader->UpdateWorldBuffer(m_DxModel->World);
             m_DxModel->Render();
 
-            
+            // Write floor to the stencil only
+            m_DxRenderer->SetEmptyRenderTarget();
+            m_DxRenderer->WriteToMirrorStencil();
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+            m_DxFloor->Render();
+
+            // Render model - mirrored
+            m_DxRenderer->SetRenderTarget();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilMirrorMask.Get(), 1);
+            auto mirror_world = DirectX::XMMatrixTranslation(0.0f, -4.0f, 0.0f);
+            m_DxShader->UpdateWorldBuffer(mirror_world);
+            m_DxModel->Render();
+
+            // Render floor
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
+            /*m_DxRenderer->SetRenderTarget();
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+            m_DxFloor->Render();*/
 
             // Display the rendered scene
             m_DxRenderer->Present();
