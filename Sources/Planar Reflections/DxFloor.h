@@ -34,5 +34,8 @@ namespace DX
 
 		// Mesh data
 		MeshData m_MeshData;
+
+		// Textures
+		ComPtr<ID3D11ShaderResourceView> m_DiffuseTexture = nullptr;
 	};
 }

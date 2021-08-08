@@ -1,6 +1,7 @@
 #include "DxFloor.h"
 #include <DirectXMath.h>
 #include "GeometryGenerator.h"
+#include "DDSTextureLoader.h"
 
 DX::Floor::Floor(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
@@ -14,6 +15,11 @@ void DX::Floor::Create()
 	// Create input buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
+
+	// Load texture
+	ComPtr<ID3D11Resource> resource = nullptr;
+	DX::Check(DirectX::CreateDDSTextureFromFile(m_DxRenderer->GetDevice(), L"..\\..\\Resources\\Textures\\grass_diffuse.dds",
+		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
 }
 
 void DX::Floor::CreateVertexBuffer()
@@ -64,6 +70,9 @@ void DX::Floor::Render()
 
 	// Bind the geometry topology to the Input Assembler
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Bind texture
+	d3dDeviceContext->PSSetShaderResources(0, 1, m_DiffuseTexture.GetAddressOf());
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(m_MeshData.indices.size()), 0, 0);

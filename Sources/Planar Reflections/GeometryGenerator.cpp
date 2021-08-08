@@ -5,35 +5,35 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, DX::Me
 	// Vertices
 	meshData->vertices =
 	{
-		{ -width, -height, -depth, +0.0f, +0.0f },
-		{ -width, +height, -depth, +0.0f, +0.0f },
-		{ +width, +height, -depth, +0.0f, +0.0f },
-		{ +width, -height, -depth, +0.0f, +0.0f },
-											   
-		{ -width, -height, +depth, +0.0f, +0.0f },
-		{ +width, -height, +depth, +0.0f, +0.0f },
-		{ +width, +height, +depth, +0.0f, +0.0f },
-		{ -width, +height, +depth, +0.0f, +0.0f },
-											   
-		{ -width, +height, -depth, +0.0f, +1.0f },
-		{ -width, +height, +depth, +0.0f, +1.0f },
-		{ +width, +height, +depth, +0.0f, +1.0f },
-		{ +width, +height, -depth, +0.0f, +1.0f },
-											   
-		{ -width, -height, -depth, +0.0f, -1.0f },
-		{ +width, -height, -depth, +0.0f, -1.0f },
-		{ +width, -height, +depth, +0.0f, -1.0f },
-		{ -width, -height, +depth, +0.0f, -1.0f },
-											   
-		{ -width, -height, +depth, -1.0f, +0.0f },
-		{ -width, +height, +depth, -1.0f, +0.0f },
-		{ -width, +height, -depth, -1.0f, +0.0f },
-		{ -width, -height, -depth, -1.0f, +0.0f },
-											   
-		{ +width, -height, -depth, +1.0f, +0.0f },
-		{ +width, +height, -depth, +1.0f, +0.0f },
-		{ +width, +height, +depth, +1.0f, +0.0f },
-		{ +width, -height, +depth, +1.0f, +0.0f }
+		{ -width, -height, -depth, 0.0f, 1.0f },
+		{ -width, +height, -depth, 0.0f, 0.0f },
+		{ +width, +height, -depth, 1.0f, 0.0f },
+		{ +width, -height, -depth, 1.0f, 1.0f },
+
+		{ -width, -height, +depth, 1.0f, 1.0f },
+		{ +width, -height, +depth, 0.0f, 1.0f },
+		{ +width, +height, +depth, 0.0f, 0.0f },
+		{ -width, +height, +depth, 1.0f, 0.0f },
+
+		{ -width, +height, -depth, 0.0f, 1.0f },
+		{ -width, +height, +depth, 0.0f, 0.0f },
+		{ +width, +height, +depth, 1.0f, 0.0f },
+		{ +width, +height, -depth, 1.0f, 1.0f },
+
+		{ -width, -height, -depth, 1.0f, 1.0f },
+		{ +width, -height, -depth, 0.0f, 1.0f },
+		{ +width, -height, +depth, 0.0f, 0.0f },
+		{ -width, -height, +depth, 1.0f, 0.0f },
+
+		{ -width, -height, +depth, 0.0f, 1.0f },
+		{ -width, +height, +depth, 0.0f, 0.0f },
+		{ -width, +height, -depth, 1.0f, 0.0f },
+		{ -width, -height, -depth, 1.0f, 1.0f },
+
+		{ +width, -height, -depth, 0.0f, 1.0f },
+		{ +width, +height, -depth, 0.0f, 0.0f },
+		{ +width, +height, +depth, 1.0f, 0.0f },
+		{ +width, -height, +depth, 1.0f, 1.0f }
 	};
 
 	// Indices
