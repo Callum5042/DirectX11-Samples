@@ -106,6 +106,7 @@ void Application::UpdateWorldBuffer()
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
     world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
     world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    world_buffer.textureTransformation = DirectX::XMMatrixTranspose(m_DxModel->TextureTransformation);
 
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }

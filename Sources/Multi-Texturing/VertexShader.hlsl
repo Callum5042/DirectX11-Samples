@@ -1,16 +1,17 @@
 #include "ShaderData.hlsli"
 
 // Entry point for the vertex shader - will be executed for each vertex
-VertexOutput main(VertexInput input)
+PixelInput main(VertexInput input)
 {
-	VertexOutput output;
+	PixelInput output;
 
 	// Transform to homogeneous clip space.
 	output.position = mul(float4(input.position, 1.0f), cWorld);
 	output.position = mul(output.position, cView);
 	output.position = mul(output.position, cProjection);
 
-	// Set the vertex colour - multiply by size of the plane, in this case its hardcoded to 10 units
+	// Transform the texture coordinates (UV's)
+	output.tex_tiled = mul(float4(input.tex, 1.0f, 1.0f), cTextureTransform).xy;
 	output.tex = input.tex;
 
 	return output;

@@ -5,6 +5,7 @@
 
 DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
+	TextureTransformation *= DirectX::XMMatrixScaling(5.0f, 5.0f, 1.0f);
 }
 
 void DX::Model::Create()

@@ -33,6 +33,9 @@ namespace DX
 		// World 
 		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
+		// Texture
+		DirectX::XMMATRIX TextureTransformation = DirectX::XMMatrixIdentity();
+
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 

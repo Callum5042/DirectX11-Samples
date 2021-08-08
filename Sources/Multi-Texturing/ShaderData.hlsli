@@ -2,14 +2,15 @@
 struct VertexInput
 {
 	float3 position : POSITION;
-	float2 tex : TEXTURE;
+	float2 tex : TEXTURE0;
 };
 
 // Vertex output / pixel input structure
-struct VertexOutput
+struct PixelInput
 {
 	float4 position : SV_POSITION;
-	float2 tex : TEXTURE;
+	float2 tex_tiled : TEXTURE0;
+	float2 tex : TEXTURE1;
 };
 
 // World constant buffer
@@ -18,6 +19,7 @@ cbuffer WorldBuffer : register(b0)
 	matrix cWorld;
 	matrix cView;
 	matrix cProjection;
+	matrix cTextureTransform;
 }
 
 // Texture sampler

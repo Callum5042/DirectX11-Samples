@@ -1,11 +1,11 @@
 #include "ShaderData.hlsli"
 
 // Entry point for the vertex shader - will be executed for each pixel
-float4 main(VertexOutput input) : SV_TARGET
+float4 main(PixelInput input) : SV_TARGET
 {
 	// Sample textures
-	float4 grass_texture = gTetureGrass.Sample(gSamplerAnisotropic, input.tex);
-	float4 brick_texture = gTextureBrick.Sample(gSamplerAnisotropic, input.tex);
+	float4 grass_texture = gTetureGrass.Sample(gSamplerAnisotropic, input.tex_tiled);
+	float4 brick_texture = gTextureBrick.Sample(gSamplerAnisotropic, input.tex_tiled);
 	float4 alpha_texture = gTexturAlpha.Sample(gSamplerAnisotropic, input.tex);
 
 	// Linear interpolation of the 3 textures
