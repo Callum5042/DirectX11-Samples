@@ -9,7 +9,7 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
-	GeometryGenerator::CreateBox(1.0f, 1.0f, 1.0f, &m_MeshData);
+	GeometryGenerator::CreateBox(1.0f, 2.0f, 1.0f, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();

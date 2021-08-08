@@ -5,12 +5,12 @@
 
 DX::Floor::Floor(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, -1.0f, 0.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, -2.0f, 0.0f);
 }
 
 void DX::Floor::Create()
 {
-	GeometryGenerator::CreatePlane(10.0f, 10.0f, &m_MeshData);
+	GeometryGenerator::CreatePlane(5.0f, 5.0f, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();
@@ -18,7 +18,7 @@ void DX::Floor::Create()
 
 	// Load texture
 	ComPtr<ID3D11Resource> resource = nullptr;
-	DX::Check(DirectX::CreateDDSTextureFromFile(m_DxRenderer->GetDevice(), L"..\\..\\Resources\\Textures\\grass_diffuse.dds",
+	DX::Check(DirectX::CreateDDSTextureFromFile(m_DxRenderer->GetDevice(), L"..\\..\\Resources\\Textures\\brickwall_diffuse.dds",
 		resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
 }
 
