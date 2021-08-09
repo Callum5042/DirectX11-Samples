@@ -59,6 +59,8 @@ namespace DX
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
 
+		ComPtr<ID3D11BlendState> m_BlendState = nullptr;
+
 		// Display the rendered scene
 		void Present();
 
