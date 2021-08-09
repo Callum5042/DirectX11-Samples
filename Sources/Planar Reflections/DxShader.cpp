@@ -50,7 +50,7 @@ void DX::Shader::Use()
 	d3dDeviceContext->IASetInputLayout(m_d3dVertexLayout.Get());
 
 	// Bind the vertex shader to the pipeline's Vertex Shader stage
-	d3dDeviceContext->VSSetShader(m_d3dVertexShader.Get(), nullptr, 0);
+	d3dDeviceContext->VSSetShader(m_d3dVertexShader.Get(), nullptr, 0); 
 
 	// Bind the pixel shader to the pipeline's Pixel Shader stage
 	d3dDeviceContext->PSSetShader(m_d3dPixelShader.Get(), nullptr, 0);
@@ -61,6 +61,7 @@ void DX::Shader::Use()
 
 	// Bind the light constant buffer to pixel shader
 	d3dDeviceContext->PSSetConstantBuffers(0, 1, m_d3dCameraConstantBuffer.GetAddressOf());
+	d3dDeviceContext->PSSetConstantBuffers(1, 1, m_d3dWorldConstantBuffer.GetAddressOf());
 }
 
 void DX::Shader::UpdateCameraBuffer(const CameraBuffer& buffer)
@@ -69,13 +70,14 @@ void DX::Shader::UpdateCameraBuffer(const CameraBuffer& buffer)
 	d3dDeviceContext->UpdateSubresource(m_d3dCameraConstantBuffer.Get(), 0, nullptr, &buffer, 0, 0);
 }
 
-void DX::Shader::UpdateWorldBuffer(const DirectX::XMMATRIX& world)
+void DX::Shader::UpdateWorldBuffer(const DirectX::XMMATRIX& world, float alpha)
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 
 	DX::WorldBuffer buffer = {};
 	buffer.world = DirectX::XMMatrixTranspose(world);
 	buffer.worldInverse = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, world));
+	buffer.transparent = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, alpha);
 
 	// We use Map/Unmap here over UpdateSubresource for performance
 	D3D11_MAPPED_SUBRESOURCE resource = {};

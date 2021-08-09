@@ -34,94 +34,65 @@ void DX::Renderer::Create()
 	CreateAnisotropicFiltering();
 
 	// Blend
-	D3D11_BLEND_DESC blendDesc;
+	D3D11_BLEND_DESC blendDesc = {};
 	blendDesc.AlphaToCoverageEnable = false;
 	blendDesc.IndependentBlendEnable = false;
 
-	blendDesc.RenderTarget[0].BlendEnable = true;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	D3D11_RENDER_TARGET_BLEND_DESC rtbd = {};
+	rtbd.BlendEnable = true;
+	rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+	rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+	rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+	rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	blendDesc.RenderTarget[0] = rtbd;
 
 	DX::Check(m_d3dDevice->CreateBlendState(&blendDesc, &m_BlendState));
 
-	
-
-	// Depth stencil
-	{
-		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
-		dsDesc.DepthEnable = FALSE;
-		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		dsDesc.StencilEnable = TRUE;
-		dsDesc.StencilReadMask = 0xFF;
-		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL;
-		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-
-		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateMask.GetAddressOf()));
-	}
+	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	UINT mask = 0xffffffff;
+	m_d3dDeviceContext->OMSetBlendState(m_BlendState.Get(), blendFactor, mask);
 
 	// Write to stencil
 	{
 		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
-		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthEnable = TRUE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
 		dsDesc.StencilEnable = TRUE;
 		dsDesc.StencilWriteMask = 0xFF;
-		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_DepthStencilStateWrite.GetAddressOf()));
 	}
 
-
+	// Use Depth stencil
 	{
-		D3D11_DEPTH_STENCIL_DESC mirrorDesc = {};
-		mirrorDesc.DepthEnable = true;
-		mirrorDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		mirrorDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		mirrorDesc.StencilEnable = true;
-		mirrorDesc.StencilReadMask = 0xff;
-		mirrorDesc.StencilWriteMask = 0xff;
+		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC{ CD3D11_DEFAULT{} };
+		dsDesc.DepthEnable = FALSE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-		mirrorDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-		mirrorDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		dsDesc.StencilEnable = TRUE;
+		dsDesc.StencilReadMask = 0xFF;
 
-		// We are not rendering backfacing polygons, so these settings do not matter.
-		mirrorDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-		mirrorDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL; //< Only writes to stencil
 
-		DX::Check(m_d3dDevice->CreateDepthStencilState(&mirrorDesc, m_DepthStencilMirrorWrite.GetAddressOf()));
-	}
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_IncludeDepthStencilStateMask.GetAddressOf()));
 
-	{
-		D3D11_DEPTH_STENCIL_DESC mirrorDesc;
-		mirrorDesc.DepthEnable = true;
-		mirrorDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		mirrorDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		mirrorDesc.StencilEnable = true;
-		mirrorDesc.StencilReadMask = 0xff;
-		mirrorDesc.StencilWriteMask = 0xff;
-
-		mirrorDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
-
-		// We are not rendering backfacing polygons, so these settings do not matter.
-		mirrorDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		mirrorDesc.BackFace.StencilFunc = D3D11_COMPARISON_EQUAL;
-
-		DX::Check(m_d3dDevice->CreateDepthStencilState(&mirrorDesc, m_DepthStencilMirrorMask.GetAddressOf()));
+		dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_NOT_EQUAL; //< Excludes stencil
+		DX::Check(m_d3dDevice->CreateDepthStencilState(&dsDesc, m_ExcludeDepthStencilStateMask.GetAddressOf()));
 	}
 }
 
@@ -160,11 +131,6 @@ void DX::Renderer::SetEmptyRenderTarget()
 	m_d3dDeviceContext->OMSetRenderTargets(1, targets, m_d3dDepthStencilView.Get());
 }
 
-void DX::Renderer::WriteToMirrorStencil()
-{
-	//m_d3dDeviceContext->OMSetDepthStencilState(m_DepthStencilMirrorWrite.Get(), 1);
-}
-
 void DX::Renderer::Present()
 {
 	// Check if we support IDXGISwapChain1
@@ -179,6 +145,11 @@ void DX::Renderer::Present()
 	{
 		DX::Check(m_d3dSwapChain->Present(0, 0));
 	}
+}
+
+void DX::Renderer::ClearStencil()
+{
+	m_d3dDeviceContext->ClearDepthStencilView(m_d3dDepthStencilView.Get(), D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void DX::Renderer::CreateDeviceAndContext()

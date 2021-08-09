@@ -30,7 +30,7 @@
 [-] Lens Flare
 [-] Motion Blur
 [?] Volume Rendering?
-[-] Volumic Lighting
+[-] Volumetric Lighting
 [?] Gamma Correction - Seems too small for its own project
 [?] Bloom?
 [-] Texture Animations
@@ -38,6 +38,8 @@
 [?] Specular Mapping - Could use PBR instead
 [?] Stencil Shadows - Might be worth ignoring in favour of shadow mapping
 [?] Fog? - Looks bad with an skybox - needs redoing
+[?] Depth/Height Fog - Not really useful in modern hardware
+[-] Volumetric Fog
 [-] Cascaded Shadow Maps
 [?] Screen Space Reflections
 

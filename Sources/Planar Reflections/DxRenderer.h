@@ -49,15 +49,10 @@ namespace DX
 		// Empty render target
 		void SetEmptyRenderTarget();
 
-		// Set mirror write stencil
-		void WriteToMirrorStencil();
-
 		// Set 
-		ComPtr<ID3D11DepthStencilState> m_DepthStencilMirrorWrite = nullptr;
-		ComPtr<ID3D11DepthStencilState> m_DepthStencilMirrorMask = nullptr;
-
 		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateWrite = nullptr;
-		ComPtr<ID3D11DepthStencilState> m_DepthStencilStateMask = nullptr;
+		ComPtr<ID3D11DepthStencilState> m_IncludeDepthStencilStateMask = nullptr;
+		ComPtr<ID3D11DepthStencilState> m_ExcludeDepthStencilStateMask = nullptr;
 
 		ComPtr<ID3D11BlendState> m_BlendState = nullptr;
 
@@ -69,6 +64,9 @@ namespace DX
 
 		// Get the ID3D11 Device Context
 		ID3D11DeviceContext* GetDeviceContext() const { return m_d3dDeviceContext.Get(); }
+
+		// Clear depth stencil
+		void ClearStencil();
 
 	private:
 		SDL_Window* m_SdlWindow = nullptr;

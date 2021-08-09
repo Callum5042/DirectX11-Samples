@@ -19,6 +19,7 @@ namespace DX
 	{
 		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX worldInverse;
+		DirectX::XMFLOAT4 transparent;
 	};
 
 	class Shader
@@ -40,7 +41,7 @@ namespace DX
 		void UpdateCameraBuffer(const CameraBuffer& buffer);
 
 		// Set world constant buffer from camera
-		void UpdateWorldBuffer(const DirectX::XMMATRIX& world);
+		void UpdateWorldBuffer(const DirectX::XMMATRIX& world, float alpha);
 
 	private:
 		Renderer* m_DxRenderer = nullptr;

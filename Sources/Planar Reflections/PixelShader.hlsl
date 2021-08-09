@@ -5,6 +5,6 @@ float4 main(PixelInput input) : SV_TARGET
 {
 	float4 diffuse_texture = gTextureDiffuse.Sample(gSamplerAnisotropic, input.tex);
 
-	diffuse_texture.a = 0.5;
+	diffuse_texture.a = cTransparent.a;
 	return diffuse_texture;
 }

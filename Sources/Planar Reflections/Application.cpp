@@ -86,49 +86,36 @@ int Applicataion::Execute()
             m_Timer.Tick();
             CalculateFramesPerSecond();
 
-            // Bind the shader to the pipeline
             m_DxShader->Use();
 
-            // Clears the back buffer
             m_DxRenderer->ClearScreen();
 
-            // Write floor to the stencil only
-            m_DxRenderer->SetEmptyRenderTarget();
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilMirrorWrite.Get(), 1);
-            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
-            m_DxFloor->Render();
-
-            // Render model - mirrored
+            // Render model
             m_DxRenderer->SetRenderTarget();
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilMirrorMask.Get(), 1);
-            auto mirror_world = DirectX::XMMatrixTranslation(0.0f, -4.0f, 0.0f);
-            m_DxShader->UpdateWorldBuffer(mirror_world);
+            m_DxShader->UpdateWorldBuffer(m_DxModel->World, 1.0f);
             m_DxModel->Render();
 
-            // Write model to stencil
+            // Write floor to stencil
             m_DxRenderer->SetEmptyRenderTarget();
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateWrite.Get(), 2);
-            m_DxShader->UpdateWorldBuffer(mirror_world);
-            m_DxModel->Render();
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateWrite.Get(), 1);
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World, 1.0f);
+            m_DxFloor->Render();
 
             // Render floor
             m_DxRenderer->SetRenderTarget();
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_DepthStencilStateMask.Get(), 2);
-            
-            float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            UINT sampleMask = 0xffffffff;
-            //m_DxRenderer->GetDeviceContext()->OMSetBlendState(m_DxRenderer->m_BlendState.Get(), blendFactor, sampleMask);
-
-            m_DxShader->UpdateWorldBuffer(m_DxFloor->World);
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
+            m_DxShader->UpdateWorldBuffer(m_DxFloor->World, 1.0f);
             m_DxFloor->Render();
-
-            // Render model
-            //m_DxRenderer->GetDeviceContext()->OMSetBlendState(nullptr, blendFactor, sampleMask);
+             
+            // Render model - mirrored
             m_DxRenderer->SetRenderTarget();
-            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 2);
-            m_DxShader->UpdateWorldBuffer(m_DxModel->World);
+            auto mirror = DirectX::XMMatrixTranslation(0.0f, -4.0f, 0.0f);
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(m_DxRenderer->m_IncludeDepthStencilStateMask.Get(), 1);
+            m_DxShader->UpdateWorldBuffer(mirror, 0.5f);
             m_DxModel->Render();
+
+            // Clear stencils
+            m_DxRenderer->GetDeviceContext()->OMSetDepthStencilState(nullptr, 1);
 
             // Display the rendered scene
             m_DxRenderer->Present();
