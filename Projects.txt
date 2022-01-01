@@ -9,6 +9,7 @@
 [x] Stencil Outline
 [-] Alpha Mapping
 [x] Multi-Texturing
+[-] Bitmap-Fonts
 
 === Advanced ===
 [x] Heightmap
@@ -23,6 +24,7 @@
 [-] Ambient Occlusion (SSAO)
 [-] High-dynamic-range (HDR)
 [x] Anti Aliasing
+[-] Vector-Fonts
 
 === Unknown ===
 [-] Depth of Field

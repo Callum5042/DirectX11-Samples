@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Initializing directx11", "Sources\Initializing directx11\Initializing directx11.vcxproj", "{3CEB4FBB-B516-4151-8894-D46D7FFFC913}"
 EndProject
@@ -60,6 +60,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Multi-Texturing", "Sources\Multi-Texturing\Multi-Texturing.vcxproj", "{8412F1D7-1628-408E-910D-AEE7E80F4C53}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Planar Reflections", "Sources\Planar Reflections\Planar Reflections.vcxproj", "{E851CC0C-1706-4601-B682-262AFB724D27}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bitmap-Fonts", "Sources\Bitmap-Fonts\Bitmap-Fonts.vcxproj", "{68A01E66-3675-43FC-9861-331AD0CF0EF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -277,6 +279,14 @@ Global
 		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x64.Build.0 = Release|x64
 		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x86.ActiveCfg = Release|Win32
 		{E851CC0C-1706-4601-B682-262AFB724D27}.Release|x86.Build.0 = Release|Win32
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Debug|x64.ActiveCfg = Debug|x64
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Debug|x64.Build.0 = Debug|x64
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Debug|x86.ActiveCfg = Debug|Win32
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Debug|x86.Build.0 = Debug|Win32
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Release|x64.ActiveCfg = Release|x64
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Release|x64.Build.0 = Release|x64
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Release|x86.ActiveCfg = Release|Win32
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -308,6 +318,7 @@ Global
 		{EF9BF7BE-F26B-44F3-BD12-D0CAE6FB956F} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 		{8412F1D7-1628-408E-910D-AEE7E80F4C53} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{E851CC0C-1706-4601-B682-262AFB724D27} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
+		{68A01E66-3675-43FC-9861-331AD0CF0EF3} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
