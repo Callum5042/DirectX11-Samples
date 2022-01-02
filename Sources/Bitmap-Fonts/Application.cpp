@@ -20,27 +20,12 @@ int Applicataion::Execute()
     m_DxRenderer = std::make_unique<DX::Renderer>(m_SdlWindow);
     m_DxRenderer->Create();
 
-    // Initialise and create the DirectX 11 model
-    //m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
-    //m_DxModel->Create();
-
     // Sprite font
-    std::unique_ptr<DirectX::SpriteFont> m_font;
-    m_font = std::make_unique<DirectX::SpriteFont>(m_DxRenderer->GetDevice(), L"myfile.spritefont");
-    //m_font.reset();
-
-    DirectX::SimpleMath::Vector2 m_fontPos;
-    std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+    std::unique_ptr<DirectX::SpriteFont> spriteFont = std::make_unique<DirectX::SpriteFont>(m_DxRenderer->GetDevice(), L"myfile.spritefont");
 
     auto context = m_DxRenderer->GetDeviceContext();
-    m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
-
-    int width, height;
-    SDL_GetWindowSize(m_SdlWindow, &width, &height);
-
-    m_fontPos.x = float(width) / 2.f;
-    m_fontPos.y = float(height) / 2.f;
-    //m_spriteBatch.reset();
+    DirectX::SimpleMath::Vector2 fontPos;
+    std::unique_ptr<DirectX::SpriteBatch> spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
 
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
@@ -62,6 +47,13 @@ int Applicataion::Execute()
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED)
                 {
                     m_DxRenderer->Resize(e.window.data1, e.window.data2);
+
+                    // Resize text position to be centre of the window
+                    int width, height;
+                    SDL_GetWindowSize(m_SdlWindow, &width, &height);
+
+                    fontPos.x = float(width) / 2.f;
+                    fontPos.y = float(height) / 2.f;
                 }
             }
         }
@@ -77,18 +69,15 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
-            //m_DxModel->Render();
+            spriteBatch->Begin();
 
-            m_spriteBatch->Begin();
-
-            const wchar_t* output = L"Hello World";
-
-            DirectX::SimpleMath::Vector2 origin = m_font->MeasureString(output);
+            std::wstring output = L"Hello, DirectX11!";
+            DirectX::SimpleMath::Vector2 origin = spriteFont->MeasureString(output.c_str());
             origin /= 2.0f;
 
-            m_font->DrawString(m_spriteBatch.get(), output, m_fontPos, DirectX::Colors::White, 0.f, origin);
+            spriteFont->DrawString(spriteBatch.get(), output.c_str(), fontPos, DirectX::Colors::White, 0.f, origin);
 
-            m_spriteBatch->End();
+            spriteBatch->End();
 
             // Display the rendered scene
             m_DxRenderer->Present();
