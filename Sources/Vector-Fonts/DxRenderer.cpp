@@ -110,8 +110,10 @@ void DX::Renderer::CreateDeviceAndContext()
 
 	// Add debug flag if in debug mode
 	D3D11_CREATE_DEVICE_FLAG deviceFlag = (D3D11_CREATE_DEVICE_FLAG)0;
+	deviceFlag = static_cast<D3D11_CREATE_DEVICE_FLAG>(deviceFlag | D3D11_CREATE_DEVICE_BGRA_SUPPORT);
+
 #ifdef _DEBUG
-	deviceFlag = D3D11_CREATE_DEVICE_DEBUG;
+	deviceFlag = static_cast<D3D11_CREATE_DEVICE_FLAG>(deviceFlag | D3D11_CREATE_DEVICE_DEBUG);
 #endif
 
 	// Create device and device context

@@ -3,6 +3,8 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+#include <dwrite.h>
+#include <d2d1_1.h>
 
 Application::~Application()
 {
@@ -38,6 +40,22 @@ int Application::Execute()
 
     m_DxCamera1 = std::make_unique<DX::Camera>(window_width, window_height);
     m_DxCamera2 = std::make_unique<DX::Camera>(window_width, window_height);
+
+    // Something DirectWrite
+   ComPtr<ID3D11Device> device = m_DxRenderer->GetDevice();
+
+   ComPtr<IDXGIDevice> dxgiDevice = nullptr;
+   DX::Check(device.As(&dxgiDevice));
+
+   // Create a Direct2D factory.
+   ComPtr<ID2D1Factory1> d2dFactory = nullptr;
+   DX::Check(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, d2dFactory.GetAddressOf()));
+
+   ComPtr<ID2D1Device> d2dDevice = nullptr;
+   DX::Check(d2dFactory->CreateDevice(dxgiDevice.Get(), d2dDevice.GetAddressOf()));
+
+   ComPtr<ID2D1DeviceContext> d2dDeviceContext = nullptr;
+   DX::Check(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, d2dDeviceContext.GetAddressOf()));
 
     // Starts the timer
     m_Timer.Start();
