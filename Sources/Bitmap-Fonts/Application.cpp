@@ -2,6 +2,8 @@
 
 #include <string>
 #include <SDL.h>
+#include <SpriteFont.h>
+#include <SimpleMath.h>
 
 Applicataion::~Applicataion()
 {
@@ -19,8 +21,26 @@ int Applicataion::Execute()
     m_DxRenderer->Create();
 
     // Initialise and create the DirectX 11 model
-    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
-    m_DxModel->Create();
+    //m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
+    //m_DxModel->Create();
+
+    // Sprite font
+    std::unique_ptr<DirectX::SpriteFont> m_font;
+    m_font = std::make_unique<DirectX::SpriteFont>(m_DxRenderer->GetDevice(), L"myfile.spritefont");
+    //m_font.reset();
+
+    DirectX::SimpleMath::Vector2 m_fontPos;
+    std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+
+    auto context = m_DxRenderer->GetDeviceContext();
+    m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
+
+    int width, height;
+    SDL_GetWindowSize(m_SdlWindow, &width, &height);
+
+    m_fontPos.x = float(width) / 2.f;
+    m_fontPos.y = float(height) / 2.f;
+    //m_spriteBatch.reset();
 
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
@@ -57,7 +77,18 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
-            m_DxModel->Render();
+            //m_DxModel->Render();
+
+            m_spriteBatch->Begin();
+
+            const wchar_t* output = L"Hello World";
+
+            DirectX::SimpleMath::Vector2 origin = m_font->MeasureString(output);
+            origin /= 2.0f;
+
+            m_font->DrawString(m_spriteBatch.get(), output, m_fontPos, DirectX::Colors::White, 0.f, origin);
+
+            m_spriteBatch->End();
 
             // Display the rendered scene
             m_DxRenderer->Present();
