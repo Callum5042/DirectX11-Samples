@@ -5,6 +5,9 @@
 #include <SpriteFont.h>
 #include <SimpleMath.h>
 
+// Tutorial
+// https://github.com/microsoft/DirectXTK/wiki/Drawing-text
+
 Applicataion::~Applicataion()
 {
     SDLCleanup();
