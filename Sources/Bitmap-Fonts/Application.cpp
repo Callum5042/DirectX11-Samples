@@ -27,11 +27,6 @@ int Applicataion::Execute()
     DirectX::SimpleMath::Vector2 fontPos;
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
 
-    // Initialise and create the DirectX 11 shader
-    m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
-    m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
-    m_DxShader->LoadPixelShader("Shaders/PixelShader.cso");
-
     // Starts the timer
     m_Timer.Start();
 
@@ -64,9 +59,6 @@ int Applicataion::Execute()
 
             // Clear the buffers
             m_DxRenderer->Clear();
-
-            // Bind the shader to the pipeline
-            m_DxShader->Use();
 
             // Render the model
             spriteBatch->Begin();
