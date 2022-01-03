@@ -53,22 +53,22 @@ int Application::Execute()
 	DX::Check(d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface.Get(), &props, d2dRenderTarget.GetAddressOf()));
 
 	// Setup DirectWrite
-	IDWriteFactory* m_pDWriteFactory = nullptr;
-	IDWriteTextFormat* m_pTextFormat = nullptr;
+	ComPtr<IDWriteFactory> directWriteFactory = nullptr;
+	ComPtr<IDWriteTextFormat> directWriteTextFormat = nullptr;
 
-	HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(m_pDWriteFactory), reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
+	DX::Check(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(directWriteFactory), reinterpret_cast<IUnknown**>(directWriteFactory.GetAddressOf())));
 
 	static const WCHAR msc_fontName[] = L"Verdana";
 	static const FLOAT msc_fontSize = 100;
 
-	hr = m_pDWriteFactory->CreateTextFormat(msc_fontName, NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, msc_fontSize, L"", &m_pTextFormat);
+	DX::Check(directWriteFactory->CreateTextFormat(msc_fontName, NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, msc_fontSize, L"", directWriteTextFormat.GetAddressOf()));
 
-	m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-	m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	directWriteTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	directWriteTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-	ID2D1SolidColorBrush* pBrush = nullptr;
+	ComPtr<ID2D1SolidColorBrush> textBrushColour = nullptr;
 	const D2D1_COLOR_F color = D2D1::ColorF(0.0f, 0.0f, 0.0f);
-	hr = d2dRenderTarget->CreateSolidColorBrush(color, &pBrush);
+	DX::Check(d2dRenderTarget->CreateSolidColorBrush(color, textBrushColour.GetAddressOf()));
 
 	// Starts the timer
 	m_Timer.Start();
@@ -111,11 +111,9 @@ int Application::Execute()
 			d2dRenderTarget->BeginDraw();
 			d2dRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::YellowGreen));
 
-			static const WCHAR sc_helloWorld[] = L"Hello, World!";
+			static const WCHAR sc_helloWorld[] = L"Hello, DirectWrite!";
 			D2D1_SIZE_F renderTargetSize = d2dRenderTarget->GetSize();
-			d2dRenderTarget->DrawText(sc_helloWorld, ARRAYSIZE(sc_helloWorld) - 1, 
-				m_pTextFormat, D2D1::RectF(0, 0, renderTargetSize.width, renderTargetSize.height), pBrush);
-
+			d2dRenderTarget->DrawText(sc_helloWorld, ARRAYSIZE(sc_helloWorld) - 1, directWriteTextFormat.Get(), D2D1::RectF(0, 0, renderTargetSize.width, renderTargetSize.height), textBrushColour.Get());
 
 			d2dRenderTarget->EndDraw();
 
@@ -167,7 +165,7 @@ bool Application::SDLInit()
 
 	// Create SDL Window
 	auto window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-	m_SdlWindow = SDL_CreateWindow("DirectX - Vector-Fonts", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
+	m_SdlWindow = SDL_CreateWindow("DirectX - DirectWrite", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_flags);
 	if (m_SdlWindow == nullptr)
 	{
 		std::string error = "SDL_CreateWindow failed: ";
@@ -200,7 +198,7 @@ void Application::CalculateFramesPerSecond()
 		time = 0.0f;
 		frameCount = 0;
 
-		auto title = "DirectX - Vector-Fonts - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
+		auto title = "DirectX - DirectWrite - FPS: " + std::to_string(fps) + " (" + std::to_string(1000.0f / fps) + " ms)";
 		SDL_SetWindowTitle(m_SdlWindow, title.c_str());
 	}
 }
