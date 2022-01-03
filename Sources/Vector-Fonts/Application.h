@@ -4,7 +4,6 @@
 #include <SDL_video.h>
 #include "Timer.h"
 #include "DxRenderer.h"
-#include "DxModel.h"
 #include "DxShader.h"
 #include "DxCamera.h"
 #include "DxPlane.h"
@@ -31,20 +30,14 @@ private:
 	std::unique_ptr<DX::Renderer> m_DxRenderer = nullptr;
 	
 	// Direct3D 11 model
-	std::unique_ptr<DX::Model> m_DxModel = nullptr;
 	std::unique_ptr<DX::Plane> m_DxPlane = nullptr;
 
 	// Direct3D 11 shader
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;
 
 	// Direct3D 11 perspective camera
-	std::unique_ptr<DX::Camera> m_DxCamera1 = nullptr;
-	std::unique_ptr<DX::Camera> m_DxCamera2 = nullptr;
+	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
 
 	// Update buffers
-	void UpdateWorldBufferCamera1();
-	void UpdateWorldBufferCamera2();
-
-	// Wireframe
-	bool m_EnableWireframe = false;
+	void UpdateWorldBufferCamera();
 };
