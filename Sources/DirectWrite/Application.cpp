@@ -98,6 +98,11 @@ int Application::Execute()
 					m_DxCamera->Rotate(pitch, yaw);
 				}
 			}
+			else if (e.type == SDL_MOUSEWHEEL)
+			{
+				auto direction = static_cast<float>(e.wheel.y);
+				m_DxCamera->UpdateFov(-direction);
+			}
 		}
 		else
 		{
