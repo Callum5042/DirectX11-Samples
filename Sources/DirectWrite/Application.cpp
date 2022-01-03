@@ -38,24 +38,6 @@ int Application::Execute()
 	m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
 
 	// Something DirectWrite
-	ComPtr<ID3D11Device> device = m_DxRenderer->GetDevice();
-
-	ComPtr<IDXGIDevice> dxgiDevice = nullptr;
-	DX::Check(device.As(&dxgiDevice));
-
-	// Create a Direct2D factory.
-	ComPtr<ID2D1Factory1> d2dFactory = nullptr;
-	DX::Check(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, d2dFactory.GetAddressOf()));
-
-	ComPtr<ID2D1Device> d2dDevice = nullptr;
-	DX::Check(d2dFactory->CreateDevice(dxgiDevice.Get(), d2dDevice.GetAddressOf()));
-
-	ComPtr<ID2D1DeviceContext> d2dDeviceContext = nullptr;
-	DX::Check(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, d2dDeviceContext.GetAddressOf()));
-
-	ComPtr<ID2D1SolidColorBrush> pBlackBrush;
-	DX::Check(d2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black),&pBlackBrush));
-
 
 
 	// Starts the timer
@@ -91,6 +73,23 @@ int Application::Execute()
 		{
 			m_Timer.Tick();
 			CalculateFramesPerSecond();
+
+			//
+			// Direct2D
+			//
+
+			/*d2dDeviceContext->BeginDraw();
+
+			d2dDeviceContext->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+			d2dDeviceContext->EndDraw();*/
+
+
+
+
+			//
+			// Direct3D
+			//
 
 			// Clear the buffers
 			m_DxRenderer->SetRenderTargetBackBuffer();

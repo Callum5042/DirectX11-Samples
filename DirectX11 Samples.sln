@@ -63,7 +63,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Planar Reflections", "Sourc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bitmap-Fonts", "Sources\Bitmap-Fonts\Bitmap-Fonts.vcxproj", "{68A01E66-3675-43FC-9861-331AD0CF0EF3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vector-Fonts", "Sources\Vector-Fonts\Vector-Fonts.vcxproj", "{F6DCB360-5113-4A50-AAC0-3545DA724444}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectWrite", "Sources\DirectWrite\DirectWrite.vcxproj", "{F6DCB360-5113-4A50-AAC0-3545DA724444}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -24,7 +24,7 @@
     <ProjectGuid>{F6DCB360-5113-4A50-AAC0-3545DA724444}</ProjectGuid>
     <RootNamespace>Texturing</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Vector-Fonts</ProjectName>
+    <ProjectName>DirectWrite</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
