@@ -38,6 +38,21 @@ int Application::Execute()
 	m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
 
 	// Something DirectWrite
+	auto texture = m_DxRenderer->GetTexture();
+
+	IDXGISurface* dxgiSurface = NULL;
+	DX::Check(texture->QueryInterface(&dxgiSurface));
+
+	D2D1_RENDER_TARGET_PROPERTIES props =
+		D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
+			96, 96);
+
+
+	ID2D1Factory* pFactory = nullptr;
+	DX::Check(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory));
+
+	ID2D1RenderTarget* pRenderTarget = nullptr;
+	DX::Check(pFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface, &props, &pRenderTarget));
 
 
 	// Starts the timer
@@ -78,13 +93,9 @@ int Application::Execute()
 			// Direct2D
 			//
 
-			/*d2dDeviceContext->BeginDraw();
-
-			d2dDeviceContext->Clear(D2D1::ColorF(D2D1::ColorF::White));
-
-			d2dDeviceContext->EndDraw();*/
-
-
+			pRenderTarget->BeginDraw();
+			pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::YellowGreen));
+			pRenderTarget->EndDraw();
 
 
 			//

@@ -61,6 +61,9 @@ namespace DX
 		// Get texture
 		ID3D11ShaderResourceView* GetRenderedTexture() { return m_RenderedTexture.Get(); }
 
+		// Get texture
+		ID3D11Texture2D* GetTexture() { return m_Texture.Get(); }
+
 	private:
 		SDL_Window* m_SdlWindow = nullptr;
 
