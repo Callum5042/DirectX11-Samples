@@ -43,9 +43,6 @@ namespace DX
 		// Clear the buffers and set render target to the back buffer
 		void SetRenderTargetBackBuffer();
 
-		// Clear the buffers and set render target to the texture
-		void SetRenderTargetTexture();
-
 		// Display the rendered scene
 		void Present();
 

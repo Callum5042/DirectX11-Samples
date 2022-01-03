@@ -37,22 +37,22 @@ int Application::Execute()
 
 	m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
 
-	// Something DirectWrite
+	// Make Direct2D device from Direct3D Texture
 	auto texture = m_DxRenderer->GetTexture();
 
-	IDXGISurface* dxgiSurface = NULL;
-	DX::Check(texture->QueryInterface(&dxgiSurface));
+	ComPtr<IDXGISurface> dxgiSurface = nullptr;
+	DX::Check(texture->QueryInterface(dxgiSurface.GetAddressOf()));
 
-	D2D1_RENDER_TARGET_PROPERTIES props =
-		D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
-			96, 96);
+	D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96, 96);
 
+	ComPtr<ID2D1Factory> d2dFactory = nullptr;
+	DX::Check(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, d2dFactory.GetAddressOf()));
 
-	ID2D1Factory* pFactory = nullptr;
-	DX::Check(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory));
+	ComPtr<ID2D1RenderTarget> d2dRenderTarget = nullptr;
+	DX::Check(d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface.Get(), &props, d2dRenderTarget.GetAddressOf()));
 
-	ID2D1RenderTarget* pRenderTarget = nullptr;
-	DX::Check(pFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface, &props, &pRenderTarget));
+	// Setup DirectWrite
+
 
 
 	// Starts the timer
@@ -93,9 +93,9 @@ int Application::Execute()
 			// Direct2D
 			//
 
-			pRenderTarget->BeginDraw();
-			pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::YellowGreen));
-			pRenderTarget->EndDraw();
+			d2dRenderTarget->BeginDraw();
+			d2dRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::YellowGreen));
+			d2dRenderTarget->EndDraw();
 
 
 			//
