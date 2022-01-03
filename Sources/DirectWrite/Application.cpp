@@ -6,6 +6,7 @@
 
 #include <dwrite.h>
 #include <d2d1_1.h>
+#pragma comment(lib, "dwrite")
 
 Application::~Application()
 {
@@ -52,8 +53,22 @@ int Application::Execute()
 	DX::Check(d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface.Get(), &props, d2dRenderTarget.GetAddressOf()));
 
 	// Setup DirectWrite
+	IDWriteFactory* m_pDWriteFactory = nullptr;
+	IDWriteTextFormat* m_pTextFormat = nullptr;
 
+	HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(m_pDWriteFactory), reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
 
+	static const WCHAR msc_fontName[] = L"Verdana";
+	static const FLOAT msc_fontSize = 100;
+
+	hr = m_pDWriteFactory->CreateTextFormat(msc_fontName, NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, msc_fontSize, L"", &m_pTextFormat);
+
+	m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+	ID2D1SolidColorBrush* pBrush = nullptr;
+	const D2D1_COLOR_F color = D2D1::ColorF(0.0f, 0.0f, 0.0f);
+	hr = d2dRenderTarget->CreateSolidColorBrush(color, &pBrush);
 
 	// Starts the timer
 	m_Timer.Start();
@@ -95,6 +110,13 @@ int Application::Execute()
 
 			d2dRenderTarget->BeginDraw();
 			d2dRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::YellowGreen));
+
+			static const WCHAR sc_helloWorld[] = L"Hello, World!";
+			D2D1_SIZE_F renderTargetSize = d2dRenderTarget->GetSize();
+			d2dRenderTarget->DrawText(sc_helloWorld, ARRAYSIZE(sc_helloWorld) - 1, 
+				m_pTextFormat, D2D1::RectF(0, 0, renderTargetSize.width, renderTargetSize.height), pBrush);
+
+
 			d2dRenderTarget->EndDraw();
 
 
