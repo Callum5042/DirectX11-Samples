@@ -9,22 +9,22 @@
 [x] Stencil Outline
 [-] Alpha Mapping
 [x] Multi-Texturing
-[-] Bitmap-Fonts
+[x] Bitmap-Fonts
 
 === Advanced ===
 [x] Heightmap
 [-] Displacement Mapping
 [x] Normal Mapping - This works, but it feels wrong?
 [x] Directional Shadow Mapping
-[-] Omnidirectional Shadow Mapping
-[-] Planar Reflections
+[x] Omnidirectional Shadow Mapping
+[x] Planar Reflections
 [-] Reflection Mapping / Environment Mapping
 [-] Deferred Shading
 [-] Particles
 [-] Ambient Occlusion (SSAO)
 [-] High-dynamic-range (HDR)
 [x] Anti Aliasing
-[-] Vector-Fonts
+[x] DirectWrite (Vector-Fonts)
 
 === Unknown ===
 [-] Depth of Field
