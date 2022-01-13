@@ -44,7 +44,7 @@ void DX::Renderer::Create()
 
 	// Render to texture
 	CreateMsaaRenderTargetView(window_width, window_height);
-	CreateMsaaDepthStencilView(window_width, window_height); 
+	CreateMsaaDepthStencilView(window_width, window_height);
 }
 
 void DX::Renderer::Resize(int width, int height)
@@ -59,6 +59,10 @@ void DX::Renderer::Resize(int width, int height)
 
 	// Creates a new render target and depth stencil view with the new window size
 	CreateRenderTargetAndDepthStencilView(width, height);
+
+	// Render to texture
+	CreateMsaaRenderTargetView(width, height);
+	CreateMsaaDepthStencilView(width, height);
 
 	// Sets a new viewport with the new window size
 	SetViewport(width, height);
