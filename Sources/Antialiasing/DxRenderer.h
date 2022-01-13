@@ -41,7 +41,7 @@ namespace DX
 		void Resize(int width, int height);
 
 		// Clear the buffers and set render target to the back buffer
-		void SetRenderTargetBackBuffer();
+		void CopyMsaaRenderTargetBackBuffer();
 
 		// Clear the buffers and set render target to the texture
 		void SetRenderTargetTexture();

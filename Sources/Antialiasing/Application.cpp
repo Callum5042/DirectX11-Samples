@@ -106,7 +106,7 @@ int Application::Execute()
             m_DxModel->Render();
 
             // Clear the buffers
-            m_DxRenderer->SetRenderTargetBackBuffer();
+            m_DxRenderer->CopyMsaaRenderTargetBackBuffer();
 
             // Display the rendered scene
             m_DxRenderer->Present();
