@@ -10,8 +10,5 @@ VertexOutput main(VertexInput input)
 	output.position = mul(output.position, cView);
 	output.position = mul(output.position, cProjection);
 
-	// Set the vertex colour
-	output.colour = input.colour;
-
 	return output;
 }
