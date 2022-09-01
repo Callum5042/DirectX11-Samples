@@ -28,6 +28,16 @@ public:
 	GltfFileData Load(const std::filesystem::path path);
 
 private:
+	std::filesystem::path m_Path;
 	GltfFileData m_Data;
 	simdjson_result<element> m_Document;
+
+	// Load vertices
+	void LoadVertices(int64_t vertices_index);
+
+	// Load indices
+	void LoadIndices(int64_t indices_index);
+
+	// Load buffer
+	std::vector<char> LoadBuffer(int64_t index);
 };
