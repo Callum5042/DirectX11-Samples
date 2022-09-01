@@ -204,8 +204,10 @@
     <ClCompile Include="DxCamera.cpp" />
     <ClCompile Include="DxModel.cpp" />
     <ClCompile Include="DxShader.cpp" />
+    <ClCompile Include="GltfModelLoader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DxRenderer.cpp" />
+    <ClCompile Include="simdjson.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +216,8 @@
     <ClInclude Include="DxModel.h" />
     <ClInclude Include="DxRenderer.h" />
     <ClInclude Include="DxShader.h" />
+    <ClInclude Include="GltfModelLoader.h" />
+    <ClInclude Include="simdjson.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>

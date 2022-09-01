@@ -16,6 +16,9 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{c5ce5fbc-7fad-4f62-b162-d52b928dbe4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third-Party">
+      <UniqueIdentifier>{86152ccb-9979-4e31-a20a-db5d460767a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +42,12 @@
     <ClCompile Include="DxCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GltfModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simdjson.cpp">
+      <Filter>Third-Party</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -58,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="DxCamera.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GltfModelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simdjson.h">
+      <Filter>Third-Party</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

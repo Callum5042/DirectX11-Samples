@@ -1,4 +1,5 @@
 #include "DxModel.h"
+#include "GltfModelLoader.h"
 #include <DirectXMath.h>
 #include <vector>
 
@@ -9,46 +10,21 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Model::Create()
 {
+	// Load model
+	GltfModelLoader loader;
+	GltfFileData file_data = loader.Load("");
 
-
+	// Copy model object data
+	m_ModelObjectData = file_data.model_object_data;
 
 	// Create buffers
-	CreateVertexBuffer();
-	CreateIndexBuffer();
+	CreateVertexBuffer(file_data.vertices);
+	CreateIndexBuffer(file_data.indices);
 }
 
-void DX::Model::CreateVertexBuffer()
+void DX::Model::CreateVertexBuffer(std::vector<Vertex> vertices)
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
-
-	// Set vertex data
-	std::vector<Vertex> vertices =
-	{
-		{ -1.0f, -1.0f, -1.0f },
-		{ -1.0f, +1.0f, -1.0f },
-		{ +1.0f, +1.0f, -1.0f },
-		{ +1.0f, -1.0f, -1.0f },
-		{ -1.0f, -1.0f, +1.0f },
-		{ +1.0f, -1.0f, +1.0f },
-		{ +1.0f, +1.0f, +1.0f },
-		{ -1.0f, +1.0f, +1.0f },
-		{ -1.0f, +1.0f, -1.0f },
-		{ -1.0f, +1.0f, +1.0f },
-		{ +1.0f, +1.0f, +1.0f },
-		{ +1.0f, +1.0f, -1.0f },
-		{ -1.0f, -1.0f, -1.0f },
-		{ +1.0f, -1.0f, -1.0f },
-		{ +1.0f, -1.0f, +1.0f },
-		{ -1.0f, -1.0f, +1.0f },
-		{ -1.0f, -1.0f, +1.0f },
-		{ -1.0f, +1.0f, +1.0f },
-		{ -1.0f, +1.0f, -1.0f },
-		{ -1.0f, -1.0f, -1.0f },
-		{ +1.0f, -1.0f, -1.0f },
-		{ +1.0f, +1.0f, -1.0f },
-		{ +1.0f, +1.0f, +1.0f },
-		{ +1.0f, -1.0f, +1.0f }
-	};
 
 	// Create index buffer
 	D3D11_BUFFER_DESC vertex_buffer_desc = {};
@@ -62,28 +38,9 @@ void DX::Model::CreateVertexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dVertexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Model::CreateIndexBuffer()
+void DX::Model::CreateIndexBuffer(std::vector<UINT> indices)
 {
 	auto d3dDevice = m_DxRenderer->GetDevice();
-
-	// Set Indices
-	std::vector<UINT> indices =
-	{
-		0, 1, 2,
-		0, 2, 3,
-		4, 5, 6,
-		4, 6, 7,
-		8, 9, 10,
-		8, 10, 11,
-		12, 13, 14,
-		12, 14, 15,
-		16, 17, 18,
-		16, 18, 19,
-		20, 21, 22,
-		20, 22, 23,
-	};
-
-	m_IndexCount = static_cast<UINT>(indices.size());
 
 	// Create index buffer
 	D3D11_BUFFER_DESC index_buffer_desc = {};
@@ -114,7 +71,10 @@ void DX::Model::Render()
 	// Bind the geometry topology to the pipeline's Input Assembler stage
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Render geometry
-	d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+	// Render all geometry
+	for (auto& obj : m_ModelObjectData)
+	{
+		d3dDeviceContext->DrawIndexed(obj.index_count, obj.index_start, 0);
+	}
 }
  
