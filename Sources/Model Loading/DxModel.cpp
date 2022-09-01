@@ -12,7 +12,7 @@ void DX::Model::Create()
 {
 	// Load model
 	GltfModelLoader loader;
-	GltfFileData file_data = loader.Load("");
+	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
 
 	// Copy model object data
 	m_ModelObjectData = file_data.model_object_data;

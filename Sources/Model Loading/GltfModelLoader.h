@@ -2,6 +2,9 @@
 
 #include "DxModel.h"
 #include <filesystem>
+#include "simdjson.h"
+using namespace simdjson;
+using namespace simdjson::dom;
 
 // glTF is a royalty-free 3D file format
 // https://www.khronos.org/gltf/
@@ -25,5 +28,6 @@ public:
 	GltfFileData Load(const std::filesystem::path path);
 
 private:
-
+	GltfFileData m_Data;
+	simdjson_result<element> m_Document;
 };
