@@ -2,6 +2,8 @@
 struct VertexInput
 {
 	float3 position : POSITION;
+	float4 weight : WEIGHT;
+	int4 joint : JOINT;
 };
 
 // Vertex output / pixel input structure

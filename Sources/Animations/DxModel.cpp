@@ -5,16 +5,14 @@
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, -2.0f, 0.0f);
 }
 
 void DX::Model::Create()
 {
 	// Load model
 	GltfModelLoader loader;
-	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
-	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\monkey.gltf");
-	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\multiple_objects.gltf");
+	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\single_bone.gltf");
 
 	// Copy model object data
 	m_ModelObjectData = file_data.model_object_data;

@@ -1,6 +1,32 @@
 #include "GltfModelLoader.h"
 #include <fstream>
 
+namespace
+{
+	struct Position
+	{
+		float x;
+		float y;
+		float z;
+	};
+
+	struct Joint
+	{
+		unsigned char x;
+		unsigned char y;
+		unsigned char z;
+		unsigned char w;
+	};
+
+	struct Weight
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+}
+
 GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 {
 	m_Path = path;
@@ -40,8 +66,7 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		auto mesh_primitives = mesh["primitives"].at(0);
 
 		// Load mesh vertices
-		auto mesh_vertex_position_index = mesh_primitives["attributes"]["POSITION"].get_int64();
-		UINT vertex_count = LoadVertices(mesh_vertex_position_index.value());
+		UINT vertex_count = LoadVertices(mesh_primitives.value());
 
 		// Set base vertex
 		object_data.base_vertex = vertex_total;
@@ -67,27 +92,57 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 	return m_Data;
 }
 
-UINT GltfModelLoader::LoadVertices(int64_t vertices_index)
+UINT GltfModelLoader::LoadVertices(simdjson::dom::element& primitive)
 {
+	auto position_index = primitive["attributes"]["POSITION"].get_int64().value();
+	auto joints_index = primitive["attributes"]["JOINTS_0"].get_int64().value();
+	auto weights_index = primitive["attributes"]["WEIGHTS_0"].get_int64().value();
+
 	// Get vertex position accessors
-	auto mesh_vertex_position_accessor = m_Document["accessors"].at(vertices_index);
+	auto position_accessor = m_Document["accessors"].at(position_index);
+	auto joints_accessor = m_Document["accessors"].at(joints_index);
+	auto weights_accessor = m_Document["accessors"].at(weights_index);
 
 	// Vertex count
-	auto vertex_count = mesh_vertex_position_accessor["count"].get_int64();
+	auto vertex_count = static_cast<UINT>(position_accessor["count"].get_int64().value());
 
 	// Buffer
-	auto vertex_buffer_view_index = mesh_vertex_position_accessor["bufferView"].get_int64();
-	std::vector<char> buffer = LoadBuffer(vertex_buffer_view_index.value());
+	std::vector<char> position_buffer = LoadBuffer(position_accessor["bufferView"].get_int64().value());
+	std::vector<char> joints_buffer = LoadBuffer(joints_accessor["bufferView"].get_int64().value());
+	std::vector<char> weights_buffer = LoadBuffer(weights_accessor["bufferView"].get_int64().value());
 
 	// Reinterpret the data to what we set in the input layout
-	DX::Vertex* raw_vertices = reinterpret_cast<DX::Vertex*>(buffer.data());
-	std::vector<DX::Vertex> vertices(raw_vertices, raw_vertices + vertex_count.value());
+	Position* position = reinterpret_cast<Position*>(position_buffer.data());
+	Joint* joints = reinterpret_cast<Joint*>(joints_buffer.data());
+	Weight* weights = reinterpret_cast<Weight*>(weights_buffer.data());
 
 	// Set vertices
-	m_Data.vertices.insert(m_Data.vertices.end(), vertices.begin(), vertices.end());
+	for (UINT i = 0; i < vertex_count; ++i)
+	{
+		DX::Vertex vertex;
+
+		// Position
+		vertex.x = position[i].x;
+		vertex.y = position[i].y;
+		vertex.z = position[i].z;
+
+		// Joint
+		vertex.joint_x = joints[i].x;
+		vertex.joint_y = joints[i].y;
+		vertex.joint_z = joints[i].z;
+		vertex.joint_w = joints[i].w;
+
+		// Weight
+		vertex.weight_x = weights[i].x;
+		vertex.weight_y = weights[i].y;
+		vertex.weight_z = weights[i].z;
+		vertex.weight_w = weights[i].w;
+
+		m_Data.vertices.push_back(vertex);
+	}
 
 	// Return vertex count for rendering
-	return static_cast<UINT>(vertices.size());
+	return vertex_count;
 }
 
 UINT GltfModelLoader::LoadIndices(int64_t indices_index)

@@ -14,6 +14,18 @@ namespace DX
 		float x = 0;
 		float y = 0;
 		float z = 0;
+
+		// Weight
+		float weight_x = 0;
+		float weight_y = 0;
+		float weight_z = 0;
+		float weight_w = 0;
+
+		// Joint
+		int joint_x = 0;
+		int joint_y = 0;
+		int joint_z = 0;
+		int joint_w = 0;
 	};
 
 	struct ModelObjectData
