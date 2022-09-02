@@ -16,7 +16,7 @@ public:
 
 	int Execute();
 
-	void UpdateWorldBuffers();
+	void UpdateCameraBuffers();
 
 private:
 	// SDL window

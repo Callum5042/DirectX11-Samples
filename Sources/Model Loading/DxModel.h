@@ -27,7 +27,7 @@ namespace DX
 	class Model
 	{
 	public:
-		Model(DX::Renderer* renderer, DX::Shader* shader, DX::Camera* camera);
+		Model(DX::Renderer* renderer, DX::Shader* shader);
 		virtual ~Model() = default;
 
 		// Create device
@@ -42,7 +42,6 @@ namespace DX
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 		DX::Shader* m_DxShader = nullptr;
-		DX::Camera* m_DxCamera = nullptr;
 
 		// Model object data
 		std::vector<ModelObjectData> m_ModelObjectData;

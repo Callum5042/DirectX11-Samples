@@ -5,6 +5,7 @@
 DX::Shader::Shader(Renderer* renderer) : m_DxRenderer(renderer)
 {
 	CreateWorldConstantBuffer();
+	CreateCameraConstantBuffer();
 }
 
 void DX::Shader::LoadVertexShader(std::string&& vertex_shader_path)
@@ -53,14 +54,23 @@ void DX::Shader::Use()
 	// Bind the pixel shader to the pipeline's Pixel Shader stage
 	d3dDeviceContext->PSSetShader(m_d3dPixelShader.Get(), nullptr, 0);
 
-	// Bind the world constant buffer to the vertex shader
+	// Bind the world constant buffer to the vertex shader - slot 0
 	d3dDeviceContext->VSSetConstantBuffers(0, 1, m_d3dWorldConstantBuffer.GetAddressOf());
+
+	// Bind the camera constant buffer to the vertex shader - slot 1
+	d3dDeviceContext->VSSetConstantBuffers(1, 1, m_d3dCameraConstantBuffer.GetAddressOf());
 }
 
 void DX::Shader::UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer)
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 	d3dDeviceContext->UpdateSubresource(m_d3dWorldConstantBuffer.Get(), 0, nullptr, &worldBuffer, 0, 0);
+}
+
+void DX::Shader::UpdateCameraConstantBuffer(const CameraBuffer& cameraBuffer)
+{
+	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
+	d3dDeviceContext->UpdateSubresource(m_d3dCameraConstantBuffer.Get(), 0, nullptr, &cameraBuffer, 0, 0);
 }
 
 void DX::Shader::CreateWorldConstantBuffer()
@@ -74,4 +84,17 @@ void DX::Shader::CreateWorldConstantBuffer()
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dWorldConstantBuffer.ReleaseAndGetAddressOf()));
+}
+
+void DX::Shader::CreateCameraConstantBuffer()
+{
+	auto d3dDevice = m_DxRenderer->GetDevice();
+
+	// Create world constant buffer
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(CameraBuffer);
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	DX::Check(d3dDevice->CreateBuffer(&bd, nullptr, m_d3dCameraConstantBuffer.ReleaseAndGetAddressOf()));
 }

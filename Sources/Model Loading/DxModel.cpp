@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 #include <vector>
 
-DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader, DX::Camera* camera) : m_DxRenderer(renderer), m_DxShader(shader), m_DxCamera(camera)
+DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
 	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
@@ -82,9 +82,6 @@ void DX::Model::Render()
 		// Apply object transformation
 		DX::WorldBuffer world_buffer = {};
 		world_buffer.world = DirectX::XMMatrixTranspose(matrix);
-		world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-		world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
-
 		m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 
 		// Render object

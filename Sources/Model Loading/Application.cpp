@@ -32,7 +32,7 @@ int Application::Execute()
     m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
 
     // Initialise and create the DirectX 11 model
-    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get(), m_DxShader.get(), m_DxCamera.get());
+    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get(), m_DxShader.get());
     m_DxModel->Create();
 
     // Starts the timer
@@ -53,7 +53,7 @@ int Application::Execute()
                     m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 
                     // Update world constant buffer with new camera view and perspective
-                    UpdateWorldBuffers();
+                    UpdateCameraBuffers();
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)
@@ -66,7 +66,7 @@ int Application::Execute()
                     m_DxCamera->Rotate(pitch, yaw);
 
                     // Update world constant buffer with new camera view and perspective
-                    UpdateWorldBuffers();
+                    UpdateCameraBuffers();
                 }
             }
             else if (e.type == SDL_MOUSEWHEEL)
@@ -75,7 +75,7 @@ int Application::Execute()
                 m_DxCamera->UpdateFov(-direction);
 
                 // Update world constant buffer with new camera view and perspective
-                UpdateWorldBuffers();
+                UpdateCameraBuffers();
             }
             else if (e.type == SDL_KEYDOWN)
             {
@@ -109,14 +109,13 @@ int Application::Execute()
     return 0;
 }
 
-void Application::UpdateWorldBuffers()
+void Application::UpdateCameraBuffers()
 {
-    DX::WorldBuffer world_buffer = {};
-    world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
-    world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
-    world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+    DX::CameraBuffer camera_buffer = {};
+    camera_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+    camera_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
 
-    m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+    m_DxShader->UpdateCameraConstantBuffer(camera_buffer);
 }
 
 bool Application::SDLInit()

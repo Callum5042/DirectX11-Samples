@@ -9,6 +9,10 @@ namespace DX
 	struct WorldBuffer
 	{
 		DirectX::XMMATRIX world;
+	};
+
+	struct CameraBuffer
+	{
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
 	};
@@ -31,6 +35,9 @@ namespace DX
 		// Set world constant buffer from camera
 		void UpdateWorldConstantBuffer(const WorldBuffer& worldBuffer);
 
+		// Set camera constant buffer from camera
+		void UpdateCameraConstantBuffer(const CameraBuffer& cameraBuffer);
+
 	private:
 		Renderer* m_DxRenderer = nullptr;
 
@@ -46,5 +53,9 @@ namespace DX
 		// World constant buffer
 		ComPtr<ID3D11Buffer> m_d3dWorldConstantBuffer = nullptr;
 		void CreateWorldConstantBuffer();
+
+		// World constant buffer
+		ComPtr<ID3D11Buffer> m_d3dCameraConstantBuffer = nullptr;
+		void CreateCameraConstantBuffer();
 	};
 }

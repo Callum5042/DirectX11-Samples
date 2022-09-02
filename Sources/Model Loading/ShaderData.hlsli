@@ -14,6 +14,11 @@ struct VertexOutput
 cbuffer WorldBuffer : register(b0)
 {
 	matrix cWorld;
+}
+
+// Camera constant buffer
+cbuffer CameraBuffer : register(b1)
+{
 	matrix cView;
 	matrix cProjection;
 }
