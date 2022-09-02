@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 #include <vector>
 
-DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
+DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader, DX::Camera* camera) : m_DxRenderer(renderer), m_DxShader(shader), m_DxCamera(camera)
 {
 	World *= DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
@@ -12,7 +12,9 @@ void DX::Model::Create()
 {
 	// Load model
 	GltfModelLoader loader;
-	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
+	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
+	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\monkey.gltf");
+	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\test.gltf");
 
 	// Copy model object data
 	m_ModelObjectData = file_data.model_object_data;
@@ -74,6 +76,18 @@ void DX::Model::Render()
 	// Render all geometry
 	for (auto& obj : m_ModelObjectData)
 	{
+		// Set obj transformation
+		auto matrix = DirectX::XMMatrixMultiply(World, obj.transformation);
+
+		// Apply object transformation
+		DX::WorldBuffer world_buffer = {};
+		world_buffer.world = DirectX::XMMatrixTranspose(obj.transformation);
+		world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+		world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+
+		m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+		// Render object
 		d3dDeviceContext->DrawIndexed(obj.index_count, obj.index_start, 0);
 	}
 }

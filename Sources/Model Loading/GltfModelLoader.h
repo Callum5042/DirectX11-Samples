@@ -36,8 +36,11 @@ private:
 	void LoadVertices(int64_t vertices_index);
 
 	// Load indices
-	void LoadIndices(int64_t indices_index);
+	UINT LoadIndices(int64_t indices_index);
 
 	// Load buffer
 	std::vector<char> LoadBuffer(int64_t index);
+
+	// Load transformation
+	DirectX::XMMATRIX LoadTransformation(simdjson::dom::element& node);
 };

@@ -9,6 +9,9 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 	parser parser;
 	m_Document = parser.load(path.string());
 
+	// Indices count - we want to keep track of the indices for the object_data index_start variable
+	UINT index_total = 0;
+
 	// Loop through the nodes and check for nodes that contain a mesh index
 	for (auto node : m_Document["nodes"])
 	{
@@ -16,6 +19,13 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		auto mesh_index = node["mesh"].get_int64();
 		if (mesh_index.error() != simdjson::SUCCESS)
 			continue;
+
+		// Model data
+		DX::ModelObjectData object_data = {};
+
+		// Load transformation
+		auto transformation_matrix = LoadTransformation(node);
+		object_data.transformation = transformation_matrix;
 
 		// Read mesh
 		auto mesh = m_Document["meshes"].at(mesh_index.value());
@@ -32,7 +42,17 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 
 		// Load mesh indices
 		auto mesh_indices_index = mesh_primitives["indices"].get_int64();
-		LoadIndices(mesh_indices_index.value());
+		UINT index_count = LoadIndices(mesh_indices_index.value());
+
+		// Set index data
+		object_data.index_start = index_total;
+		object_data.index_count = index_count;
+
+		// Increase total index so we know when the next object index start is
+		index_total += index_count;
+
+		// Store the model object data
+		m_Data.model_object_data.push_back(object_data);
 	}
 
 	return m_Data;
@@ -55,10 +75,10 @@ void GltfModelLoader::LoadVertices(int64_t vertices_index)
 	std::vector<DX::Vertex> vertices(raw_vertices, raw_vertices + vertex_count.value());
 
 	// Set vertices
-	m_Data.vertices = vertices;
+	m_Data.vertices.insert(m_Data.vertices.end(), vertices.begin(), vertices.end());
 }
 
-void GltfModelLoader::LoadIndices(int64_t indices_index)
+UINT GltfModelLoader::LoadIndices(int64_t indices_index)
 {
 	// Indices count
 	auto mesh_indices_accessor = m_Document["accessors"].at(indices_index);
@@ -71,13 +91,12 @@ void GltfModelLoader::LoadIndices(int64_t indices_index)
 	// Reinterpret the data to what we set in the input layout
 	USHORT* raw_indices = reinterpret_cast<USHORT*>(buffer.data());
 	std::vector<UINT> indices(raw_indices, raw_indices + indices_count.value());
-	m_Data.indices = indices;
 
-	// To be moved
-	DX::ModelObjectData model_object_data = {};
-	model_object_data.index_count = indices_count.value();
-	model_object_data.index_start = 0;
-	m_Data.model_object_data.push_back(model_object_data);
+	// Set indices
+	m_Data.indices.insert(m_Data.indices.end(), indices.begin(), indices.end());
+
+	// Return indices count
+	return indices.size();
 }
 
 std::vector<char> GltfModelLoader::LoadBuffer(int64_t index)
@@ -104,4 +123,42 @@ std::vector<char> GltfModelLoader::LoadBuffer(int64_t index)
 	file.close();
 
 	return data;
+}
+
+DirectX::XMMATRIX GltfModelLoader::LoadTransformation(simdjson::dom::element& node)
+{
+	DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
+
+	// Rotation - this must be done before position otherwise it will skew the maths
+	simdjson_result<array> rotation = node["rotation"].get_array();
+	if (rotation.error() == simdjson::SUCCESS)
+	{
+		float x = static_cast<float>(rotation.at(0).get_double().value());
+		float y = static_cast<float>(rotation.at(1).get_double().value());
+		float z = static_cast<float>(rotation.at(2).get_double().value());
+		float w = static_cast<float>(rotation.at(3).get_double().value());
+		world *= DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(x, y, z, w));
+	}
+
+	// Scale
+	simdjson_result<array> scale = node["scale"].get_array();
+	if (scale.error() == simdjson::SUCCESS)
+	{
+		float x = static_cast<float>(scale.at(0).get_double().value());
+		float y = static_cast<float>(scale.at(1).get_double().value());
+		float z = static_cast<float>(scale.at(2).get_double().value());
+		world *= DirectX::XMMatrixScaling(x, y, z);
+	}
+
+	// Position
+	simdjson_result<array> translation = node["translation"].get_array();
+	if (translation.error() == simdjson::SUCCESS)
+	{
+		float x = static_cast<float>(translation.at(0).get_double().value());
+		float y = static_cast<float>(translation.at(1).get_double().value());
+		float z = static_cast<float>(translation.at(2).get_double().value());
+		world *= DirectX::XMMatrixTranslation(x, y, z);
+	}
+
+	return world;
 }

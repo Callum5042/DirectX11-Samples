@@ -19,10 +19,6 @@ int Application::Execute()
     m_DxRenderer = std::make_unique<DX::Renderer>(m_SdlWindow);
     m_DxRenderer->Create();
 
-    // Initialise and create the DirectX 11 model
-    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
-    m_DxModel->Create();
-
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -34,6 +30,10 @@ int Application::Execute()
     SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
 
     m_DxCamera = std::make_unique<DX::Camera>(window_width, window_height);
+
+    // Initialise and create the DirectX 11 model
+    m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get(), m_DxShader.get(), m_DxCamera.get());
+    m_DxModel->Create();
 
     // Starts the timer
     m_Timer.Start();

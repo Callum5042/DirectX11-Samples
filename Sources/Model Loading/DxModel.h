@@ -1,6 +1,8 @@
 #pragma once
 
 #include "DxRenderer.h"
+#include "DxShader.h"
+#include "DxCamera.h"
 #include <vector>
 #include <DirectXColors.h>
 
@@ -18,12 +20,13 @@ namespace DX
 	{
 		int index_count;
 		int index_start;
+		DirectX::XMMATRIX transformation;
 	};
 
 	class Model
 	{
 	public:
-		Model(DX::Renderer* renderer);
+		Model(DX::Renderer* renderer, DX::Shader* shader, DX::Camera* camera);
 		virtual ~Model() = default;
 
 		// Create device
@@ -37,6 +40,8 @@ namespace DX
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
+		DX::Shader* m_DxShader = nullptr;
+		DX::Camera* m_DxCamera = nullptr;
 
 		// Model object data
 		std::vector<ModelObjectData> m_ModelObjectData;

@@ -1,0 +1,202 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v3.2.43",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0,
+                1,
+                2,
+                3
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "Sphere"
+        },
+        {
+            "mesh" : 1,
+            "name" : "Sphere.001",
+            "translation" : [
+                2.309497356414795,
+                0.8973644971847534,
+                0.8408393263816833
+            ]
+        },
+        {
+            "mesh" : 2,
+            "name" : "Sphere.002",
+            "translation" : [
+                -1.536539077758789,
+                1.187111258506775,
+                -1.6684672832489014
+            ]
+        },
+        {
+            "mesh" : 3,
+            "name" : "Sphere.003",
+            "translation" : [
+                1.2975430488586426,
+                -1.1629544496536255,
+                1.5087130069732666
+            ]
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Sphere",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0
+                    },
+                    "indices" : 1
+                }
+            ]
+        },
+        {
+            "name" : "Sphere.001",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 2
+                    },
+                    "indices" : 1
+                }
+            ]
+        },
+        {
+            "name" : "Sphere.002",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 3
+                    },
+                    "indices" : 1
+                }
+            ]
+        },
+        {
+            "name" : "Sphere.003",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 4
+                    },
+                    "indices" : 1
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 4034,
+            "max" : [
+                0.9999998807907104,
+                1,
+                0.9999997615814209
+            ],
+            "min" : [
+                -0.9999996423721313,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5123,
+            "count" : 24192,
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 4034,
+            "max" : [
+                0.9999998807907104,
+                1,
+                0.9999997615814209
+            ],
+            "min" : [
+                -0.9999996423721313,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 4034,
+            "max" : [
+                0.9999998807907104,
+                1,
+                0.9999997615814209
+            ],
+            "min" : [
+                -0.9999996423721313,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 4034,
+            "max" : [
+                0.9999998807907104,
+                1,
+                0.9999997615814209
+            ],
+            "min" : [
+                -0.9999996423721313,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 48408,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48384,
+            "byteOffset" : 48408
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48408,
+            "byteOffset" : 96792
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48408,
+            "byteOffset" : 145200
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48408,
+            "byteOffset" : 193608
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 242016,
+            "uri" : "test.bin"
+        }
+    ]
+}
