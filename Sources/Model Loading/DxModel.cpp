@@ -14,7 +14,7 @@ void DX::Model::Create()
 	GltfModelLoader loader;
 	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
 	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\monkey.gltf");
-	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\test.gltf");
+	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\multiple_objects.gltf");
 
 	// Copy model object data
 	m_ModelObjectData = file_data.model_object_data;
@@ -81,7 +81,7 @@ void DX::Model::Render()
 
 		// Apply object transformation
 		DX::WorldBuffer world_buffer = {};
-		world_buffer.world = DirectX::XMMatrixTranspose(obj.transformation);
+		world_buffer.world = DirectX::XMMatrixTranspose(matrix);
 		world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
 		world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
 
