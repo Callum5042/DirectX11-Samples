@@ -88,7 +88,38 @@ void DX::Model::Render()
 		m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 
 		// Render object
-		d3dDeviceContext->DrawIndexed(obj.index_count, obj.index_start, 0);
+		d3dDeviceContext->DrawIndexed(obj.index_count, obj.index_start, obj.base_vertex);
 	}
+
+	// Set obj transformation
+	//{
+	//	auto matrix = DirectX::XMMatrixMultiply(World, m_ModelObjectData[0].transformation);
+
+	//	// Apply object transformation
+	//	DX::WorldBuffer world_buffer = {};
+	//	world_buffer.world = DirectX::XMMatrixTranspose(matrix);
+	//	world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+	//	world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+
+	//	m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+	//	// Render object
+	//	d3dDeviceContext->DrawIndexed(3456, 0, 0);
+	//}
+
+	//{
+	//	auto matrix = DirectX::XMMatrixMultiply(World, m_ModelObjectData[1].transformation);
+
+	//	// Apply object transformation
+	//	DX::WorldBuffer world_buffer = {};
+	//	world_buffer.world = DirectX::XMMatrixTranspose(matrix);
+	//	world_buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
+	//	world_buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
+
+	//	m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+	//	// Render object
+	//	d3dDeviceContext->DrawIndexed(36, 3456, 576);
+	//}
 }
  

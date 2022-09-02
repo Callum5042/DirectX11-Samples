@@ -33,7 +33,7 @@ private:
 	simdjson_result<element> m_Document;
 
 	// Load vertices
-	void LoadVertices(int64_t vertices_index);
+	UINT LoadVertices(int64_t vertices_index);
 
 	// Load indices
 	UINT LoadIndices(int64_t indices_index);

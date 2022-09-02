@@ -9,6 +9,9 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 	parser parser;
 	m_Document = parser.load(path.string());
 
+	// Vertex total - want to keep track of this so we know the base vertex for each object when rendering
+	UINT vertex_total = 0;
+
 	// Indices count - we want to keep track of the indices for the object_data index_start variable
 	UINT index_total = 0;
 
@@ -38,7 +41,13 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 
 		// Load mesh vertices
 		auto mesh_vertex_position_index = mesh_primitives["attributes"]["POSITION"].get_int64();
-		LoadVertices(mesh_vertex_position_index.value());
+		UINT vertex_count = LoadVertices(mesh_vertex_position_index.value());
+
+		// Set base vertex
+		object_data.base_vertex = vertex_total;
+
+		// Increase total vertex
+		vertex_total += vertex_count;
 
 		// Load mesh indices
 		auto mesh_indices_index = mesh_primitives["indices"].get_int64();
@@ -58,7 +67,7 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 	return m_Data;
 }
 
-void GltfModelLoader::LoadVertices(int64_t vertices_index)
+UINT GltfModelLoader::LoadVertices(int64_t vertices_index)
 {
 	// Get vertex position accessors
 	auto mesh_vertex_position_accessor = m_Document["accessors"].at(vertices_index);
@@ -76,6 +85,9 @@ void GltfModelLoader::LoadVertices(int64_t vertices_index)
 
 	// Set vertices
 	m_Data.vertices.insert(m_Data.vertices.end(), vertices.begin(), vertices.end());
+
+	// Return vertex count for rendering
+	return static_cast<UINT>(vertices.size());
 }
 
 UINT GltfModelLoader::LoadIndices(int64_t indices_index)
@@ -96,7 +108,7 @@ UINT GltfModelLoader::LoadIndices(int64_t indices_index)
 	m_Data.indices.insert(m_Data.indices.end(), indices.begin(), indices.end());
 
 	// Return indices count
-	return indices.size();
+	return static_cast<UINT>(indices.size());
 }
 
 std::vector<char> GltfModelLoader::LoadBuffer(int64_t index)
