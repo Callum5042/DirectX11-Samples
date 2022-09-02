@@ -80,6 +80,11 @@ void DX::Model::Render()
 		// Apply object transformation
 		DX::WorldBuffer world_buffer = {};
 		world_buffer.world = DirectX::XMMatrixTranspose(matrix);
+		for (size_t i = 0; i < obj.bones.size(); ++i)
+		{
+			world_buffer.bone_matrix[i] = DirectX::XMMatrixTranspose(obj.bones[i].matrix);
+		}
+
 		m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 
 		// Render object

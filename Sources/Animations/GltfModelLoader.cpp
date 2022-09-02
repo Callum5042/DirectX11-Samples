@@ -85,6 +85,11 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		// Increase total index so we know when the next object index start is
 		index_total += index_count;
 
+		// Load joint data
+		auto skin_index = node["skin"].get_int64();
+		auto bones = LoadSkin(skin_index.value());
+		object_data.bones = bones;
+
 		// Store the model object data
 		m_Data.model_object_data.push_back(object_data);
 	}
@@ -228,4 +233,40 @@ DirectX::XMMATRIX GltfModelLoader::LoadTransformation(simdjson::dom::element& no
 	}
 
 	return world;
+}
+
+std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
+{
+	std::vector<DX::BoneData> bones;
+
+	// Load skin
+	auto skin = m_Document["skins"].at(skin_index);
+
+	// Skin name
+	auto skin_name = skin["name"].get_string();
+
+	// Inverse bind matrix?
+	auto inverseBindMatrices_index = skin["inverseBindMatrices"].get_int64();
+
+	// List of joints
+	auto joints = skin["joints"].get_array();
+	for (auto it = joints.begin(); it != joints.end(); ++it)
+	{
+		DX::BoneData bone = {};
+
+		// Load bone data from node
+		auto index = (*it).get_int64();
+		auto node = m_Document["nodes"].at(index.value());
+
+		// Get bone name
+		auto name = node["name"].get_string().value();
+		
+		// Fill struct
+		bone.name = name;
+		bone.matrix = DirectX::XMMatrixIdentity();
+
+		bones.push_back(bone);
+	}
+
+	return bones;
 }

@@ -43,4 +43,7 @@ private:
 
 	// Load transformation
 	DirectX::XMMATRIX LoadTransformation(simdjson::dom::element& node);
+
+	// Load skin
+	std::vector<DX::BoneData> LoadSkin(int64_t skin_index);
 };

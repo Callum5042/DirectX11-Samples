@@ -28,12 +28,19 @@ namespace DX
 		int joint_w = 0;
 	};
 
+	struct BoneData
+	{
+		std::string name;
+		DirectX::XMMATRIX matrix;
+	};
+
 	struct ModelObjectData
 	{
 		int index_count;
 		int index_start;
 		int base_vertex;
 		DirectX::XMMATRIX transformation;
+		std::vector<BoneData> bones;
 	};
 
 	class Model

@@ -16,6 +16,7 @@ struct VertexOutput
 cbuffer WorldBuffer : register(b0)
 {
 	matrix cWorld;
+	matrix cBoneTransformation[64];
 }
 
 // Camera constant buffer

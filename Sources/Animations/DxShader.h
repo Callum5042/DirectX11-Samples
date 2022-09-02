@@ -9,6 +9,7 @@ namespace DX
 	struct WorldBuffer
 	{
 		DirectX::XMMATRIX world;
+		DirectX::XMMATRIX bone_matrix[64];
 	};
 
 	struct CameraBuffer
