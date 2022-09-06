@@ -92,6 +92,9 @@ namespace DX
 		std::string name;
 		std::string parentName;
 		DirectX::XMMATRIX offset;
+
+		int bone_index;
+		std::vector<int> children;
 	};
 
 	struct Subset

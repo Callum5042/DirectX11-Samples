@@ -30,8 +30,13 @@ namespace DX
 
 	struct BoneData
 	{
+		int bone_index;
 		std::string name;
 		DirectX::XMMATRIX matrix;
+		DirectX::XMMATRIX final_transform;
+		DirectX::XMMATRIX ibm;
+		std::vector<int> children;
+		BoneData* parent;
 	};
 
 	struct ModelObjectData

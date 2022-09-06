@@ -5,14 +5,14 @@
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, -2.0f, 0.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, -0.0f, 0.0f);
 }
 
 void DX::Model::Create()
 {
 	// Load model
 	GltfModelLoader loader;
-	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\single_bone.gltf");
+	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\skinned_mesh.gltf");
 
 	// Copy model object data
 	m_ModelObjectData = file_data.model_object_data;
@@ -74,15 +74,21 @@ void DX::Model::Render()
 	// Render all geometry
 	for (auto& obj : m_ModelObjectData)
 	{
-		// Set obj transformation
+		for (auto& bone : obj.bones)
+		{
+			bone.final_transform = DirectX::XMMatrixMultiply(bone.matrix, bone.ibm);
+		}
+
+
+		// Set obj transformation 
 		auto matrix = DirectX::XMMatrixMultiply(World, obj.transformation);
 
 		// Apply object transformation
 		DX::WorldBuffer world_buffer = {};
-		world_buffer.world = DirectX::XMMatrixTranspose(matrix);
+		world_buffer.world = DirectX::XMMatrixTranspose(World);
 		for (size_t i = 0; i < obj.bones.size(); ++i)
 		{
-			world_buffer.bone_matrix[i] = DirectX::XMMatrixTranspose(obj.bones[i].matrix);
+			world_buffer.bone_matrix[i] = DirectX::XMMatrixTranspose(obj.bones[i].final_transform);
 		}
 
 		m_DxShader->UpdateWorldConstantBuffer(world_buffer);

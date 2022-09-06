@@ -8,22 +8,7 @@
 #include <fstream>
 
 #include "ModelLoader.h"
-
-namespace
-{
-	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
-	{
-		aiVector3D scale, rot, pos;
-		matrix.Decompose(scale, rot, pos);
-
-		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
-		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
-		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
-
-		return _matrix;
-	}
-}
+#include "GltfModelLoader.h"
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
@@ -33,7 +18,19 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 void DX::Model::Create()
 {
 	// Load data
-	ModelLoader::Load("..\\..\\Resources\\Models\\complex_post.glb", &m_Mesh);
+	// ModelLoader::Load("..\\..\\Resources\\Models\\complex_post.glb", &m_Mesh);
+	ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
+
+	GltfModelLoader loader;
+	auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
+	//auto fileData = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
+
+	m_Mesh.vertices = fileData.vertices;
+	m_Mesh.indices = fileData.indices;
+	m_Mesh.subsets = fileData.model_object_data;
+	m_Mesh.bones = fileData.bones;
+	m_Mesh.animations["Take1"] = fileData.animationClip;
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -44,11 +41,11 @@ void DX::Model::Update(float dt)
 {
 	static float TimeInSeconds = 0.0f;
 	TimeInSeconds += dt * 100.0f;
-
+	 
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
-	// Animation
+	//// Animation
 	auto clip = m_Mesh.animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 	if (TimeInSeconds > clip->second.GetClipEndTime())
@@ -73,6 +70,8 @@ void DX::Model::Update(float dt)
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
 		DirectX::XMMATRIX toRoot = toRootTransforms[i];
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
+
+		//matrix = DirectX::XMMatrixIdentity();
 		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
 	}
 

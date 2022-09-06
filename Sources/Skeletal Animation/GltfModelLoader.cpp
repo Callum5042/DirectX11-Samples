@@ -1,5 +1,6 @@
 #include "GltfModelLoader.h"
 #include <fstream>
+#include <map>
 
 namespace
 {
@@ -33,6 +34,21 @@ namespace
 		float m20, m21, m22, m23;
 		float m30, m31, m32, m33;
 	};
+
+	struct Scale
+	{
+		float x;
+		float y;
+		float z;
+	};
+
+	struct Quaternion
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
 }
 
 GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
@@ -58,11 +74,11 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 			continue;
 
 		// Model data
-		DX::ModelObjectData object_data = {};
+		DX::Subset object_data = {};
 
 		// Load transformation
 		auto transformation_matrix = LoadTransformation(node);
-		object_data.transformation = transformation_matrix;
+		// object_data.transformation = transformation_matrix;
 
 		// Read mesh
 		auto mesh = m_Document["meshes"].at(mesh_index.value());
@@ -77,7 +93,7 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		UINT vertex_count = LoadVertices(mesh_primitives.value());
 
 		// Set base vertex
-		object_data.base_vertex = vertex_total;
+		object_data.baseVertex = vertex_total;
 
 		// Increase total vertex
 		vertex_total += vertex_count;
@@ -87,8 +103,8 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		UINT index_count = LoadIndices(mesh_indices_index.value());
 
 		// Set index data
-		object_data.index_start = index_total;
-		object_data.index_count = index_count;
+		object_data.startIndex = index_total;
+		object_data.totalIndex = index_count;
 
 		// Increase total index so we know when the next object index start is
 		index_total += index_count;
@@ -96,7 +112,7 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		// Load joint data
 		auto skin_index = node["skin"].get_int64();
 		auto bones = LoadSkin(skin_index.value());
-		object_data.bones = bones;
+		m_Data.bones = bones;
 
 		// Store the model object data
 		m_Data.model_object_data.push_back(object_data);
@@ -109,6 +125,103 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		auto channels = animation["channels"];
 		auto samplers = animation["samplers"];
 
+		std::map<int, std::vector<float>> times;
+		std::map<int, std::vector<Position>> translations;
+		std::map<int, std::vector<Scale>> scales;
+		std::map<int, std::vector<Quaternion>> rotations;
+
+		// Set channels
+		for (auto channel_iterator = channels.begin(); channel_iterator != channels.end(); ++channel_iterator)
+		{
+			auto channel = (*channel_iterator);
+
+			// Channel details
+			auto bone_index = channel["target"]["node"].get_int64();
+			auto path = channel["target"]["path"].get_string().value();
+			auto sampler_index = channel["sampler"].get_int64();
+
+			// Sampler details
+			auto sampler = animation["samplers"].at(sampler_index.value());
+			auto input_index = sampler["input"].get_int64();
+			auto output_index = sampler["output"].get_int64();
+			auto interpolation = sampler["interpolation"].get_string();
+
+			// Input value
+			auto input_accessor = m_Document["accessors"].at(input_index.value());
+			auto input_accessor_count = input_accessor["count"].get_int64();
+			std::vector<char> input_buffer = LoadBuffer(input_accessor["bufferView"].get_int64().value());
+
+			float* raw_input_data = reinterpret_cast<float*>(input_buffer.data());
+			std::vector<float> time_frame_data(raw_input_data, raw_input_data + input_accessor_count.value());
+
+			times[bone_index.value()] = time_frame_data;
+
+			// Output
+			auto output_accessor = m_Document["accessors"].at(output_index.value());
+			auto output_accessor_count = output_accessor["count"].get_int64();
+			auto output_accessor_type = output_accessor["type"].get_string().value();
+
+			if (path == "translation")
+			{
+				std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
+				Position* raw_data = reinterpret_cast<Position*>(buffer.data());
+				std::vector<Position> data(raw_data, raw_data + output_accessor_count.value());
+
+				for (auto& d : data)
+				{
+					//auto v = DirectX::XMVectorSet(d.x, d.y, d.z, 1.0f);
+					translations[bone_index.value()].push_back(d);
+				}
+			}
+			else if (path == "scale")
+			{
+				std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
+				Scale* raw_data = reinterpret_cast<Scale*>(buffer.data());
+				std::vector<Scale> data(raw_data, raw_data + output_accessor_count.value());
+
+				for (auto& d : data)
+				{
+					//auto v = DirectX::XMVectorSet(d.x, d.y, d.z, 1.0f);
+					scales[bone_index.value()].push_back(d);
+				}
+			}
+			else if (path == "rotation")
+			{
+				std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
+				Quaternion* raw_data = reinterpret_cast<Quaternion*>(buffer.data());
+				std::vector<Quaternion> data(raw_data, raw_data + output_accessor_count.value());
+
+				for (auto& d : data)
+				{
+					//auto v = DirectX::XMVectorSet(d.x, d.y, d.z, d.w);
+					rotations[bone_index.value()].push_back(d);
+				}
+			}
+		}
+
+		// Turn data into framedata
+		DX::AnimationClip clip;
+		clip.BoneAnimations.resize(times.size());
+		for (int i = 0; i < times.size(); ++i)
+		{
+			for (unsigned k = 0; k < times[i].size(); ++k)
+			{
+				auto time = times[i][k];
+				auto pos = translations[i][k];
+				auto rotation = rotations[i][k];
+				auto scale = scales[i][k];
+
+				DX::Keyframe frame;
+				frame.TimePos = static_cast<float>(time * 1000.0f);
+				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
+				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
+				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
+
+				clip.BoneAnimations[times.size() - i - 1].Keyframes.push_back(frame);
+			}
+		}
+
+		m_Data.animationClip = clip;
 	}
 
 	return m_Data;
@@ -149,16 +262,16 @@ UINT GltfModelLoader::LoadVertices(simdjson::dom::element& primitive)
 		vertex.z = position[i].z;
 
 		// Joint
-		vertex.joint_x = joints[i].x;
-		vertex.joint_y = joints[i].y;
-		vertex.joint_z = joints[i].z;
-		vertex.joint_w = joints[i].w;
+		vertex.bone[0] = joints[i].x;
+		vertex.bone[1] = joints[i].y;
+		vertex.bone[2] = joints[i].z;
+		vertex.bone[3] = joints[i].w;
 
 		// Weight
-		vertex.weight_x = weights[i].x;
-		vertex.weight_y = weights[i].y;
-		vertex.weight_z = weights[i].z;
-		vertex.weight_w = weights[i].w;
+		vertex.weight[0] = weights[i].x;
+		vertex.weight[1] = weights[i].y;
+		vertex.weight[2] = weights[i].z;
+		vertex.weight[3] = weights[i].w;
 
 		m_Data.vertices.push_back(vertex);
 	}
@@ -252,9 +365,9 @@ DirectX::XMMATRIX GltfModelLoader::LoadTransformation(simdjson::dom::element& no
 	return world;
 }
 
-std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
+std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 {
-	std::vector<DX::BoneData> bones;
+	std::vector<DX::BoneInfo> bones;
 
 	// Load skin
 	auto skin = m_Document["skins"].at(skin_index);
@@ -282,7 +395,7 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 	auto joints = skin["joints"].get_array();
 	for (auto it = joints.begin(); it != joints.end(); ++it)
 	{
-		DX::BoneData bone = {};
+		DX::BoneInfo bone = {};
 
 		// Load bone data from node
 		auto index = (*it).get_int64();
@@ -323,12 +436,9 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 							  m.m20, m.m21, m.m22, m.m23,
 							  m.m30, m.m31, m.m32, m.m33);
 
-		// matrix = DirectX::XMMatrixMultiply(matrix, ibm);
-
 		// Fill struct
 		bone.name = name;
-		bone.matrix = matrix;
-		bone.ibm = ibm;
+		bone.offset = ibm;
 
 		bones.push_back(bone);
 
@@ -340,13 +450,28 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 	{
 		for (auto& child_index : bone.children)
 		{
-			auto child_bone = std::find_if(bones.begin(), bones.end(), [&](const DX::BoneData& bone)
+			auto child_bone = std::find_if(bones.begin(), bones.end(), [&](const DX::BoneInfo& bone)
 			{
 				return (bone.bone_index == child_index);
 			});
 
-			(*child_bone).parent = &bone;
+			(*child_bone).parentName = bone.name;
 		}
+	}
+
+	for (int i = 0; i < bones.size(); ++i)
+	{
+		int parentId = 0;
+		for (int j = 0; j < bones.size(); ++j)
+		{
+			if (bones[i].parentName == bones[j].name)
+			{
+				parentId = j;
+				break;
+			}
+		}
+
+		bones[i].parentId = parentId;
 	}
 
 	return bones;

@@ -3,7 +3,7 @@
 
 DX::Camera::Camera(int width, int height)
 {
-	constexpr auto pitch_radians = DirectX::XMConvertToRadians(30.0f);
+	constexpr auto pitch_radians = DirectX::XMConvertToRadians(0.0f);
 	Rotate(pitch_radians, 0.0f);
 
 	m_AspectRatio = static_cast<float>(width) / height;
@@ -24,7 +24,7 @@ void DX::Camera::Rotate(float pitch_radians, float yaw_radians)
 
 	// Calculate camera's view
 	auto eye = position;
-	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	auto at = DirectX::XMVectorSet(0.0f, 4.0f, 0.0f, 0.0f);
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_View = DirectX::XMMatrixLookAtLH(eye, at, up);
 }
