@@ -48,4 +48,7 @@ private:
 
 	// Load skin
 	std::vector<DX::BoneInfo> LoadSkin(int64_t skin_index);
+
+	// Animations
+	void LoadAnimations();
 };

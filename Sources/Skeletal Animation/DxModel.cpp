@@ -158,7 +158,6 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 
 		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
-		//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 	}
 	else if (t >= Keyframes.back().TimePos)
 	{
@@ -168,7 +167,6 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 
 		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
-		//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 	}
 	else
 	{
@@ -193,7 +191,6 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 
 				DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 				M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
-				//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 
 				break;
 			}

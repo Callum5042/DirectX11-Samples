@@ -118,111 +118,7 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 		m_Data.model_object_data.push_back(object_data);
 	}
 
-	// Animations
-	for (auto animation : m_Document["animations"])
-	{
-		auto name = animation["name"].get_string();
-		auto channels = animation["channels"];
-		auto samplers = animation["samplers"];
-
-		std::map<int, std::vector<float>> times;
-		std::map<int, std::vector<Position>> translations;
-		std::map<int, std::vector<Scale>> scales;
-		std::map<int, std::vector<Quaternion>> rotations;
-
-		// Set channels
-		for (auto channel_iterator = channels.begin(); channel_iterator != channels.end(); ++channel_iterator)
-		{
-			auto channel = (*channel_iterator);
-
-			// Channel details
-			auto bone_index = channel["target"]["node"].get_int64();
-			auto path = channel["target"]["path"].get_string().value();
-			auto sampler_index = channel["sampler"].get_int64();
-
-			// Sampler details
-			auto sampler = animation["samplers"].at(sampler_index.value());
-			auto input_index = sampler["input"].get_int64();
-			auto output_index = sampler["output"].get_int64();
-			auto interpolation = sampler["interpolation"].get_string();
-
-			// Input value
-			auto input_accessor = m_Document["accessors"].at(input_index.value());
-			auto input_accessor_count = input_accessor["count"].get_int64();
-			std::vector<char> input_buffer = LoadBuffer(input_accessor["bufferView"].get_int64().value());
-
-			float* raw_input_data = reinterpret_cast<float*>(input_buffer.data());
-			std::vector<float> time_frame_data(raw_input_data, raw_input_data + input_accessor_count.value());
-
-			times[bone_index.value()] = time_frame_data;
-
-			// Output
-			auto output_accessor = m_Document["accessors"].at(output_index.value());
-			auto output_accessor_count = output_accessor["count"].get_int64();
-			auto output_accessor_type = output_accessor["type"].get_string().value();
-
-			if (path == "translation")
-			{
-				std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
-				Position* raw_data = reinterpret_cast<Position*>(buffer.data());
-				std::vector<Position> data(raw_data, raw_data + output_accessor_count.value());
-
-				for (auto& d : data)
-				{
-					//auto v = DirectX::XMVectorSet(d.x, d.y, d.z, 1.0f);
-					translations[bone_index.value()].push_back(d);
-				}
-			}
-			else if (path == "scale")
-			{
-				std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
-				Scale* raw_data = reinterpret_cast<Scale*>(buffer.data());
-				std::vector<Scale> data(raw_data, raw_data + output_accessor_count.value());
-
-				for (auto& d : data)
-				{
-					//auto v = DirectX::XMVectorSet(d.x, d.y, d.z, 1.0f);
-					scales[bone_index.value()].push_back(d);
-				}
-			}
-			else if (path == "rotation")
-			{
-				std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
-				Quaternion* raw_data = reinterpret_cast<Quaternion*>(buffer.data());
-				std::vector<Quaternion> data(raw_data, raw_data + output_accessor_count.value());
-
-				for (auto& d : data)
-				{
-					//auto v = DirectX::XMVectorSet(d.x, d.y, d.z, d.w);
-					rotations[bone_index.value()].push_back(d);
-				}
-			}
-		}
-
-		// Turn data into framedata
-		DX::AnimationClip clip;
-		clip.BoneAnimations.resize(times.size());
-		for (int i = 0; i < times.size(); ++i)
-		{
-			for (unsigned k = 0; k < times[i].size(); ++k)
-			{
-				auto time = times[i][k];
-				auto pos = translations[i][k];
-				auto rotation = rotations[i][k];
-				auto scale = scales[i][k];
-
-				DX::Keyframe frame;
-				frame.TimePos = static_cast<float>(time * 1000.0f);
-				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
-				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
-				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
-
-				clip.BoneAnimations[times.size() - i - 1].Keyframes.push_back(frame);
-			}
-		}
-
-		m_Data.animationClip = clip;
-	}
+	LoadAnimations();
 
 	return m_Data;
 }
@@ -386,9 +282,7 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 	auto bufferView_index = accessor["bufferView"].get_int64();
 	std::vector<char> buffer = LoadBuffer(bufferView_index.value());
-
 	InverseBindMatrix* raw_inverseBindMatrix = reinterpret_cast<InverseBindMatrix*>(buffer.data());
-	// std::vector<InverseBindMatrix> inverseBindMatrix(raw_inverseBindMatrix, raw_inverseBindMatrix + count.value());
 
 	// List of joints
 	int index_count = 0;
@@ -399,7 +293,7 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 		// Load bone data from node
 		auto index = (*it).get_int64();
-		bone.bone_index = index.value();
+		bone.bone_index = static_cast<int>(index.value());
 		auto node = m_Document["nodes"].at(index.value());
 
 		// Get bone name
@@ -411,7 +305,7 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 		{
 			for (auto bone_it = child_bones.begin(); bone_it != child_bones.end(); ++bone_it)
 			{
-				auto bone_index = (*bone_it).get_int64().value();
+				auto bone_index = static_cast<int>((*bone_it).get_int64().value());
 				bone.children.push_back(bone_index);
 			}
 		}
@@ -475,4 +369,94 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 	}
 
 	return bones;
+}
+
+void GltfModelLoader::LoadAnimations()
+{
+	// Animations
+	for (auto animation : m_Document["animations"])
+	{
+		auto name = animation["name"].get_string();
+		auto channels = animation["channels"];
+		auto samplers = animation["samplers"];
+
+		std::map<int, std::vector<float>> times;
+		std::map<int, std::vector<Position>> translations;
+		std::map<int, std::vector<Scale>> scales;
+		std::map<int, std::vector<Quaternion>> rotations;
+
+		// Set channels
+		for (auto channel_iterator = channels.begin(); channel_iterator != channels.end(); ++channel_iterator)
+		{
+			auto channel = (*channel_iterator);
+
+			// Channel details
+			auto bone_index = static_cast<int>(channel["target"]["node"].get_int64().value());
+			auto path = channel["target"]["path"].get_string().value();
+			auto sampler_index = channel["sampler"].get_int64();
+
+			// Sampler details
+			auto sampler = animation["samplers"].at(sampler_index.value());
+			auto input_index = sampler["input"].get_int64();
+			auto output_index = sampler["output"].get_int64();
+			auto interpolation = sampler["interpolation"].get_string();
+
+			// Input value
+			auto input_accessor = m_Document["accessors"].at(input_index.value());
+			auto input_accessor_count = input_accessor["count"].get_int64();
+			std::vector<char> input_buffer = LoadBuffer(input_accessor["bufferView"].get_int64().value());
+
+			float* raw_input_data = reinterpret_cast<float*>(input_buffer.data());
+			std::vector<float> time_frame_data(raw_input_data, raw_input_data + input_accessor_count.value());
+			times[bone_index] = time_frame_data;
+
+			// Output
+			auto output_accessor = m_Document["accessors"].at(output_index.value());
+			auto output_accessor_count = output_accessor["count"].get_int64();
+			std::vector<char> buffer = LoadBuffer(output_accessor["bufferView"].get_int64().value());
+
+			if (path == "translation")
+			{
+				Position* raw_data = reinterpret_cast<Position*>(buffer.data());
+				std::vector<Position> data(raw_data, raw_data + output_accessor_count.value());
+				translations[bone_index] = data;
+			}
+			else if (path == "scale")
+			{
+				Scale* raw_data = reinterpret_cast<Scale*>(buffer.data());
+				std::vector<Scale> data(raw_data, raw_data + output_accessor_count.value());
+				scales[bone_index] = data;
+			}
+			else if (path == "rotation")
+			{
+				Quaternion* raw_data = reinterpret_cast<Quaternion*>(buffer.data());
+				std::vector<Quaternion> data(raw_data, raw_data + output_accessor_count.value());
+				rotations[bone_index] = data;
+			}
+		}
+
+		// Turn data into framedata
+		DX::AnimationClip clip;
+		clip.BoneAnimations.resize(times.size());
+		for (int i = 0; i < times.size(); ++i)
+		{
+			for (unsigned k = 0; k < times[i].size(); ++k)
+			{
+				auto time = times[i][k];
+				auto position = translations[i][k];
+				auto rotation = rotations[i][k];
+				auto scale = scales[i][k];
+
+				DX::Keyframe frame;
+				frame.TimePos = static_cast<float>(time * 1000.0f);
+				frame.Translation = DirectX::XMFLOAT3(position.x, position.y, position.z);
+				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
+				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
+
+				clip.BoneAnimations[times.size() - i - 1].Keyframes.push_back(frame);
+			}
+		}
+
+		m_Data.animationClip = clip;
+	}
 }

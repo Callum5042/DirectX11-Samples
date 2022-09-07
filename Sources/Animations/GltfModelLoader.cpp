@@ -103,13 +103,7 @@ GltfFileData GltfModelLoader::Load(const std::filesystem::path path)
 	}
 
 	// Animations
-	for (auto animation : m_Document["animations"])
-	{
-		auto name = animation["name"].get_string();
-		auto channels = animation["channels"];
-		auto samplers = animation["samplers"];
-
-	}
+	LoadAnimations();
 
 	return m_Data;
 }
@@ -273,9 +267,7 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 	auto bufferView_index = accessor["bufferView"].get_int64();
 	std::vector<char> buffer = LoadBuffer(bufferView_index.value());
-
 	InverseBindMatrix* raw_inverseBindMatrix = reinterpret_cast<InverseBindMatrix*>(buffer.data());
-	// std::vector<InverseBindMatrix> inverseBindMatrix(raw_inverseBindMatrix, raw_inverseBindMatrix + count.value());
 
 	// List of joints
 	int index_count = 0;
@@ -286,7 +278,7 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 		// Load bone data from node
 		auto index = (*it).get_int64();
-		bone.bone_index = index.value();
+		bone.bone_index = (int)index.value();
 		auto node = m_Document["nodes"].at(index.value());
 
 		// Get bone name
@@ -299,7 +291,7 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 			for (auto bone_it = child_bones.begin(); bone_it != child_bones.end(); ++bone_it)
 			{
 				auto bone_index = (*bone_it).get_int64().value();
-				bone.children.push_back(bone_index);
+				bone.children.push_back((int)bone_index);
 			}
 		}
 
@@ -323,13 +315,10 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 							  m.m20, m.m21, m.m22, m.m23,
 							  m.m30, m.m31, m.m32, m.m33);
 
-		// matrix = DirectX::XMMatrixMultiply(matrix, ibm);
-
 		// Fill struct
 		bone.name = name;
 		bone.matrix = matrix;
 		bone.ibm = ibm;
-
 		bones.push_back(bone);
 
 		index_count++;
@@ -350,4 +339,14 @@ std::vector<DX::BoneData> GltfModelLoader::LoadSkin(int64_t skin_index)
 	}
 
 	return bones;
+}
+
+void GltfModelLoader::LoadAnimations()
+{
+	for (auto animation : m_Document["animations"])
+	{
+		auto name = animation["name"].get_string();
+		auto channels = animation["channels"];
+		auto samplers = animation["samplers"];
+	}
 }
