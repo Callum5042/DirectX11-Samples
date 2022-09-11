@@ -38,6 +38,9 @@ int Application::Execute()
     // Starts the timer
     m_Timer.Start();
 
+    // Set wireframe on
+    m_DxRenderer->ToggleWireframe(true);
+
     // Main application event loop
     SDL_Event e = {};
     while (e.type != SDL_QUIT)
