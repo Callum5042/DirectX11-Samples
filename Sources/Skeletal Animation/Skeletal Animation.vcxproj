@@ -201,6 +201,7 @@ xcopy /e /v /i /y "$(SolutionDir)External\Assimp\Lib\assimp-vc142-mtd.dll" "$(So
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DxCamera.cpp" />
+    <ClCompile Include="DxCube.cpp" />
     <ClCompile Include="DxModel.cpp" />
     <ClCompile Include="DxShader.cpp" />
     <ClCompile Include="GltfModelLoader.cpp" />
@@ -213,6 +214,7 @@ xcopy /e /v /i /y "$(SolutionDir)External\Assimp\Lib\assimp-vc142-mtd.dll" "$(So
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="DxCamera.h" />
+    <ClInclude Include="DxCube.h" />
     <ClInclude Include="DxModel.h" />
     <ClInclude Include="DxRenderer.h" />
     <ClInclude Include="DxShader.h" />

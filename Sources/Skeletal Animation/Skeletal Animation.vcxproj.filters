@@ -51,6 +51,9 @@
     <ClCompile Include="GltfModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DxCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -78,6 +81,9 @@
       <Filter>Third-Party</Filter>
     </ClInclude>
     <ClInclude Include="GltfModelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DxCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

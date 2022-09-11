@@ -19,20 +19,20 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 void DX::Model::Create()
 {
 	// Load data
-	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
+	ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
 
 	GltfModelLoader loader;
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
-	auto fileData = loader.Load("..\\..\\Resources\\Models\\test.gltf");
+	//auto fileData = loader.Load("..\\..\\Resources\\Models\\test.gltf");
 
-	m_Mesh.vertices = fileData.vertices;
+	/*m_Mesh.vertices = fileData.vertices;
 	m_Mesh.indices = fileData.indices;
 	m_Mesh.subsets = fileData.model_object_data;
 	m_Mesh.bones = fileData.bones;
-	m_Mesh.animations["Take1"] = fileData.animationClip;
+	m_Mesh.animations["Take1"] = fileData.animationClip;*/
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -66,6 +66,8 @@ void DX::Model::Update(float dt)
 	}
 
 	// Transform bone
+
+	finalTransform.clear();
 	BoneBuffer bone_buffer = {};
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
@@ -74,7 +76,10 @@ void DX::Model::Update(float dt)
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
 
 		//matrix = DirectX::XMMatrixIdentity();
+
+
 		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
+		finalTransform.push_back(toRoot);
 	}
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
