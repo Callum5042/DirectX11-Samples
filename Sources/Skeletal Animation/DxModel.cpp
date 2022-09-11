@@ -19,9 +19,10 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 void DX::Model::Create()
 {
 	// Load data
-	ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
-	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
+	ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\test.gltf", &m_Mesh);
 
 	GltfModelLoader loader;
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
@@ -39,15 +40,38 @@ void DX::Model::Create()
 	CreateIndexBuffer();
 }
 
+void CalculateAnimationPose(std::vector<DX::BoneInfo>& bones, std::vector<DirectX::XMMATRIX>& inMatrices, std::vector<DirectX::XMMATRIX>& outMatrices)
+{
+	std::vector<DirectX::XMMATRIX> localTransform(bones.size());
+	std::vector<DirectX::XMMATRIX> modelTransform(bones.size());
+
+	for (int i = 0; i < bones.size(); ++i)
+	{
+		localTransform[i] = bones[i].transform * inMatrices[i];
+	}
+
+	modelTransform[0] = localTransform[0];
+	for (int i = 1; i < bones.size(); ++i)
+	{
+		int parent = bones[i].parentId;
+		modelTransform[i] = modelTransform[parent] * localTransform[i];
+	}
+
+	for (int i = 0; i < bones.size(); ++i)
+	{
+		outMatrices[i] = modelTransform[i] * bones[i].offset;
+	}
+}
+
 void DX::Model::Update(float dt)
 {
 	static float TimeInSeconds = 0.0f;
 	TimeInSeconds += dt * 100.0f;
-	 
+	// 
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
-	// Animation
+	//// Animation
 	auto clip = m_Mesh.animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 	if (TimeInSeconds > clip->second.GetClipEndTime())

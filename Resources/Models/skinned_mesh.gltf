@@ -221,9 +221,9 @@
         {
             "bufferView" : 7,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "max" : [
-                0.041666666666666664
+                0.08333333333333333
             ],
             "min" : [
                 0.041666666666666664
@@ -233,37 +233,37 @@
         {
             "bufferView" : 8,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "type" : "VEC3"
         },
         {
             "bufferView" : 9,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "type" : "VEC4"
         },
         {
             "bufferView" : 10,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "type" : "VEC3"
         },
         {
             "bufferView" : 11,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "type" : "VEC3"
         },
         {
             "bufferView" : 12,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "type" : "VEC4"
         },
         {
             "bufferView" : 13,
             "componentType" : 5126,
-            "count" : 1,
+            "count" : 2,
             "type" : "VEC3"
         }
     ],
@@ -305,43 +305,43 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 4,
+            "byteLength" : 8,
             "byteOffset" : 1912
         },
         {
             "buffer" : 0,
-            "byteLength" : 12,
-            "byteOffset" : 1916
+            "byteLength" : 24,
+            "byteOffset" : 1920
         },
         {
             "buffer" : 0,
-            "byteLength" : 16,
-            "byteOffset" : 1928
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 12,
+            "byteLength" : 32,
             "byteOffset" : 1944
         },
         {
             "buffer" : 0,
-            "byteLength" : 12,
-            "byteOffset" : 1956
+            "byteLength" : 24,
+            "byteOffset" : 1976
         },
         {
             "buffer" : 0,
-            "byteLength" : 16,
-            "byteOffset" : 1968
+            "byteLength" : 24,
+            "byteOffset" : 2000
         },
         {
             "buffer" : 0,
-            "byteLength" : 12,
-            "byteOffset" : 1984
+            "byteLength" : 32,
+            "byteOffset" : 2024
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 24,
+            "byteOffset" : 2056
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 1996,
+            "byteLength" : 2080,
             "uri" : "skinned_mesh.bin"
         }
     ]

@@ -107,7 +107,8 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 			boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
 			meshData->bones.push_back(boneInfo);
 
-			meshData->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);;
+			meshData->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
+			meshData->bones[bone_index].transform = ConvertToDirectXMatrix(ai_bone->mNode->mTransformation);
 
 			// Vertex weight data
 			for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
@@ -146,6 +147,10 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 	}
 
 	// Load animations
+	auto animation = scene->mAnimations[0];
+	float duration = animation->mDuration;
+	float ticksPerSecond = animation->mTicksPerSecond;
+
 	for (auto animation_index = 0u; animation_index < scene->mNumAnimations; ++animation_index)
 	{
 		auto animation = scene->mAnimations[animation_index];
@@ -170,9 +175,23 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
 				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
 
-				clip.BoneAnimations[i].Keyframes.push_back(frame);
+				clip.BoneAnimationsMap[name].Keyframes.push_back(frame);
 			}
 		}
+
+		// Sort it manually - THIS IS THE FIX - The animation don't always read in the same order as the bones was so goes funky
+		clip.BoneAnimations[0] = clip.BoneAnimationsMap["Root"];
+
+		clip.BoneAnimations[1] = clip.BoneAnimationsMap["RightHip"];
+		clip.BoneAnimations[2] = clip.BoneAnimationsMap["RightLeg"];
+		clip.BoneAnimations[3] = clip.BoneAnimationsMap["RightLowerLeg"];
+
+		clip.BoneAnimations[4] = clip.BoneAnimationsMap["Spine"];
+		clip.BoneAnimations[5] = clip.BoneAnimationsMap["Head"];
+
+		clip.BoneAnimations[6] = clip.BoneAnimationsMap["LeftHip"];
+		clip.BoneAnimations[7] = clip.BoneAnimationsMap["LeftLeg"];
+		clip.BoneAnimations[8] = clip.BoneAnimationsMap["LeftLowerLeg"];
 
 		std::string animation_name = animation->mName.C_Str();
 		meshData->animations["Take1"] = clip;

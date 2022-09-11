@@ -84,6 +84,7 @@ namespace DX
 		void Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms)const;
 
 		std::vector<BoneAnimation> BoneAnimations;
+		std::map<std::string, BoneAnimation> BoneAnimationsMap;
 	};
 
 	struct BoneInfo
@@ -92,6 +93,7 @@ namespace DX
 		std::string name;
 		std::string parentName;
 		DirectX::XMMATRIX offset;
+		DirectX::XMMATRIX transform;
 
 		int bone_index;
 		std::vector<int> children;

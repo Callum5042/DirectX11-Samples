@@ -104,7 +104,7 @@ int Applicataion::Execute()
             // Render the model
             m_DxModel->Render();
 
-            for (auto& matrix : m_DxModel->finalTransform)
+            /*for (auto& matrix : m_DxModel->finalTransform)
             {
                 DX::WorldBuffer buffer = {};
                 buffer.world = DirectX::XMMatrixTranspose(matrix);
@@ -113,7 +113,7 @@ int Applicataion::Execute()
 
                 m_DxShader->UpdateWorldConstantBuffer(buffer);
                 cube.Render();
-            }
+            }*/
 
             // Display the rendered scene
             m_DxRenderer->Present();
