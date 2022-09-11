@@ -23,12 +23,9 @@
             "doubleSided" : true,
             "name" : "Material",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 0
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.4000000059604645
             }
@@ -43,19 +40,33 @@
                         "POSITION" : 0,
                         "NORMAL" : 1,
                         "TANGENT" : 2,
-                        "TEXCOORD_0" : 3
+                        "TEXCOORD_0" : 3,
+                        "COLOR_0" : 4
                     },
-                    "indices" : 4,
+                    "indices" : 5,
                     "material" : 0
                 }
             ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "crate_diffuse",
+            "uri" : "crate_diffuse.png"
         }
     ],
     "accessors" : [
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 16,
+            "count" : 24,
             "max" : [
                 1,
                 1,
@@ -63,7 +74,7 @@
             ],
             "min" : [
                 -1,
-                0,
+                -1,
                 -1
             ],
             "type" : "VEC3"
@@ -71,59 +82,77 @@
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 16,
+            "count" : 24,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 16,
+            "count" : 24,
             "type" : "VEC4"
         },
         {
             "bufferView" : 3,
             "componentType" : 5126,
-            "count" : 16,
+            "count" : 24,
             "type" : "VEC2"
         },
         {
             "bufferView" : 4,
             "componentType" : 5123,
-            "count" : 18,
+            "count" : 24,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5123,
+            "count" : 36,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 192,
+            "byteLength" : 288,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 288
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 384,
+            "byteOffset" : 576
+        },
+        {
+            "buffer" : 0,
             "byteLength" : 192,
-            "byteOffset" : 192
+            "byteOffset" : 960
         },
         {
             "buffer" : 0,
-            "byteLength" : 256,
-            "byteOffset" : 384
+            "byteLength" : 192,
+            "byteOffset" : 1152
         },
         {
             "buffer" : 0,
-            "byteLength" : 128,
-            "byteOffset" : 640
-        },
+            "byteLength" : 72,
+            "byteOffset" : 1344
+        }
+    ],
+    "samplers" : [
         {
-            "buffer" : 0,
-            "byteLength" : 36,
-            "byteOffset" : 768
+            "magFilter" : 9729,
+            "minFilter" : 9987
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 804,
-            "uri" : "pyramid.bin"
+            "byteLength" : 1416,
+            "uri" : "cube.bin"
         }
     ]
 }

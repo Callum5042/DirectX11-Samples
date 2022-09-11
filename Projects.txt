@@ -10,6 +10,7 @@
 [-] Alpha Mapping
 [x] Multi-Texturing
 [x] Bitmap-Fonts
+[x] Model Loading
 
 === Advanced ===
 [x] Heightmap

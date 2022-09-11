@@ -9,22 +9,24 @@
 
 #include "ModelLoader.h"
 #include "GltfModelLoader.h"
+using namespace DX;
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	World = DirectX::XMMatrixTranslation(0.0f, -3.0f, 0.0f);
+	World = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
 
 void DX::Model::Create()
 {
 	// Load data
-	// ModelLoader::Load("..\\..\\Resources\\Models\\complex_post.glb", &m_Mesh);
-	ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
 
 	GltfModelLoader loader;
-	auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
+	//auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
+	auto fileData = loader.Load("..\\..\\Resources\\Models\\test.gltf");
 
 	m_Mesh.vertices = fileData.vertices;
 	m_Mesh.indices = fileData.indices;
@@ -45,7 +47,7 @@ void DX::Model::Update(float dt)
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
-	//// Animation
+	// Animation
 	auto clip = m_Mesh.animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 	if (TimeInSeconds > clip->second.GetClipEndTime())
