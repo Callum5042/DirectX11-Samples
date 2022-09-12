@@ -111,6 +111,7 @@ namespace DX
 		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
 		std::vector<BoneInfo> bones;
+		std::map<std::string, BoneInfo> bonemap;
 		std::map<std::string, AnimationClip> animations;
 		std::vector<Subset> subsets;
 	};

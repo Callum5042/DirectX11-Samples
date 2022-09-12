@@ -29,11 +29,11 @@ void DX::Model::Create()
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\test.gltf");
 
-	/*m_Mesh.vertices = fileData.vertices;
-	m_Mesh.indices = fileData.indices;
-	m_Mesh.subsets = fileData.model_object_data;
-	m_Mesh.bones = fileData.bones;
-	m_Mesh.animations["Take1"] = fileData.animationClip;*/
+	//m_Mesh.vertices = fileData.vertices;
+	//m_Mesh.indices = fileData.indices;
+	//m_Mesh.subsets = fileData.model_object_data;
+	//m_Mesh.bones = fileData.bones;
+	//m_Mesh.animations["Take1"] = fileData.animationClip;
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -65,13 +65,56 @@ void CalculateAnimationPose(std::vector<DX::BoneInfo>& bones, std::vector<Direct
 
 void DX::Model::Update(float dt)
 {
+	//static float TimeInSeconds = 0.0f;
+	//TimeInSeconds += dt * 100.0f;
+	//// 
+	//auto numBones = m_Mesh.bones.size();
+	//std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
+
+	////// Animation
+	//auto clip = m_Mesh.animations.find("Take1");
+	//clip->second.Interpolate(TimeInSeconds, toParentTransforms);
+	//if (TimeInSeconds > clip->second.GetClipEndTime())
+	//{
+	//	TimeInSeconds = 0.0f;
+	//}
+
+	//// Transform to root
+	//std::vector<DirectX::XMMATRIX> toRootTransforms(numBones);
+	//toRootTransforms[0] = toParentTransforms[0];
+	//for (UINT i = 1; i < numBones; ++i)
+	//{
+	//	DirectX::XMMATRIX toParent = toParentTransforms[i];
+	//	DirectX::XMMATRIX parentToRoot = toRootTransforms[m_Mesh.bones[i].parentId];
+	//	toRootTransforms[i] = XMMatrixMultiply(toParent, parentToRoot);
+	//}
+
+	//// Transform bone
+
+	//finalTransform.clear();
+	//BoneBuffer bone_buffer = {};
+	//for (size_t i = 0; i < m_Mesh.bones.size(); i++)
+	//{
+	//	DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
+	//	DirectX::XMMATRIX toRoot = toRootTransforms[i];
+	//	DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
+
+	//	bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
+	//	finalTransform.push_back(toRoot);
+	//}
+
+	//m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
+
+
+
+
 	static float TimeInSeconds = 0.0f;
 	TimeInSeconds += dt * 100.0f;
-	// 
+
 	auto numBones = m_Mesh.bones.size();
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
-	//// Animation
+	// Animation
 	auto clip = m_Mesh.animations.find("Take1");
 	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 	if (TimeInSeconds > clip->second.GetClipEndTime())
@@ -98,9 +141,6 @@ void DX::Model::Update(float dt)
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
 		DirectX::XMMATRIX toRoot = toRootTransforms[i];
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
-
-		//matrix = DirectX::XMMatrixIdentity();
-
 
 		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
 		finalTransform.push_back(toRoot);

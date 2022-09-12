@@ -144,6 +144,12 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 
 			meshData->bones[i].parentId = parentId;
 		}
+
+		// Put bones into map
+		for (auto& bone : meshData->bones)
+		{
+			meshData->bonemap[bone.name] = bone;
+		}
 	}
 
 	// Load animations
@@ -179,19 +185,13 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 			}
 		}
 
-		// Sort it manually - THIS IS THE FIX - The animation don't always read in the same order as the bones was so goes funky
-		clip.BoneAnimations[0] = clip.BoneAnimationsMap["Root"];
+		// Must put bones into array thing
+		for (int i = 0; i < meshData->bones.size(); ++i)
+		{
+			std::string name = meshData->bones[i].name;
+			clip.BoneAnimations[i] = clip.BoneAnimationsMap[name];
+		}
 
-		clip.BoneAnimations[1] = clip.BoneAnimationsMap["RightHip"];
-		clip.BoneAnimations[2] = clip.BoneAnimationsMap["RightLeg"];
-		clip.BoneAnimations[3] = clip.BoneAnimationsMap["RightLowerLeg"];
-
-		clip.BoneAnimations[4] = clip.BoneAnimationsMap["Spine"];
-		clip.BoneAnimations[5] = clip.BoneAnimationsMap["Head"];
-
-		clip.BoneAnimations[6] = clip.BoneAnimationsMap["LeftHip"];
-		clip.BoneAnimations[7] = clip.BoneAnimationsMap["LeftLeg"];
-		clip.BoneAnimations[8] = clip.BoneAnimationsMap["LeftLowerLeg"];
 
 		std::string animation_name = animation->mName.C_Str();
 		meshData->animations["Take1"] = clip;
