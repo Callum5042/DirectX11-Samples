@@ -108,7 +108,6 @@ bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 			meshData->bones.push_back(boneInfo);
 
 			meshData->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);
-			meshData->bones[bone_index].transform = ConvertToDirectXMatrix(ai_bone->mNode->mTransformation);
 
 			// Vertex weight data
 			for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
