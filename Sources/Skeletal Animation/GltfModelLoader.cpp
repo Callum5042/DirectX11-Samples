@@ -325,10 +325,12 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 		// Inverse bind
 		auto m = raw_inverseBindMatrix[index_count];
-		DirectX::XMMATRIX ibm(m.m00, m.m01, m.m02, m.m03,
-							  m.m10, m.m11, m.m12, m.m13,
-							  m.m20, m.m21, m.m22, m.m23,
-							  m.m30, m.m31, m.m32, m.m33);
+
+		// Must tranpose it to DirectX row major
+		DirectX::XMMATRIX ibm(m.m00, m.m10, m.m20, m.m30,
+							  m.m01, m.m11, m.m21, m.m31,
+							  m.m02, m.m12, m.m22, m.m32,
+							  m.m03, m.m13, m.m23, m.m33);
 
 		// Fill struct
 		bone.name = name;
