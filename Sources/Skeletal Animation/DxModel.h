@@ -6,6 +6,7 @@
 #include "DxShader.h"
 #include <cmath>
 #include <map>
+#include <string>
 
 #undef min
 #include <assimp/Importer.hpp>
@@ -93,7 +94,6 @@ namespace DX
 		std::string name;
 		std::string parentName;
 		DirectX::XMMATRIX offset;
-		DirectX::XMMATRIX transform;
 
 		int bone_index;
 		std::vector<int> children;
