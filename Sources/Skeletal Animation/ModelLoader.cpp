@@ -23,7 +23,7 @@ namespace
 bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
 {
 	Assimp::Importer importer;
-	auto scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
+	auto scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_PopulateArmatureData);
 
 	// Load model
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
