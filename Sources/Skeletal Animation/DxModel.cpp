@@ -22,18 +22,31 @@ void DX::Model::Create()
 	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
-	ModelLoader::Load("..\\..\\Resources\\Models\\test.gltf", &m_Mesh);
+	ModelLoader::Load("..\\..\\Resources\\Models\\test5.gltf", &m_Mesh);
 
 	GltfModelLoader loader;
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
 	//auto fileData = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
-	//auto fileData = loader.Load("..\\..\\Resources\\Models\\test.gltf");
+	//auto fileData = loader.Load("..\\..\\Resources\\Models\\test5.gltf");
 
 	//m_Mesh.vertices = fileData.vertices;
 	//m_Mesh.indices = fileData.indices;
 	//m_Mesh.subsets = fileData.model_object_data;
 	//m_Mesh.bones = fileData.bones;
 	//m_Mesh.animations["Take1"] = fileData.animationClip;
+
+	/*DirectX::XMVECTOR scale;
+	DirectX::XMVECTOR rotation;
+	DirectX::XMVECTOR translation;
+
+	DirectX::XMMatrixDecompose(&scale, &rotation, &translation, m_Mesh.bones[0].offset);
+
+	DirectX::XMFLOAT3 s;
+	DirectX::XMFLOAT4 r;
+	DirectX::XMFLOAT3 t;
+	DirectX::XMStoreFloat3(&s, scale);
+	DirectX::XMStoreFloat4(&r, rotation);
+	DirectX::XMStoreFloat3(&t, translation);*/
 
 	// Create buffers
 	CreateVertexBuffer();

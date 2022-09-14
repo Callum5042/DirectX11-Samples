@@ -27,12 +27,20 @@ namespace
 		float w;
 	};
 
-	struct InverseBindMatrix
+	/*struct InverseBindMatrix
 	{
 		float m00, m01, m02, m03;
 		float m10, m11, m12, m13;
 		float m20, m21, m22, m23;
 		float m30, m31, m32, m33;
+	};*/
+
+	struct InverseBindMatrix
+	{
+		float a1, a2, a3, a4;
+		float b1, b2, b3, b4;
+		float c1, c2, c3, c4;
+		float d1, d2, d3, d4;
 	};
 
 	struct Scale
@@ -281,8 +289,33 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 	auto type = accessor["type"].get_string();
 
 	auto bufferView_index = accessor["bufferView"].get_int64();
-	std::vector<char> buffer = LoadBuffer(bufferView_index.value());
-	InverseBindMatrix* raw_inverseBindMatrix = reinterpret_cast<InverseBindMatrix*>(buffer.data());
+	/*std::vector<char> buffer = LoadBuffer(bufferView_index.value());
+	InverseBindMatrix* raw_inverseBindMatrix = reinterpret_cast<InverseBindMatrix*>(buffer.data());*/
+
+	/////////////////////////////
+	// Buffer view data
+	auto vertex_buffer_view = m_Document["bufferViews"].at(bufferView_index.value());
+	auto buffer_index = vertex_buffer_view["buffer"].get_int64();
+	auto buffer_byte_length = vertex_buffer_view["byteLength"].get_int64();
+	auto buffer_byte_offset = vertex_buffer_view["byteOffset"].get_int64();
+
+	// Set buffer data
+	auto buffer = m_Document["buffers"].at(buffer_index.value());
+	auto buffer_length = buffer["byteLength"].get_int64();
+	auto buffer_uri = buffer["uri"].get_string();
+
+	// Read buffer
+	auto buffer_file = m_Path.parent_path() / buffer_uri.value();
+	std::ifstream file(buffer_file.string(), std::fstream::in | std::fstream::binary);
+	file.seekg(buffer_byte_offset.value());
+
+	std::vector<unsigned char> data;
+	data.resize(buffer_byte_length.value());
+	file.read((char*)(data.data()), buffer_byte_length.value());
+	file.close();
+
+
+	InverseBindMatrix* raw_inverseBindMatrix = reinterpret_cast<InverseBindMatrix*>(data.data());
 
 	// List of joints
 	int index_count = 0;
@@ -325,10 +358,10 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 		// Inverse bind
 		auto m = raw_inverseBindMatrix[index_count];
-		DirectX::XMMATRIX ibm(m.m00, m.m01, m.m02, m.m03,
-							  m.m10, m.m11, m.m12, m.m13,
-							  m.m20, m.m21, m.m22, m.m23,
-							  m.m30, m.m31, m.m32, m.m33);
+		DirectX::XMMATRIX ibm(m.a1, m.a2, m.a3, m.a4,
+							  m.b1, m.b2, m.b3, m.b4,
+							  m.c1, m.c2, m.c3, m.c4,
+							  m.d1, m.d2, m.d3, m.d4);
 
 		// Fill struct
 		bone.name = name;
