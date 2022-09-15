@@ -24,10 +24,10 @@ void DX::Model::Create()
 	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
 	ModelLoader::Load("..\\..\\Resources\\Models\\test5.gltf", &m_Mesh);
 
-	GltfModelLoader loader;
-	//auto fileData = loader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
-	//auto fileData = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
-	//auto fileData = loader.Load("..\\..\\Resources\\Models\\test5.gltf");
+	//GltfModelLoader gltfLoader;
+	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
+	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\3bone.gltf");
+	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\test5.gltf");
 
 	//m_Mesh.vertices = fileData.vertices;
 	//m_Mesh.indices = fileData.indices;
@@ -35,18 +35,55 @@ void DX::Model::Create()
 	//m_Mesh.bones = fileData.bones;
 	//m_Mesh.animations["Take1"] = fileData.animationClip;
 
-	/*DirectX::XMVECTOR scale;
-	DirectX::XMVECTOR rotation;
-	DirectX::XMVECTOR translation;
+	// Clear
+	m_Mesh.vertices.clear();
+	m_Mesh.indices.clear();
+	m_Mesh.subsets.clear();
 
-	DirectX::XMMatrixDecompose(&scale, &rotation, &translation, m_Mesh.bones[0].offset);
+	// Load model
+	Assimp::Loader loader;
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test5.gltf");
 
-	DirectX::XMFLOAT3 s;
-	DirectX::XMFLOAT4 r;
-	DirectX::XMFLOAT3 t;
-	DirectX::XMStoreFloat3(&s, scale);
-	DirectX::XMStoreFloat4(&r, rotation);
-	DirectX::XMStoreFloat3(&t, translation);*/
+	// Assign vertices
+	for (auto& v : model.vertices)
+	{
+		DX::Vertex vertex;
+
+		// Set position
+		vertex.x = v.x;
+		vertex.y = v.y;
+		vertex.z = v.z;
+
+		// Set bone
+		vertex.bone[0] = v.bone[0];
+		vertex.bone[1] = v.bone[1];
+		vertex.bone[2] = v.bone[2];
+		vertex.bone[3] = v.bone[3];
+
+		// Set weight
+		vertex.weight[0] = v.weight[0];
+		vertex.weight[1] = v.weight[1];
+		vertex.weight[2] = v.weight[2];
+		vertex.weight[3] = v.weight[3];
+
+		m_Mesh.vertices.push_back(vertex);
+	}
+
+	// Assign indices
+	m_Mesh.indices = model.indices;
+
+	// Assign subset
+	for (auto& s : model.subset)
+	{
+		DX::Subset subset = {};
+		subset.baseVertex = s.base_vertex;
+		subset.startIndex = s.start_index;
+		subset.totalIndex = s.total_index;
+		m_Mesh.subsets.push_back(subset);
+	}
+
+	// Assign bones
+
 
 	// Create buffers
 	CreateVertexBuffer();
