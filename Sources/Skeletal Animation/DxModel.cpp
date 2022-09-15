@@ -98,7 +98,7 @@ void DX::Model::Update(float dt)
 	}
 	else*/
 	{
-		clip->second.Frame(5, toParentTransforms);
+		clip->second.Frame(0, toParentTransforms);
 	}
 
 	// Transform to root
@@ -250,7 +250,7 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 
 void DX::BoneAnimation::Frame(int frame, DirectX::XMMATRIX& bone_transforms) const
 {
-	frame = std::clamp<int>(frame, 0, static_cast<int>(Keyframes.size())) - 1;
+	frame = std::clamp<int>(frame, 1, static_cast<int>(Keyframes.size())) - 1;
 
 	DirectX::XMVECTOR scale = DirectX::XMLoadFloat3(&Keyframes[frame].Scale);
 	DirectX::XMVECTOR translation = DirectX::XMLoadFloat3(&Keyframes[frame].Translation);
