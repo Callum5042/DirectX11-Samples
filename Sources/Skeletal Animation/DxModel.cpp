@@ -18,29 +18,6 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 
 void DX::Model::Create()
 {
-	// Load data
-	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
-	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
-	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
-	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
-
-	//GltfModelLoader gltfLoader;
-	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
-	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\3bone.gltf");
-	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\test5.gltf");
-
-	//m_Mesh.vertices = fileData.vertices;
-	//m_Mesh.indices = fileData.indices;
-	//m_Mesh.subsets = fileData.model_object_data;
-	//m_Mesh.bones = fileData.bones;
-	//m_Mesh.animations["Take1"] = fileData.animationClip;
-
-	// Clear
-	m_Mesh.vertices.clear();
-	m_Mesh.indices.clear();
-	m_Mesh.subsets.clear();
-	m_Mesh.bones.clear();
-
 	// Load model
 	Assimp::Loader loader;
 	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test2.gltf");
