@@ -22,7 +22,7 @@ void DX::Model::Create()
 	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
-	//ModelLoader::Load("..\\..\\Resources\\Models\\test2.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 
 	//GltfModelLoader gltfLoader;
 	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
@@ -94,6 +94,8 @@ void DX::Model::Create()
 		m_Mesh.bones.push_back(bone);
 	}
 
+	m_Mesh.animations["Take1"] = model.animations.begin()->second;
+
 	// Create buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
@@ -119,10 +121,7 @@ void DX::Model::Update(float dt)
 	}
 	else
 	{
-		for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
-		{
-			toParentTransforms[i] = DirectX::XMMatrixInverse(nullptr, m_Mesh.bones[i].offset);
-		}
+		
 	}
 
 	// Transform to root

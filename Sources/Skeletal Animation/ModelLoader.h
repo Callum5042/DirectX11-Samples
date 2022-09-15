@@ -66,6 +66,7 @@ namespace Assimp
 		std::vector<UINT> indices;
 		std::vector<Subset> subset;
 		std::vector<Bone> bones;
+		std::map<std::string, DX::AnimationClip> animations;
 	};
 
 	// Model loader
@@ -94,5 +95,8 @@ namespace Assimp
 
 		// Load bones
 		void LoadMeshBones(const aiMesh* mesh);
+
+		// Load animations
+		void LoadAnimations(const aiScene* scene);
 	};
 }

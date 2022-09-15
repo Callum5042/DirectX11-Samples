@@ -216,6 +216,7 @@ Assimp::Model Assimp::Loader::Load(const std::string& path)
 	}
 
 	LoadMesh(scene);
+	LoadAnimations(scene);
 
 	return m_ModelData;
 }
@@ -336,4 +337,52 @@ void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 
 	// Assign to bones
 	m_ModelData.bones.insert(m_ModelData.bones.begin(), bones.begin(), bones.end());
+}
+
+void Assimp::Loader::LoadAnimations(const aiScene* scene)
+{
+	for (UINT i = 0; i < scene->mNumAnimations; ++i)
+	{
+		const aiAnimation* animation = scene->mAnimations[i];
+		std::string name = animation->mName.C_Str();
+
+		// Animation clip
+		DX::AnimationClip clip;
+		clip.BoneAnimations.resize(animation->mNumChannels);
+
+		// Channel is the bones being animated
+		for (UINT j = 0; j < animation->mNumChannels; ++j)
+		{
+			const aiNodeAnim* channel = animation->mChannels[j];
+			std::string bone_name = channel->mNodeName.C_Str();
+			int bone_id = bonemap[bone_name].id;
+
+			for (UINT k = 0; k < channel->mNumPositionKeys; ++k)
+			{
+				auto time = channel->mPositionKeys[k].mTime;
+				auto pos = channel->mPositionKeys[k].mValue;
+				auto rotation = channel->mRotationKeys[k].mValue;
+				auto scale = channel->mScalingKeys[k].mValue;
+
+				DX::Keyframe frame;
+				frame.TimePos = static_cast<float>(time);
+				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
+				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
+				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
+
+				// clip.BoneAnimationsMap[bone_name].Keyframes.push_back(frame);
+				clip.BoneAnimations[bone_id].Keyframes.push_back(frame);
+			}
+
+			// Must put bones into array thing
+			/*for (int i = 0; i < meshData->bones.size(); ++i)
+			{
+				std::string name = meshData->bones[i].name;
+				clip.BoneAnimations[i] = clip.BoneAnimationsMap[name];
+			}*/
+		}
+
+		// Save clip into map by name
+		m_ModelData.animations[name] = clip;
+	}
 }
