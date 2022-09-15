@@ -22,7 +22,7 @@ void DX::Model::Create()
 	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
-	ModelLoader::Load("..\\..\\Resources\\Models\\test2.gltf", &m_Mesh);
+	//ModelLoader::Load("..\\..\\Resources\\Models\\test2.gltf", &m_Mesh);
 
 	//GltfModelLoader gltfLoader;
 	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
@@ -109,10 +109,20 @@ void DX::Model::Update(float dt)
 
 	// Animation
 	auto clip = m_Mesh.animations.find("Take1");
-	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
-	if (TimeInSeconds > clip->second.GetClipEndTime())
+	if (clip != m_Mesh.animations.end())
 	{
-		TimeInSeconds = 0.0f;
+		clip->second.Interpolate(TimeInSeconds, toParentTransforms);
+		if (TimeInSeconds > clip->second.GetClipEndTime())
+		{
+			TimeInSeconds = 0.0f;
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
+		{
+			toParentTransforms[i] = DirectX::XMMatrixInverse(nullptr, m_Mesh.bones[i].offset);
+		}
 	}
 
 	// Transform to root
@@ -216,21 +226,21 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 {
 	if (t <= Keyframes.front().TimePos)
 	{
-		DirectX::XMVECTOR S = XMLoadFloat3(&Keyframes.front().Scale);
-		DirectX::XMVECTOR P = XMLoadFloat3(&Keyframes.front().Translation);
-		DirectX::XMVECTOR Q = XMLoadFloat4(&Keyframes.front().RotationQuat);
+		DirectX::XMVECTOR scale = XMLoadFloat3(&Keyframes.front().Scale);
+		DirectX::XMVECTOR translation = XMLoadFloat3(&Keyframes.front().Translation);
+		DirectX::XMVECTOR rotation = XMLoadFloat4(&Keyframes.front().RotationQuat);
 
-		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+		DirectX::XMVECTOR origin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		M = DirectX::XMMatrixAffineTransformation(scale, origin, rotation, translation);
 	}
 	else if (t >= Keyframes.back().TimePos)
 	{
-		DirectX::XMVECTOR S = XMLoadFloat3(&Keyframes.back().Scale);
-		DirectX::XMVECTOR P = XMLoadFloat3(&Keyframes.back().Translation);
-		DirectX::XMVECTOR Q = XMLoadFloat4(&Keyframes.back().RotationQuat);
+		DirectX::XMVECTOR scale = XMLoadFloat3(&Keyframes.back().Scale);
+		DirectX::XMVECTOR translation = XMLoadFloat3(&Keyframes.back().Translation);
+		DirectX::XMVECTOR rotation = XMLoadFloat4(&Keyframes.back().RotationQuat);
 
-		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+		DirectX::XMVECTOR origin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		M = DirectX::XMMatrixAffineTransformation(scale, origin, rotation, translation);
 	}
 	else
 	{
