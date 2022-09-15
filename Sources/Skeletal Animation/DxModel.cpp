@@ -20,7 +20,7 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test2.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -88,7 +88,7 @@ void DX::Model::Update(float dt)
 
 	// Animation
 	auto clip = m_Mesh.animations.find("Take1");
-	if (clip != m_Mesh.animations.end())
+	/*if (clip != m_Mesh.animations.end())
 	{
 		clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 		if (TimeInSeconds > clip->second.GetClipEndTime())
@@ -96,9 +96,9 @@ void DX::Model::Update(float dt)
 			TimeInSeconds = 0.0f;
 		}
 	}
-	else
+	else*/
 	{
-		
+		clip->second.Frame(5, toParentTransforms);
 	}
 
 	// Transform to root
@@ -248,6 +248,18 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 	}
 }
 
+void DX::BoneAnimation::Frame(int frame, DirectX::XMMATRIX& bone_transforms) const
+{
+	frame = std::clamp<int>(frame, 0, static_cast<int>(Keyframes.size())) - 1;
+
+	DirectX::XMVECTOR scale = DirectX::XMLoadFloat3(&Keyframes[frame].Scale);
+	DirectX::XMVECTOR translation = DirectX::XMLoadFloat3(&Keyframes[frame].Translation);
+	DirectX::XMVECTOR rotation = DirectX::XMLoadFloat4(&Keyframes[frame].RotationQuat);
+
+	DirectX::XMVECTOR origin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	bone_transforms = DirectX::XMMatrixAffineTransformation(scale, origin, rotation, translation);
+}
+
 float DX::AnimationClip::GetClipStartTime()const
 {
 	// Find smallest start time over all bones in this clip.
@@ -277,5 +289,13 @@ void DX::AnimationClip::Interpolate(float t, std::vector<DirectX::XMMATRIX>& bon
 	for (UINT i = 0; i < BoneAnimations.size(); ++i)
 	{
 		BoneAnimations[i].Interpolate(t, boneTransforms[i]);
+	}
+}
+
+void DX::AnimationClip::Frame(int frame, std::vector<DirectX::XMMATRIX>& bone_transforms) const
+{
+	for (UINT i = 0; i < BoneAnimations.size(); ++i)
+	{
+		BoneAnimations[i].Frame(frame, bone_transforms[i]);
 	}
 }

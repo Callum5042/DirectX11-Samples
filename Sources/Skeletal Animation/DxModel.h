@@ -69,6 +69,8 @@ namespace DX
 
 		void Interpolate(float t, DirectX::XMMATRIX& M) const;
 
+		void Frame(int frame, DirectX::XMMATRIX& bone_transforms) const;
+
 		std::vector<Keyframe> Keyframes;
 	};
 
@@ -82,7 +84,9 @@ namespace DX
 		float GetClipStartTime() const;
 		float GetClipEndTime() const;
 
-		void Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms)const;
+		void Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms) const;
+
+		void Frame(int frame, std::vector<DirectX::XMMATRIX>& bone_transforms) const;
 
 		std::vector<BoneAnimation> BoneAnimations;
 		std::map<std::string, BoneAnimation> BoneAnimationsMap;
