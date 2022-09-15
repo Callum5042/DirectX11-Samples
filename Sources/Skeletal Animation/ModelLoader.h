@@ -6,11 +6,6 @@
 #include <vector>
 #include <map>
 
-namespace ModelLoader
-{
-	bool Load(const std::string& path, DX::Mesh* mesh);
-};
-
 namespace Assimp
 {
 	// Vertex data
@@ -20,18 +15,6 @@ namespace Assimp
 		float x = 0;
 		float y = 0;
 		float z = 0;
-
-		// Bone weight
-		//float weight_x = 0;
-		//float weight_y = 0;
-		//float weight_z = 0;
-		//float weight_w = 0;
-
-		//// Bone id
-		//float bone_x = 0;
-		//float bone_y = 0;
-		//float bone_z = 0;
-		//float bone_w = 0;
 
 		// Weights
 		float weight[4] = { 0, 0, 0, 0 };

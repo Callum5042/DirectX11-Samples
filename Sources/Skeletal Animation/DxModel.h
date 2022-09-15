@@ -135,7 +135,7 @@ namespace DX
 		DirectX::XMMATRIX World;
 
 
-		Mesh m_Mesh;
+		DX::Mesh m_Mesh;
 
 
 		std::vector<DirectX::XMMATRIX> finalTransform;
