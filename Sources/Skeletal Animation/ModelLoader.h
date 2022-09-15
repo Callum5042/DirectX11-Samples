@@ -1,9 +1,10 @@
 #pragma once
 
 #include "DxModel.h"
+#include <assimp/scene.h>
 #include <string>
 #include <vector>
-#include <assimp/scene.h>
+#include <map>
 
 namespace ModelLoader
 {
@@ -42,6 +43,8 @@ namespace Assimp
 	// Bone data
 	struct Bone
 	{
+		int id = 0;
+		int parent_id = 0;
 		std::string name;
 		std::string parent_name;
 		DirectX::XMMATRIX inversebindmatrix;
@@ -77,6 +80,8 @@ namespace Assimp
 
 	private:
 		Model m_ModelData;
+
+		std::map<std::string, Assimp::Bone> bonemap;
 
 		// Load mesh data
 		void LoadMesh(const aiScene* scene);

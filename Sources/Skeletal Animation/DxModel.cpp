@@ -22,7 +22,7 @@ void DX::Model::Create()
 	//ModelLoader::Load("..\\..\\Resources\\Models\\skinned_mesh.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\3bone.gltf", &m_Mesh);
 	//ModelLoader::Load("..\\..\\Resources\\Models\\man.gltf", &m_Mesh);
-	ModelLoader::Load("..\\..\\Resources\\Models\\test5.gltf", &m_Mesh);
+	ModelLoader::Load("..\\..\\Resources\\Models\\test2.gltf", &m_Mesh);
 
 	//GltfModelLoader gltfLoader;
 	//auto fileData = gltfLoader.Load("..\\..\\Resources\\Models\\skinned_mesh.gltf");
@@ -39,10 +39,11 @@ void DX::Model::Create()
 	m_Mesh.vertices.clear();
 	m_Mesh.indices.clear();
 	m_Mesh.subsets.clear();
+	m_Mesh.bones.clear();
 
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test5.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test2.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -83,7 +84,15 @@ void DX::Model::Create()
 	}
 
 	// Assign bones
-
+	for (auto& b : model.bones)
+	{
+		DX::BoneInfo bone;
+		bone.name = b.name;
+		bone.parentName = b.parent_name;
+		bone.offset = b.inversebindmatrix;
+		bone.parentId = b.parent_id;
+		m_Mesh.bones.push_back(bone);
+	}
 
 	// Create buffers
 	CreateVertexBuffer();

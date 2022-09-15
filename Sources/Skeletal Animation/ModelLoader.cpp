@@ -289,15 +289,20 @@ UINT Assimp::Loader::LoadMeshIndices(const aiMesh* mesh)
 
 void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 {
+	// Set bone data
 	std::vector<Bone> bones(mesh->mNumBones);
 	for (UINT i = 0; i < mesh->mNumBones; ++i)
 	{
 		aiBone* bone = mesh->mBones[i];
 
 		// Set bone data
+		bones[i].id = i;
 		bones[i].name = bone->mName.C_Str();
 		bones[i].parent_name = bone->mNode->mParent->mName.C_Str();
 		bones[i].inversebindmatrix = ConvertToDirectXMatrix(bone->mOffsetMatrix);
+
+		// Set to map
+		bonemap[bones[i].name] = bones[i];
 
 		// Set vertex bone id and weight influence
 		for (UINT j = 0; j < bone->mNumWeights; ++j)
@@ -321,6 +326,12 @@ void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 				}
 			}
 		}
+	}
+
+	// Set bone hierarchy
+	for (auto& bone : bones)
+	{
+		bone.parent_id = bonemap[bone.parent_name].id;
 	}
 
 	// Assign to bones
