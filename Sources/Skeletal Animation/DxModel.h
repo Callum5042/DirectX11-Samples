@@ -138,15 +138,12 @@ namespace DX
 		// World 
 		DirectX::XMMATRIX World;
 
-
-		DX::Mesh m_Mesh;
-
-
-		std::vector<DirectX::XMMATRIX> finalTransform;
-
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 		DX::Shader* m_DxShader = nullptr;
+
+		// Mesh data
+		DX::Mesh m_Mesh;
 
 		// Number of indices to draw
 		UINT m_IndexCount = 0;

@@ -20,7 +20,7 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test2.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -72,6 +72,7 @@ void DX::Model::Create()
 	}
 
 	m_Mesh.animations["Take1"] = model.animations.begin()->second;
+	m_Mesh.animations["Take2"] = model.animations["ArmatureAction2"];
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -87,8 +88,8 @@ void DX::Model::Update(float dt)
 	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
 
 	// Animation
-	auto clip = m_Mesh.animations.find("Take1");
-	/*if (clip != m_Mesh.animations.end())
+	auto clip = m_Mesh.animations.find("Take2");
+	if (clip != m_Mesh.animations.end())
 	{
 		clip->second.Interpolate(TimeInSeconds, toParentTransforms);
 		if (TimeInSeconds > clip->second.GetClipEndTime())
@@ -96,9 +97,9 @@ void DX::Model::Update(float dt)
 			TimeInSeconds = 0.0f;
 		}
 	}
-	else*/
+	else
 	{
-		clip->second.Frame(0, toParentTransforms);
+		//clip->second.Frame(0, toParentTransforms);
 	}
 
 	// Transform to root
@@ -112,8 +113,6 @@ void DX::Model::Update(float dt)
 	}
 
 	// Transform bone
-
-	finalTransform.clear();
 	BoneBuffer bone_buffer = {};
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
@@ -122,7 +121,6 @@ void DX::Model::Update(float dt)
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
 
 		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
-		finalTransform.push_back(toRoot);
 	}
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
