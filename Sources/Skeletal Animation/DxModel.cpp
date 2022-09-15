@@ -20,7 +20,7 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\test2.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\noanimation.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -71,8 +71,7 @@ void DX::Model::Create()
 		m_Mesh.bones.push_back(bone);
 	}
 
-	m_Mesh.animations["Take1"] = model.animations.begin()->second;
-	m_Mesh.animations["Take2"] = model.animations["ArmatureAction2"];
+	//m_Mesh.animations["Take1"] = model.animations.begin()->second;
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -81,35 +80,40 @@ void DX::Model::Create()
 
 void DX::Model::Update(float dt)
 {
-	static float TimeInSeconds = 0.0f;
-	TimeInSeconds += dt * 100.0f;
+	// Time to interpolate each frame between
+	static float time_in_seconds = 0.0f;
+	time_in_seconds += dt * 100.0f;
 
-	auto numBones = m_Mesh.bones.size();
-	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
+	// Parent transforms
+	std::vector<DirectX::XMMATRIX> parent_transform(m_Mesh.bones.size());
 
 	// Animation
-	auto clip = m_Mesh.animations.find("Take2");
+	auto clip = m_Mesh.animations.find("Take1");
 	if (clip != m_Mesh.animations.end())
 	{
-		clip->second.Interpolate(TimeInSeconds, toParentTransforms);
-		if (TimeInSeconds > clip->second.GetClipEndTime())
+		clip->second.Interpolate(time_in_seconds, parent_transform);
+		if (time_in_seconds > clip->second.GetClipEndTime())
 		{
-			TimeInSeconds = 0.0f;
+			time_in_seconds = 0.0f;
 		}
 	}
 	else
 	{
-		//clip->second.Frame(0, toParentTransforms);
+		// If we are not playing any animation then we want to be in default pose - how do we do this?
+		/*for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
+		{
+			parent_transform[i] = DirectX::XMMatrixInverse(nullptr, m_Mesh.bones[i].offset);
+		}*/
 	}
 
 	// Transform to root
-	std::vector<DirectX::XMMATRIX> toRootTransforms(numBones);
-	toRootTransforms[0] = toParentTransforms[0];
-	for (UINT i = 1; i < numBones; ++i)
+	std::vector<DirectX::XMMATRIX> root_transform(m_Mesh.bones.size());
+	root_transform[0] = parent_transform[0];
+	for (UINT i = 1; i < m_Mesh.bones.size(); ++i)
 	{
-		DirectX::XMMATRIX toParent = toParentTransforms[i];
-		DirectX::XMMATRIX parentToRoot = toRootTransforms[m_Mesh.bones[i].parentId];
-		toRootTransforms[i] = XMMatrixMultiply(toParent, parentToRoot);
+		DirectX::XMMATRIX parent = parent_transform[i];
+		DirectX::XMMATRIX root = root_transform[m_Mesh.bones[i].parentId];
+		root_transform[i] = XMMatrixMultiply(parent, root);
 	}
 
 	// Transform bone
@@ -117,8 +121,8 @@ void DX::Model::Update(float dt)
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
-		DirectX::XMMATRIX toRoot = toRootTransforms[i];
-		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
+		DirectX::XMMATRIX root = root_transform[i];
+		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, root);
 
 		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
 	}
@@ -200,6 +204,7 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 {
 	if (t <= Keyframes.front().TimePos)
 	{
+		// First frame so we got nothing to interpolate between
 		DirectX::XMVECTOR scale = XMLoadFloat3(&Keyframes.front().Scale);
 		DirectX::XMVECTOR translation = XMLoadFloat3(&Keyframes.front().Translation);
 		DirectX::XMVECTOR rotation = XMLoadFloat4(&Keyframes.front().RotationQuat);
@@ -209,6 +214,7 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 	}
 	else if (t >= Keyframes.back().TimePos)
 	{
+		// Last frame so we got nothing to interpolate between
 		DirectX::XMVECTOR scale = XMLoadFloat3(&Keyframes.back().Scale);
 		DirectX::XMVECTOR translation = XMLoadFloat3(&Keyframes.back().Translation);
 		DirectX::XMVECTOR rotation = XMLoadFloat4(&Keyframes.back().RotationQuat);
@@ -218,6 +224,7 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 	}
 	else
 	{
+		// Only want to interpolate between current frame and next frame determined by the frame time
 		for (UINT i = 0; i < Keyframes.size() - 1; ++i)
 		{
 			if (t >= Keyframes[i].TimePos && t <= Keyframes[i + 1].TimePos)
@@ -240,6 +247,7 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 				DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 				M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
 
+				// Exit early as we have found the frame to interpolate between
 				break;
 			}
 		}
