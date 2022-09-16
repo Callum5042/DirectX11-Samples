@@ -20,7 +20,7 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\noanimation.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\man.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -67,11 +67,15 @@ void DX::Model::Create()
 		bone.name = b.name;
 		bone.parentName = b.parent_name;
 		bone.offset = b.inversebindmatrix;
+		bone.transformation = b.transformation;
 		bone.parentId = b.parent_id;
 		m_Mesh.bones.push_back(bone);
 	}
 
 	//m_Mesh.animations["Take1"] = model.animations.begin()->second;
+
+	auto m1 = DirectX::XMMatrixIdentity();
+	auto m2 = DirectX::XMMatrixIdentity();
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -99,11 +103,11 @@ void DX::Model::Update(float dt)
 	}
 	else
 	{
-		// If we are not playing any animation then we want to be in default pose - how do we do this?
-		/*for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
+		// If there is no animation then set the parent transform to the default bind pose
+		for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
 		{
-			parent_transform[i] = DirectX::XMMatrixInverse(nullptr, m_Mesh.bones[i].offset);
-		}*/
+			parent_transform[i] = m_Mesh.bones[i].transformation;
+		}
 	}
 
 	// Transform to root
@@ -117,7 +121,7 @@ void DX::Model::Update(float dt)
 	}
 
 	// Transform bone
-	BoneBuffer bone_buffer = {};
+	BoneBuffer bone_buffer = {}; 
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
 		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;

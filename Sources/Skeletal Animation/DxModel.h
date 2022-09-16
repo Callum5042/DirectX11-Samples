@@ -98,6 +98,7 @@ namespace DX
 		std::string name;
 		std::string parentName;
 		DirectX::XMMATRIX offset;
+		DirectX::XMMATRIX transformation;
 
 		int bone_index;
 		std::vector<int> children;
