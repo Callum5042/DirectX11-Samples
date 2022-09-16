@@ -88,8 +88,8 @@ namespace DX
 
 		void Frame(int frame, std::vector<DirectX::XMMATRIX>& bone_transforms) const;
 
-		std::vector<BoneAnimation> BoneAnimations;
-		std::map<std::string, BoneAnimation> BoneAnimationsMap;
+		std::vector<DX::BoneAnimation> BoneAnimations;
+		std::map<std::string, DX::BoneAnimation> BoneAnimationsMap;
 	};
 
 	struct BoneInfo
@@ -97,8 +97,8 @@ namespace DX
 		int parentId = 0;
 		std::string name;
 		std::string parentName;
-		DirectX::XMMATRIX offset;
-		DirectX::XMMATRIX transformation;
+		DirectX::XMMATRIX bind_pose;
+		DirectX::XMMATRIX inverse_bind_pose;
 
 		int bone_index;
 		std::vector<int> children;

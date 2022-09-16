@@ -30,8 +30,8 @@ namespace Assimp
 		int parent_id = 0;
 		std::string name;
 		std::string parent_name;
-		DirectX::XMMATRIX transformation;
-		DirectX::XMMATRIX inversebindmatrix;
+		DirectX::XMMATRIX bind_pose;
+		DirectX::XMMATRIX inverse_bind_pose;
 	};
 
 	// Mesh data

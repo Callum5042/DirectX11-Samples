@@ -365,7 +365,7 @@ std::vector<DX::BoneInfo> GltfModelLoader::LoadSkin(int64_t skin_index)
 
 		// Fill struct
 		bone.name = name;
-		bone.offset = ibm;
+		bone.inverse_bind_pose = ibm;
 
 		bones.push_back(bone);
 

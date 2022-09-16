@@ -118,8 +118,8 @@ void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 		bones[i].id = i;
 		bones[i].name = bone->mName.C_Str();
 		bones[i].parent_name = bone->mNode->mParent->mName.C_Str();
-		bones[i].inversebindmatrix = ConvertToDirectXMatrix(bone->mOffsetMatrix);
-		bones[i].transformation = ConvertToDirectXMatrix(bone->mNode->mTransformation);
+		bones[i].bind_pose = ConvertToDirectXMatrix(bone->mNode->mTransformation);
+		bones[i].inverse_bind_pose = ConvertToDirectXMatrix(bone->mOffsetMatrix);
 
 		// Set to map
 		bonemap[bones[i].name] = bones[i];

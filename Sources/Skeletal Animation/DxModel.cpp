@@ -66,8 +66,8 @@ void DX::Model::Create()
 		DX::BoneInfo bone;
 		bone.name = b.name;
 		bone.parentName = b.parent_name;
-		bone.offset = b.inversebindmatrix;
-		bone.transformation = b.transformation;
+		bone.bind_pose = b.bind_pose;
+		bone.inverse_bind_pose = b.inverse_bind_pose;
 		bone.parentId = b.parent_id;
 		m_Mesh.bones.push_back(bone);
 	}
@@ -84,6 +84,8 @@ void DX::Model::Create()
 
 void DX::Model::Update(float dt)
 {
+	// https://stackoverflow.com/questions/62998968/how-do-i-calculate-the-start-matrix-for-each-bonet-pose-using-collada-and-ope
+
 	// Time to interpolate each frame between
 	static float time_in_seconds = 0.0f;
 	time_in_seconds += dt * 100.0f;
@@ -106,29 +108,29 @@ void DX::Model::Update(float dt)
 		// If there is no animation then set the parent transform to the default bind pose
 		for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
 		{
-			parent_transform[i] = m_Mesh.bones[i].transformation;
+			parent_transform[i] = m_Mesh.bones[i].bind_pose;
 		}
 	}
 
 	// Transform to root
-	std::vector<DirectX::XMMATRIX> root_transform(m_Mesh.bones.size());
-	root_transform[0] = parent_transform[0];
+	std::vector<DirectX::XMMATRIX> local_transform(m_Mesh.bones.size());
+	local_transform[0] = parent_transform[0];
 	for (UINT i = 1; i < m_Mesh.bones.size(); ++i)
 	{
 		DirectX::XMMATRIX parent = parent_transform[i];
-		DirectX::XMMATRIX root = root_transform[m_Mesh.bones[i].parentId];
-		root_transform[i] = XMMatrixMultiply(parent, root);
+		DirectX::XMMATRIX root = local_transform[m_Mesh.bones[i].parentId];
+		local_transform[i] = XMMatrixMultiply(parent, root);
 	}
 
 	// Transform bone
 	BoneBuffer bone_buffer = {}; 
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
-		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
-		DirectX::XMMATRIX root = root_transform[i];
-		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, root);
+		DirectX::XMMATRIX inverse_bind_pose = m_Mesh.bones[i].inverse_bind_pose;
+		DirectX::XMMATRIX local = local_transform[i];
+		DirectX::XMMATRIX final_transform = DirectX::XMMatrixMultiply(inverse_bind_pose, local);
 
-		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
+		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(final_transform);
 	}
 
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
