@@ -67,8 +67,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectWrite", "Sources\Dire
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model Loading", "Sources\Model Loading\Model Loading.vcxproj", "{20A9DA78-DA28-4A6A-B27E-20115C4EF639}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Animations", "Sources\Animations\Animations.vcxproj", "{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -309,14 +307,6 @@ Global
 		{20A9DA78-DA28-4A6A-B27E-20115C4EF639}.Release|x64.Build.0 = Release|x64
 		{20A9DA78-DA28-4A6A-B27E-20115C4EF639}.Release|x86.ActiveCfg = Release|Win32
 		{20A9DA78-DA28-4A6A-B27E-20115C4EF639}.Release|x86.Build.0 = Release|Win32
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Debug|x64.ActiveCfg = Debug|x64
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Debug|x64.Build.0 = Debug|x64
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Debug|x86.ActiveCfg = Debug|Win32
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Debug|x86.Build.0 = Debug|Win32
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Release|x64.ActiveCfg = Release|x64
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Release|x64.Build.0 = Release|x64
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Release|x86.ActiveCfg = Release|Win32
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -351,7 +341,6 @@ Global
 		{68A01E66-3675-43FC-9861-331AD0CF0EF3} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{F6DCB360-5113-4A50-AAC0-3545DA724444} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 		{20A9DA78-DA28-4A6A-B27E-20115C4EF639} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
-		{1E135C3C-1CDA-41E4-BC51-D7865EBC0455} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
