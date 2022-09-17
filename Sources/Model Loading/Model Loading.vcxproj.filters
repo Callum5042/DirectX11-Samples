@@ -48,6 +48,9 @@
     <ClCompile Include="simdjson.cpp">
       <Filter>Third-Party</Filter>
     </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="simdjson.h">
       <Filter>Third-Party</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

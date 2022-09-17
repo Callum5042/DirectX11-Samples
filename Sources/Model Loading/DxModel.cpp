@@ -1,5 +1,6 @@
 #include "DxModel.h"
 #include "GltfModelLoader.h"
+#include "ModelLoader.h"
 #include <DirectXMath.h>
 #include <vector>
 
@@ -11,17 +12,46 @@ DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(rend
 void DX::Model::Create()
 {
 	// Load model
-	GltfModelLoader loader;
-	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
-	//GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\monkey.gltf");
-	GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\multiple_objects.gltf");
+	GltfModelLoader loader2;
+	////GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
+	////GltfFileData file_data = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\monkey.gltf");
+	//GltfFileData file_data = loader2.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\multiple_objects.gltf");
 
-	// Copy model object data
-	m_ModelObjectData = file_data.model_object_data;
+	//// Copy model object data
+	//m_ModelObjectData = file_data.model_object_data;
+
+	Assimp::Loader loader;
+	//Assimp::Model model = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\pyramid.gltf");
+	Assimp::Model model = loader.Load("D:\\Sources\\DirectX11 Samples\\Resources\\Models\\multiple_objects.gltf");
+
+	// Assign vertices
+	std::vector<DX::Vertex> vertices;
+	for (auto& v : model.vertices)
+	{
+		DX::Vertex vertex;
+
+		// Set position
+		vertex.x = v.x;
+		vertex.y = v.y;
+		vertex.z = v.z;
+
+		vertices.push_back(vertex);
+	}
+
+	// Assign subset
+	for (auto& s : model.subset)
+	{
+		DX::ModelObjectData subset = {};
+		subset.base_vertex = s.base_vertex;
+		subset.index_start = s.start_index;
+		subset.index_count = s.total_index;
+		subset.transformation = s.transformation;
+		m_ModelObjectData.push_back(subset);
+	}
 
 	// Create buffers
-	CreateVertexBuffer(file_data.vertices);
-	CreateIndexBuffer(file_data.indices);
+	CreateVertexBuffer(vertices);
+	CreateIndexBuffer(model.indices);
 }
 
 void DX::Model::CreateVertexBuffer(std::vector<Vertex> vertices)

@@ -1,10 +1,11 @@
 #pragma once
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+
 #include <exception>
 #include <SDL_video.h>
 #include <d3d11_1.h>
-
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 // This include is requires for using DirectX smart pointers (ComPtr)
