@@ -20,7 +20,7 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\man.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\double_mesh_bone.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -94,7 +94,7 @@ void DX::Model::Update(float dt)
 	if (clip != m_Mesh.animations.end())
 	{
 		// Time to interpolate each frame between
-		time_in_seconds += dt * clip->second.ticks_per_second;
+		time_in_seconds += dt * clip->second.ticks_per_second * 0.1f;
 
 		clip->second.Interpolate(time_in_seconds, parent_transform);
 		if (time_in_seconds > clip->second.GetClipEndTime())

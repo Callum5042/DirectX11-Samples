@@ -108,6 +108,12 @@ UINT Assimp::Loader::LoadMeshIndices(const aiMesh* mesh)
 
 void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 {
+	// Don't support loading a mesh without bones here
+	if (!mesh->HasBones())
+	{
+		throw std::exception("This example only works with meshes that have bones");
+	}
+
 	// Set bone data
 	std::vector<Bone> bones(mesh->mNumBones);
 	for (UINT i = 0; i < mesh->mNumBones; ++i)
@@ -167,7 +173,7 @@ void Assimp::Loader::LoadAnimations(const aiScene* scene)
 
 		// Animation clip
 		DX::AnimationClip clip;
-		clip.ticks_per_second = animation->mTicksPerSecond;
+		clip.ticks_per_second = static_cast<float>(animation->mTicksPerSecond);
 		clip.BoneAnimations.resize(animation->mNumChannels);
 
 		// Channel is the bones being animated
