@@ -2,6 +2,8 @@
 #include <iostream>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#undef min
+#undef max
 
 namespace
 {
@@ -102,7 +104,7 @@ UINT Assimp::Loader::LoadMeshIndices(const aiMesh* mesh)
 		}
 	}
 
-	m_ModelData.indices.insert(m_ModelData.indices.begin(), indices.begin(), indices.end());
+	m_ModelData.indices.insert(m_ModelData.indices.end(), indices.begin(), indices.end());
 	return static_cast<UINT>(indices.size());
 }
 
