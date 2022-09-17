@@ -90,6 +90,8 @@ namespace DX
 
 		std::vector<DX::BoneAnimation> BoneAnimations;
 		std::map<std::string, DX::BoneAnimation> BoneAnimationsMap;
+
+		float ticks_per_second = 0;
 	};
 
 	struct BoneInfo

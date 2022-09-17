@@ -167,6 +167,7 @@ void Assimp::Loader::LoadAnimations(const aiScene* scene)
 
 		// Animation clip
 		DX::AnimationClip clip;
+		clip.ticks_per_second = animation->mTicksPerSecond;
 		clip.BoneAnimations.resize(animation->mNumChannels);
 
 		// Channel is the bones being animated
@@ -176,16 +177,18 @@ void Assimp::Loader::LoadAnimations(const aiScene* scene)
 			std::string bone_name = channel->mNodeName.C_Str();
 			int bone_id = bonemap[bone_name].id;
 
+			// Frames of the bone
 			for (UINT k = 0; k < channel->mNumPositionKeys; ++k)
 			{
-				auto time = channel->mPositionKeys[k].mTime;
-				auto pos = channel->mPositionKeys[k].mValue;
-				auto rotation = channel->mRotationKeys[k].mValue;
-				auto scale = channel->mScalingKeys[k].mValue;
+				float time = static_cast<float>(channel->mPositionKeys[k].mTime);
+				const aiVector3D translation = channel->mPositionKeys[k].mValue;
+				const aiQuaternion rotation = channel->mRotationKeys[k].mValue;
+				const aiVector3D scale = channel->mScalingKeys[k].mValue;
 
+				// Store the key frame
 				DX::Keyframe frame;
-				frame.TimePos = static_cast<float>(time);
-				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
+				frame.TimePos = time;
+				frame.Translation = DirectX::XMFLOAT3(translation.x, translation.y, translation.z);
 				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
 				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
 

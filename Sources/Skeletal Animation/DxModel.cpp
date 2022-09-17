@@ -72,10 +72,7 @@ void DX::Model::Create()
 		m_Mesh.bones.push_back(bone);
 	}
 
-	//m_Mesh.animations["Take1"] = model.animations.begin()->second;
-
-	auto m1 = DirectX::XMMatrixIdentity();
-	auto m2 = DirectX::XMMatrixIdentity();
+	m_Mesh.animations = model.animations;
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -88,15 +85,17 @@ void DX::Model::Update(float dt)
 
 	// Time to interpolate each frame between
 	static float time_in_seconds = 0.0f;
-	time_in_seconds += dt * 100.0f;
 
 	// Parent transforms
 	std::vector<DirectX::XMMATRIX> parent_transform(m_Mesh.bones.size());
 
-	// Animation
-	auto clip = m_Mesh.animations.find("Take1");
+	// Animation - Take the first one we find - we can also select the animation by name with "find"
+	auto clip = m_Mesh.animations.begin();
 	if (clip != m_Mesh.animations.end())
 	{
+		// Time to interpolate each frame between
+		time_in_seconds += dt * clip->second.ticks_per_second;
+
 		clip->second.Interpolate(time_in_seconds, parent_transform);
 		if (time_in_seconds > clip->second.GetClipEndTime())
 		{
@@ -104,7 +103,7 @@ void DX::Model::Update(float dt)
 		}
 	}
 	else
-	{
+	{ 
 		// If there is no animation then set the parent transform to the default bind pose
 		for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
 		{
@@ -133,6 +132,7 @@ void DX::Model::Update(float dt)
 		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(final_transform);
 	}
 
+	// Store final transform into bone buffer
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 }
 
