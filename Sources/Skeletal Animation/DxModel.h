@@ -7,6 +7,7 @@
 #include <cmath>
 #include <map>
 #include <string>
+#include "DxCamera.h"
 
 #undef min
 #include <assimp/Importer.hpp>
@@ -111,6 +112,7 @@ namespace DX
 		unsigned totalIndex = 0;
 		unsigned startIndex = 0;
 		unsigned baseVertex = 0;
+		DirectX::XMMATRIX transformation;
 	};
 
 	struct Mesh
@@ -136,7 +138,7 @@ namespace DX
 		void Update(float dt);
 
 		// Render the model
-		void Render();
+		void Render(DX::Camera* camera);
 
 		// World 
 		DirectX::XMMATRIX World;

@@ -20,7 +20,8 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\double_mesh_bone.gltf");
+	//Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\double_mesh_bone.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\multiple_objects.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)
@@ -57,6 +58,7 @@ void DX::Model::Create()
 		subset.baseVertex = s.base_vertex;
 		subset.startIndex = s.start_index;
 		subset.totalIndex = s.total_index;
+		subset.transformation = s.transformation;
 		m_Mesh.subsets.push_back(subset);
 	}
 
@@ -81,6 +83,15 @@ void DX::Model::Create()
 
 void DX::Model::Update(float dt)
 {
+	// If there is no bones, set the bone buffer to an identity matrix so we can still view the model
+	if (m_Mesh.bones.empty())
+	{
+		BoneBuffer bone_buffer = {};
+		bone_buffer.transform[0] = DirectX::XMMatrixIdentity();
+		m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
+		return;
+	}
+
 	// https://stackoverflow.com/questions/62998968/how-do-i-calculate-the-start-matrix-for-each-bonet-pose-using-collada-and-ope
 
 	// Time to interpolate each frame between
@@ -169,7 +180,7 @@ void DX::Model::CreateIndexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Model::Render()
+void DX::Model::Render(DX::Camera* camera)
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 
@@ -186,10 +197,20 @@ void DX::Model::Render()
 	// Bind the geometry topology to the pipeline's Input Assembler stage
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Render geometry
-	for (auto i = 0u; i < m_Mesh.subsets.size(); ++i)
+	// Render all geometry
+	for (auto& subset : m_Mesh.subsets)
 	{
-		auto& subset = m_Mesh.subsets[i];
+		// Set obj transformation
+		auto matrix = DirectX::XMMatrixMultiply(World, subset.transformation);
+
+		// Apply object transformation
+		DX::WorldBuffer world_buffer = {};
+		world_buffer.world = DirectX::XMMatrixTranspose(matrix);
+		world_buffer.view = DirectX::XMMatrixTranspose(camera->GetView());
+		world_buffer.projection = DirectX::XMMatrixTranspose(camera->GetProjection());
+		m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+		// Render object
 		d3dDeviceContext->DrawIndexed(subset.totalIndex, subset.startIndex, subset.baseVertex);
 	}
 }

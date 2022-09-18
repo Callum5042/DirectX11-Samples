@@ -102,7 +102,7 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
-            m_DxModel->Render();
+            m_DxModel->Render(m_DxCamera.get());
 
             // Display the rendered scene
             m_DxRenderer->Present();

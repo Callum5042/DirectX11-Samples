@@ -28,7 +28,7 @@ Assimp::Model Assimp::Loader::Load(const std::string& path)
 	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
 
 	// Load model
-	const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_PopulateArmatureData);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_MakeLeftHanded | aiProcess_PopulateArmatureData);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << '\n';
@@ -47,6 +47,9 @@ void Assimp::Loader::LoadMesh(const aiScene* scene)
 	for (UINT i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
+
+		// Set transformation
+		m_ModelData.subset[i].transformation = ConvertToDirectXMatrix(scene->mRootNode->FindNode(mesh->mName)->mTransformation);
 
 		// Set mesh name
 		m_ModelData.subset[i].name = mesh->mName.C_Str();
@@ -84,6 +87,12 @@ void Assimp::Loader::LoadMeshVertices(const aiMesh* mesh)
 		vertex.y = y;
 		vertex.z = z;
 
+		// If the mesh doesn't have any bone data then add weight of 1
+		if (!mesh->HasBones())
+		{
+			vertex.weight[0] = 1.0f;
+		}
+
 		// Add the vertex to the vertices vector
 		m_ModelData.vertices.push_back(vertex);
 	}
@@ -110,12 +119,6 @@ UINT Assimp::Loader::LoadMeshIndices(const aiMesh* mesh)
 
 void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 {
-	// Don't support loading a mesh without bones here
-	if (!mesh->HasBones())
-	{
-		throw std::exception("This example only works with meshes that have bones");
-	}
-
 	// Set bone data
 	std::vector<Bone> bones(mesh->mNumBones);
 	for (UINT i = 0; i < mesh->mNumBones; ++i)

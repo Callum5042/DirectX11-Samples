@@ -41,6 +41,7 @@ namespace Assimp
 		UINT total_index = 0;
 		UINT start_index = 0;
 		UINT base_vertex = 0;
+		DirectX::XMMATRIX transformation;
 	};
 
 	// Model data
