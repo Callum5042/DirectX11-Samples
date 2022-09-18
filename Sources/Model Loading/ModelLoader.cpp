@@ -22,11 +22,8 @@ Assimp::Model Assimp::Loader::Load(const std::string& path)
 {
 	Assimp::Importer importer;
 
-	// Assimp will remove bones that aren't connect to a vertex. We want all the bones loaded regardless as the bones can have children bones that are animated
-	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
-
 	// Load model
-	const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_PopulateArmatureData);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_MakeLeftHanded);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << '\n';
