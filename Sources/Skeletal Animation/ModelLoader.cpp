@@ -50,14 +50,7 @@ void Assimp::Loader::LoadMesh(const aiScene* scene)
 
 		// Set transformation
 		aiNode* node = scene->mRootNode->FindNode(mesh->mName);
-		if (node != nullptr)
-		{
-			m_ModelData.subset[i].transformation = ConvertToDirectXMatrix(node->mTransformation);
-		}
-		else
-		{
-			m_ModelData.subset[i].transformation = DirectX::XMMatrixIdentity();
-		}
+		m_ModelData.subset[i].transformation = ConvertToDirectXMatrix(node->mTransformation);
 
 		// Set mesh name
 		m_ModelData.subset[i].name = mesh->mName.C_Str();
