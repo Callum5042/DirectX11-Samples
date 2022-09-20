@@ -16,6 +16,9 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{c5ce5fbc-7fad-4f62-b162-d52b928dbe4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third-Party">
+      <UniqueIdentifier>{deabd46d-216d-4bed-b7ac-83d15109b751}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -42,6 +45,15 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="simdjson.cpp">
+      <Filter>Third-Party</Filter>
+    </ClCompile>
+    <ClCompile Include="GltfModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -63,6 +75,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simdjson.h">
+      <Filter>Third-Party</Filter>
+    </ClInclude>
+    <ClInclude Include="GltfModelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DxCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

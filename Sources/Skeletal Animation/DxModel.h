@@ -3,9 +3,12 @@
 #include "DxRenderer.h"
 #include <vector>
 #include <DirectXColors.h>
+#include <DirectXMath.h>
 #include "DxShader.h"
 #include <cmath>
 #include <map>
+#include <string>
+#include "DxCamera.h"
 
 #undef min
 #include <assimp/Importer.hpp>
@@ -68,6 +71,8 @@ namespace DX
 
 		void Interpolate(float t, DirectX::XMMATRIX& M) const;
 
+		void Frame(int frame, DirectX::XMMATRIX& bone_transforms) const;
+
 		std::vector<Keyframe> Keyframes;
 	};
 
@@ -81,9 +86,14 @@ namespace DX
 		float GetClipStartTime() const;
 		float GetClipEndTime() const;
 
-		void Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms)const;
+		void Interpolate(float t, std::vector<DirectX::XMMATRIX>& boneTransforms) const;
 
-		std::vector<BoneAnimation> BoneAnimations;
+		void Frame(int frame, std::vector<DirectX::XMMATRIX>& bone_transforms) const;
+
+		std::vector<DX::BoneAnimation> BoneAnimations;
+		std::map<std::string, DX::BoneAnimation> BoneAnimationsMap;
+
+		float ticks_per_second = 0;
 	};
 
 	struct BoneInfo
@@ -91,7 +101,11 @@ namespace DX
 		int parentId = 0;
 		std::string name;
 		std::string parentName;
-		DirectX::XMMATRIX offset;
+		DirectX::XMMATRIX bind_pose;
+		DirectX::XMMATRIX inverse_bind_pose;
+
+		int bone_index;
+		std::vector<int> children;
 	};
 
 	struct Subset
@@ -99,6 +113,7 @@ namespace DX
 		unsigned totalIndex = 0;
 		unsigned startIndex = 0;
 		unsigned baseVertex = 0;
+		DirectX::XMMATRIX transformation;
 	};
 
 	struct Mesh
@@ -106,6 +121,7 @@ namespace DX
 		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
 		std::vector<BoneInfo> bones;
+		std::map<std::string, BoneInfo> bonemap;
 		std::map<std::string, AnimationClip> animations;
 		std::vector<Subset> subsets;
 	};
@@ -123,7 +139,7 @@ namespace DX
 		void Update(float dt);
 
 		// Render the model
-		void Render();
+		void Render(DX::Camera* camera);
 
 		// World 
 		DirectX::XMMATRIX World;
@@ -132,9 +148,11 @@ namespace DX
 		DX::Renderer* m_DxRenderer = nullptr;
 		DX::Shader* m_DxShader = nullptr;
 
+		// Mesh data
+		DX::Mesh m_Mesh;
+
 		// Number of indices to draw
 		UINT m_IndexCount = 0;
-		Mesh m_Mesh;
 
 		// Vertex buffer
 		ComPtr<ID3D11Buffer> m_d3dVertexBuffer = nullptr;

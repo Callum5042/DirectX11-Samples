@@ -3,6 +3,7 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+#include "DxCube.h"
 
 Applicataion::~Applicataion()
 {
@@ -38,6 +39,10 @@ int Applicataion::Execute()
 
     // Starts the timer
     m_Timer.Start();
+
+    // Cubes
+    DX::Cube cube(m_DxRenderer.get());
+    cube.Create();
 
     // Main application event loop
     SDL_Event e = {};
@@ -97,7 +102,7 @@ int Applicataion::Execute()
             m_DxShader->Use();
 
             // Render the model
-            m_DxModel->Render();
+            m_DxModel->Render(m_DxCamera.get());
 
             // Display the rendered scene
             m_DxRenderer->Present();

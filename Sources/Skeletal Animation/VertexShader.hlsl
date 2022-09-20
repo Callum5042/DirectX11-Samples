@@ -5,24 +5,16 @@ VertexOutput main(VertexInput input)
 {
 	VertexOutput output;
 
-	float weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	weights[0] = input.weight.x;
-	weights[1] = input.weight.y;
-	weights[2] = input.weight.z;
-	weights[3] = 1.0f - weights[0] - weights[1] - weights[2];
-
-	float3 position = float3(0, 0, 0);
-	for (int i = 0; i < 4; i++)
-	{
-		float weight = weights[i];
-		int bone_index = input.bone[i];
-		matrix transform = cBoneTransform[bone_index];
-
-		position += weight * mul(float4(input.position, 1.0f), transform).xyz;
-	}
+	matrix skinMatrix =
+		input.weight.x * cBoneTransform[int(input.bone.x)] +
+		input.weight.y * cBoneTransform[int(input.bone.y)] +
+		input.weight.z * cBoneTransform[int(input.bone.z)] +
+		input.weight.w * cBoneTransform[int(input.bone.w)];
 
 	// Transform to homogeneous clip space.
-	output.position = mul(float4(position, 1.0f), cWorld);
+	//output.position = mul(float4(input.position, 1.0f), cWorld);
+	output.position = mul(float4(input.position, 1.0f), skinMatrix);
+	output.position = mul(output.position, cWorld);
 	output.position = mul(output.position, cView);
 	output.position = mul(output.position, cProjection);
 

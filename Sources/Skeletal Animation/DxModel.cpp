@@ -8,32 +8,72 @@
 #include <fstream>
 
 #include "ModelLoader.h"
-
-namespace
-{
-	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
-	{
-		aiVector3D scale, rot, pos;
-		matrix.Decompose(scale, rot, pos);
-
-		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
-		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
-		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
-
-		return _matrix;
-	}
-}
+#include "GltfModelLoader.h"
+using namespace DX;
 
 DX::Model::Model(DX::Renderer* renderer, DX::Shader* shader) : m_DxRenderer(renderer), m_DxShader(shader)
 {
-	World = DirectX::XMMatrixTranslation(0.0f, -3.0f, 0.0f);
+	World = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 }
 
 void DX::Model::Create()
 {
-	// Load data
-	ModelLoader::Load("..\\..\\Resources\\Models\\complex_post.glb", &m_Mesh);
+	// Load model
+	Assimp::Loader loader;
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
+
+	// Assign vertices
+	for (auto& v : model.vertices)
+	{
+		DX::Vertex vertex;
+
+		// Set position
+		vertex.x = v.x;
+		vertex.y = v.y;
+		vertex.z = v.z;
+
+		// Set bone
+		vertex.bone[0] = v.bone[0];
+		vertex.bone[1] = v.bone[1];
+		vertex.bone[2] = v.bone[2];
+		vertex.bone[3] = v.bone[3];
+
+		// Set weight
+		vertex.weight[0] = v.weight[0];
+		vertex.weight[1] = v.weight[1];
+		vertex.weight[2] = v.weight[2];
+		vertex.weight[3] = v.weight[3];
+
+		m_Mesh.vertices.push_back(vertex);
+	}
+
+	// Assign indices
+	m_Mesh.indices = model.indices;
+
+	// Assign subset
+	for (auto& s : model.subset)
+	{
+		DX::Subset subset = {};
+		subset.baseVertex = s.base_vertex;
+		subset.startIndex = s.start_index;
+		subset.totalIndex = s.total_index;
+		subset.transformation = s.transformation;
+		m_Mesh.subsets.push_back(subset);
+	}
+
+	// Assign bones
+	for (auto& b : model.bones)
+	{
+		DX::BoneInfo bone;
+		bone.name = b.name;
+		bone.parentName = b.parent_name;
+		bone.bind_pose = b.bind_pose;
+		bone.inverse_bind_pose = b.inverse_bind_pose;
+		bone.parentId = b.parent_id;
+		m_Mesh.bones.push_back(bone);
+	}
+
+	m_Mesh.animations = model.animations;
 
 	// Create buffers
 	CreateVertexBuffer();
@@ -42,40 +82,67 @@ void DX::Model::Create()
 
 void DX::Model::Update(float dt)
 {
-	static float TimeInSeconds = 0.0f;
-	TimeInSeconds += dt * 100.0f;
-
-	auto numBones = m_Mesh.bones.size();
-	std::vector<DirectX::XMMATRIX> toParentTransforms(numBones);
-
-	// Animation
-	auto clip = m_Mesh.animations.find("Take1");
-	clip->second.Interpolate(TimeInSeconds, toParentTransforms);
-	if (TimeInSeconds > clip->second.GetClipEndTime())
+	// If there is no bones, set the bone buffer to an identity matrix so we can still view the model
+	if (m_Mesh.bones.empty())
 	{
-		TimeInSeconds = 0.0f;
+		BoneBuffer bone_buffer = {};
+		bone_buffer.transform[0] = DirectX::XMMatrixIdentity();
+		m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
+		return;
+	}
+
+	// https://stackoverflow.com/questions/62998968/how-do-i-calculate-the-start-matrix-for-each-bonet-pose-using-collada-and-ope
+
+	// Time to interpolate each frame between
+	static float time_in_seconds = 0.0f;
+
+	// Parent transforms
+	std::vector<DirectX::XMMATRIX> parent_transform(m_Mesh.bones.size());
+
+	// Animation - Take the first one we find - we can also select the animation by name with "find"
+	auto clip = m_Mesh.animations.begin();
+	if (clip != m_Mesh.animations.end())
+	{
+		// Time to interpolate each frame between
+		time_in_seconds += dt * clip->second.ticks_per_second * 0.1f;
+
+		clip->second.Interpolate(time_in_seconds, parent_transform);
+		if (time_in_seconds > clip->second.GetClipEndTime())
+		{
+			time_in_seconds = 0.0f;
+		}
+	}
+	else
+	{ 
+		// If there is no animation then set the parent transform to the default bind pose
+		for (size_t i = 0; i < m_Mesh.bones.size(); ++i)
+		{
+			parent_transform[i] = m_Mesh.bones[i].bind_pose;
+		}
 	}
 
 	// Transform to root
-	std::vector<DirectX::XMMATRIX> toRootTransforms(numBones);
-	toRootTransforms[0] = toParentTransforms[0];
-	for (UINT i = 1; i < numBones; ++i)
+	std::vector<DirectX::XMMATRIX> local_transform(m_Mesh.bones.size());
+	local_transform[0] = parent_transform[0];
+	for (UINT i = 1; i < m_Mesh.bones.size(); ++i)
 	{
-		DirectX::XMMATRIX toParent = toParentTransforms[i];
-		DirectX::XMMATRIX parentToRoot = toRootTransforms[m_Mesh.bones[i].parentId];
-		toRootTransforms[i] = XMMatrixMultiply(toParent, parentToRoot);
+		DirectX::XMMATRIX parent = parent_transform[i];
+		DirectX::XMMATRIX root = local_transform[m_Mesh.bones[i].parentId];
+		local_transform[i] = XMMatrixMultiply(parent, root);
 	}
 
 	// Transform bone
-	BoneBuffer bone_buffer = {};
+	BoneBuffer bone_buffer = {}; 
 	for (size_t i = 0; i < m_Mesh.bones.size(); i++)
 	{
-		DirectX::XMMATRIX offset = m_Mesh.bones[i].offset;
-		DirectX::XMMATRIX toRoot = toRootTransforms[i];
-		DirectX::XMMATRIX matrix = DirectX::XMMatrixMultiply(offset, toRoot);
-		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(matrix);
+		DirectX::XMMATRIX inverse_bind_pose = m_Mesh.bones[i].inverse_bind_pose;
+		DirectX::XMMATRIX local = local_transform[i];
+		DirectX::XMMATRIX final_transform = DirectX::XMMatrixMultiply(inverse_bind_pose, local);
+
+		bone_buffer.transform[i] = DirectX::XMMatrixTranspose(final_transform);
 	}
 
+	// Store final transform into bone buffer
 	m_DxShader->UpdateBoneConstantBuffer(bone_buffer);
 }
 
@@ -112,7 +179,7 @@ void DX::Model::CreateIndexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
-void DX::Model::Render()
+void DX::Model::Render(DX::Camera* camera)
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 
@@ -129,10 +196,20 @@ void DX::Model::Render()
 	// Bind the geometry topology to the pipeline's Input Assembler stage
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Render geometry
-	for (auto i = 0u; i < m_Mesh.subsets.size(); ++i)
+	// Render all geometry
+	for (auto& subset : m_Mesh.subsets)
 	{
-		auto& subset = m_Mesh.subsets[i];
+		// Set obj transformation
+		auto matrix = DirectX::XMMatrixMultiply(World, subset.transformation);
+
+		// Apply object transformation
+		DX::WorldBuffer world_buffer = {};
+		world_buffer.world = DirectX::XMMatrixTranspose(matrix);
+		world_buffer.view = DirectX::XMMatrixTranspose(camera->GetView());
+		world_buffer.projection = DirectX::XMMatrixTranspose(camera->GetProjection());
+		m_DxShader->UpdateWorldConstantBuffer(world_buffer);
+
+		// Render object
 		d3dDeviceContext->DrawIndexed(subset.totalIndex, subset.startIndex, subset.baseVertex);
 	}
 }
@@ -153,26 +230,27 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 {
 	if (t <= Keyframes.front().TimePos)
 	{
-		DirectX::XMVECTOR S = XMLoadFloat3(&Keyframes.front().Scale);
-		DirectX::XMVECTOR P = XMLoadFloat3(&Keyframes.front().Translation);
-		DirectX::XMVECTOR Q = XMLoadFloat4(&Keyframes.front().RotationQuat);
+		// First frame so we got nothing to interpolate between
+		DirectX::XMVECTOR scale = XMLoadFloat3(&Keyframes.front().Scale);
+		DirectX::XMVECTOR translation = XMLoadFloat3(&Keyframes.front().Translation);
+		DirectX::XMVECTOR rotation = XMLoadFloat4(&Keyframes.front().RotationQuat);
 
-		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
-		//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
+		DirectX::XMVECTOR origin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		M = DirectX::XMMatrixAffineTransformation(scale, origin, rotation, translation);
 	}
 	else if (t >= Keyframes.back().TimePos)
 	{
-		DirectX::XMVECTOR S = XMLoadFloat3(&Keyframes.back().Scale);
-		DirectX::XMVECTOR P = XMLoadFloat3(&Keyframes.back().Translation);
-		DirectX::XMVECTOR Q = XMLoadFloat4(&Keyframes.back().RotationQuat);
+		// Last frame so we got nothing to interpolate between
+		DirectX::XMVECTOR scale = XMLoadFloat3(&Keyframes.back().Scale);
+		DirectX::XMVECTOR translation = XMLoadFloat3(&Keyframes.back().Translation);
+		DirectX::XMVECTOR rotation = XMLoadFloat4(&Keyframes.back().RotationQuat);
 
-		DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-		M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
-		//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
+		DirectX::XMVECTOR origin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		M = DirectX::XMMatrixAffineTransformation(scale, origin, rotation, translation);
 	}
 	else
 	{
+		// Only want to interpolate between current frame and next frame determined by the frame time
 		for (UINT i = 0; i < Keyframes.size() - 1; ++i)
 		{
 			if (t >= Keyframes[i].TimePos && t <= Keyframes[i + 1].TimePos)
@@ -194,12 +272,24 @@ void DX::BoneAnimation::Interpolate(float t, DirectX::XMMATRIX& M)const
 
 				DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 				M = DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
-				//XMStoreFloat4x4(&M, DirectX::XMMatrixAffineTransformation(S, zero, Q, P));
 
+				// Exit early as we have found the frame to interpolate between
 				break;
 			}
 		}
 	}
+}
+
+void DX::BoneAnimation::Frame(int frame, DirectX::XMMATRIX& bone_transforms) const
+{
+	frame = std::clamp<int>(frame, 1, static_cast<int>(Keyframes.size())) - 1;
+
+	DirectX::XMVECTOR scale = DirectX::XMLoadFloat3(&Keyframes[frame].Scale);
+	DirectX::XMVECTOR translation = DirectX::XMLoadFloat3(&Keyframes[frame].Translation);
+	DirectX::XMVECTOR rotation = DirectX::XMLoadFloat4(&Keyframes[frame].RotationQuat);
+
+	DirectX::XMVECTOR origin = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	bone_transforms = DirectX::XMMatrixAffineTransformation(scale, origin, rotation, translation);
 }
 
 float DX::AnimationClip::GetClipStartTime()const
@@ -231,5 +321,13 @@ void DX::AnimationClip::Interpolate(float t, std::vector<DirectX::XMMATRIX>& bon
 	for (UINT i = 0; i < BoneAnimations.size(); ++i)
 	{
 		BoneAnimations[i].Interpolate(t, boneTransforms[i]);
+	}
+}
+
+void DX::AnimationClip::Frame(int frame, std::vector<DirectX::XMMATRIX>& bone_transforms) const
+{
+	for (UINT i = 0; i < BoneAnimations.size(); ++i)
+	{
+		BoneAnimations[i].Frame(frame, bone_transforms[i]);
 	}
 }

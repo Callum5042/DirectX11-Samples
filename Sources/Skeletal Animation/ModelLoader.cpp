@@ -1,7 +1,6 @@
 #include "ModelLoader.h"
 #include <iostream>
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #undef min
 #undef max
@@ -10,175 +9,206 @@ namespace
 {
 	DirectX::XMMATRIX ConvertToDirectXMatrix(aiMatrix4x4 matrix)
 	{
-		aiVector3D scale, rot, pos;
-		matrix.Decompose(scale, rot, pos);
-
-		DirectX::XMMATRIX _matrix = DirectX::XMMatrixIdentity();
-		_matrix *= DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
-		_matrix *= DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-		_matrix *= DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+		// Direct3D is row major
+		DirectX::XMMATRIX _matrix(
+			matrix.a1, matrix.b1, matrix.c1, matrix.d1,
+			matrix.a2, matrix.b2, matrix.c2, matrix.d2,
+			matrix.a3, matrix.b3, matrix.c3, matrix.d3,
+			matrix.a4, matrix.b4, matrix.c4, matrix.d4);
 
 		return _matrix;
 	}
 }
 
-bool ModelLoader::Load(const std::string& path, DX::Mesh* meshData)
+Assimp::Model Assimp::Loader::Load(const std::string& path)
 {
 	Assimp::Importer importer;
-	auto scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData);
+
+	// Assimp will remove bones that aren't connect to a vertex. We want all the bones loaded regardless as the bones can have children bones that are animated
+	importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
 
 	// Load model
+	const aiScene* scene = importer.ReadFile(path, aiProcess_MakeLeftHanded | aiProcess_PopulateArmatureData);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << '\n';
 		throw std::runtime_error("Could not load model");
 	}
 
-	unsigned total_index = 0;
-	unsigned base_vertex = 0;
+	LoadMesh(scene);
+	LoadAnimations(scene);
 
-	// Process data
-	for (auto mesh_index = 0u; mesh_index < scene->mNumMeshes; ++mesh_index)
+	return m_ModelData;
+}
+
+void Assimp::Loader::LoadMesh(const aiScene* scene)
+{
+	m_ModelData.subset.resize(scene->mNumMeshes);
+	for (UINT i = 0; i < scene->mNumMeshes; ++i)
 	{
-		DX::Subset subset;
-		subset.startIndex = total_index;
-		subset.baseVertex = base_vertex;
+		aiMesh* mesh = scene->mMeshes[i];
 
-		auto mesh = scene->mMeshes[mesh_index];
+		// Set transformation
+		aiNode* node = scene->mRootNode->FindNode(mesh->mName);
+		m_ModelData.subset[i].transformation = ConvertToDirectXMatrix(node->mTransformation);
 
-		std::string name = mesh->mName.C_Str();
-		std::cout << name << '\n';
+		// Set mesh name
+		m_ModelData.subset[i].name = mesh->mName.C_Str();
 
-		// Load vertices
-		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
+		// Set start vertex and index
+		m_ModelData.subset[i].base_vertex = static_cast<UINT>(m_ModelData.vertices.size());
+		m_ModelData.subset[i].start_index = static_cast<UINT>(m_ModelData.indices.size());
+
+		// Load mesh vertices
+		LoadMeshVertices(mesh);
+
+		// Load mesh indices
+		UINT indices = LoadMeshIndices(mesh);
+
+		// Set total indices for this mesh
+		m_ModelData.subset[i].total_index = indices;
+
+		// Set bone data
+		LoadMeshBones(mesh);
+	}
+}
+
+void Assimp::Loader::LoadMeshVertices(const aiMesh* mesh)
+{
+	for (UINT i = 0; i < mesh->mNumVertices; ++i)
+	{
+		// Set the positions
+		float x = static_cast<float>(mesh->mVertices[i].x);
+		float y = static_cast<float>(mesh->mVertices[i].y);
+		float z = static_cast<float>(mesh->mVertices[i].z);
+
+		// Create a vertex to store the mesh's vertices temporarily
+		Assimp::Vertex vertex = {};
+		vertex.x = x;
+		vertex.y = y;
+		vertex.z = z;
+
+		// If the mesh doesn't have any bone data then add weight of 1
+		if (!mesh->HasBones())
 		{
-			base_vertex++;
-
-			// Set the positions
-			float x = static_cast<float>(mesh->mVertices[i].x);
-			float y = static_cast<float>(mesh->mVertices[i].y);
-			float z = static_cast<float>(mesh->mVertices[i].z);
-
-			// Create a vertex to store the mesh's vertices temporarily
-			DX::Vertex vertex;
-			vertex.x = x;
-			vertex.y = y;
-			vertex.z = z;
-
-			// Detect and write colours
-			if (mesh->HasVertexColors(0))
-			{
-				auto assimp_colour = mesh->mColors[0][i];
-
-				vertex.colour.r = assimp_colour.r;
-				vertex.colour.g = assimp_colour.g;
-				vertex.colour.b = assimp_colour.b;
-				vertex.colour.a = assimp_colour.a;
-			}
-
-			// Add the vertex to the vertices vector
-			meshData->vertices.push_back(vertex);
+			vertex.weight[0] = 1.0f;
 		}
 
-		// Iterate over the faces of the mesh
-		auto index_count = 0u;
-		for (auto i = 0u; i < mesh->mNumFaces; ++i)
-		{
-			// Get the face
-			const auto& face = mesh->mFaces[i];
+		// Add the vertex to the vertices vector
+		m_ModelData.vertices.push_back(vertex);
+	}
+}
 
-			// Add the indices of the face to the vector
-			for (auto k = 0u; k < face.mNumIndices; ++k)
-			{
-				total_index++;
-				index_count++;
-				meshData->indices.push_back(face.mIndices[k]);
-			}
+UINT Assimp::Loader::LoadMeshIndices(const aiMesh* mesh)
+{
+	std::vector<UINT> indices;
+	for (UINT i = 0; i < mesh->mNumFaces; ++i)
+	{
+		// Get the face
+		const aiFace& face = mesh->mFaces[i];
+
+		// Add the indices of the face to the vector
+		for (UINT k = 0; k < face.mNumIndices; ++k)
+		{
+			indices.push_back(face.mIndices[k]);
 		}
+	}
 
-		subset.totalIndex = index_count;
-		meshData->subsets.push_back(subset);
+	m_ModelData.indices.insert(m_ModelData.indices.end(), indices.begin(), indices.end());
+	return static_cast<UINT>(indices.size());
+}
 
-		// Load bones
-		for (auto bone_index = 0u; bone_index < mesh->mNumBones; ++bone_index)
+void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
+{
+	// Set bone data
+	std::vector<Bone> bones(mesh->mNumBones);
+	for (UINT i = 0; i < mesh->mNumBones; ++i)
+	{
+		aiBone* bone = mesh->mBones[i];
+
+		// Set bone data
+		bones[i].id = i;
+		bones[i].name = bone->mName.C_Str();
+		bones[i].parent_name = bone->mNode->mParent->mName.C_Str();
+		bones[i].bind_pose = ConvertToDirectXMatrix(bone->mNode->mTransformation);
+		bones[i].inverse_bind_pose = ConvertToDirectXMatrix(bone->mOffsetMatrix);
+
+		// Set to map
+		bonemap[bones[i].name] = bones[i];
+
+		// Set vertex bone id and weight influence
+		for (UINT j = 0; j < bone->mNumWeights; ++j)
 		{
-			auto ai_bone = mesh->mBones[bone_index];
+			const aiVertexWeight& vertex_weight = bone->mWeights[j];
+			UINT vertex_id = vertex_weight.mVertexId;
+			ai_real weight = vertex_weight.mWeight;
 
-			DX::BoneInfo boneInfo = {};
-			boneInfo.name = ai_bone->mName.C_Str();
-			boneInfo.parentName = ai_bone->mNode->mParent->mName.C_Str();
-			meshData->bones.push_back(boneInfo);
+			// A bone can influence multiple vertices
+			Assimp::Vertex& vertex = m_ModelData.vertices[vertex_id];
 
-			meshData->bones[bone_index].offset = ConvertToDirectXMatrix(ai_bone->mOffsetMatrix);;
-
-			// Vertex weight data
-			for (auto bone_weight_index = 0u; bone_weight_index < ai_bone->mNumWeights; bone_weight_index++)
+			// We only want a vertex to be influences by a max of 4 bones
+			const int MAX_BONE_INFLUENCE = 4;
+			for (int k = 0; k < MAX_BONE_INFLUENCE; ++k)
 			{
-				auto vertexID = ai_bone->mWeights[bone_weight_index].mVertexId;
-				auto weight = ai_bone->mWeights[bone_weight_index].mWeight;
-				auto& vertex = meshData->vertices[vertexID];
-
-				for (int vertex_weight_index = 0; vertex_weight_index < 4; ++vertex_weight_index)
+				if (vertex.weight[k] == 0.0)
 				{
-					if (vertex.weight[vertex_weight_index] == 0.0)
-					{
-						vertex.weight[vertex_weight_index] = weight;
-						vertex.bone[vertex_weight_index] = bone_index;
-						break;
-					}
-				}
-			}
-		}
-
-		// Calculate parent
-		for (int i = 0; i < meshData->bones.size(); ++i)
-		{
-			int parentId = 0;
-			for (int j = 0; j < meshData->bones.size(); ++j)
-			{
-				if (meshData->bones[i].parentName == meshData->bones[j].name)
-				{
-					parentId = j;
+					vertex.weight[k] = weight;
+					vertex.bone[k] = i;
 					break;
 				}
 			}
-
-			meshData->bones[i].parentId = parentId;
 		}
 	}
 
-	// Load animations
-	for (auto animation_index = 0u; animation_index < scene->mNumAnimations; ++animation_index)
+	// Set bone hierarchy
+	for (auto& bone : bones)
 	{
-		auto animation = scene->mAnimations[animation_index];
-		auto ticksPerSecond = static_cast<float>(animation->mTicksPerSecond);
+		bone.parent_id = bonemap[bone.parent_name].id;
+	}
 
+	// Assign to bones
+	m_ModelData.bones.insert(m_ModelData.bones.end(), bones.begin(), bones.end());
+}
+
+void Assimp::Loader::LoadAnimations(const aiScene* scene)
+{
+	for (UINT i = 0; i < scene->mNumAnimations; ++i)
+	{
+		const aiAnimation* animation = scene->mAnimations[i];
+		std::string name = animation->mName.C_Str();
+
+		// Animation clip
 		DX::AnimationClip clip;
+		clip.ticks_per_second = static_cast<float>(animation->mTicksPerSecond);
 		clip.BoneAnimations.resize(animation->mNumChannels);
-		for (unsigned i = 0; i < animation->mNumChannels; ++i)
-		{
-			auto channel = animation->mChannels[i];
-			std::string name = channel->mNodeName.C_Str();
-			for (unsigned k = 0; k < channel->mNumPositionKeys; ++k)
-			{
-				auto time = channel->mPositionKeys[k].mTime;
-				auto pos = channel->mPositionKeys[k].mValue;
-				auto rotation = channel->mRotationKeys[k].mValue;
-				auto scale = channel->mScalingKeys[k].mValue;
 
+		// Channel is the bones being animated
+		for (UINT j = 0; j < animation->mNumChannels; ++j)
+		{
+			const aiNodeAnim* channel = animation->mChannels[j];
+			std::string bone_name = channel->mNodeName.C_Str();
+			int bone_id = bonemap[bone_name].id;
+
+			// Frames of the bone
+			for (UINT k = 0; k < channel->mNumPositionKeys; ++k)
+			{
+				float time = static_cast<float>(channel->mPositionKeys[k].mTime);
+				const aiVector3D translation = channel->mPositionKeys[k].mValue;
+				const aiQuaternion rotation = channel->mRotationKeys[k].mValue;
+				const aiVector3D scale = channel->mScalingKeys[k].mValue;
+
+				// Store the key frame
 				DX::Keyframe frame;
-				frame.TimePos = static_cast<float>(time);
-				frame.Translation = DirectX::XMFLOAT3(pos.x, pos.y, pos.z);
+				frame.TimePos = time;
+				frame.Translation = DirectX::XMFLOAT3(translation.x, translation.y, translation.z);
 				frame.RotationQuat = DirectX::XMFLOAT4(rotation.x, rotation.y, rotation.z, rotation.w);
 				frame.Scale = DirectX::XMFLOAT3(scale.x, scale.y, scale.z);
 
-				clip.BoneAnimations[i].Keyframes.push_back(frame);
+				clip.BoneAnimations[bone_id].Keyframes.push_back(frame);
 			}
 		}
 
-		std::string animation_name = animation->mName.C_Str();
-		meshData->animations["Take1"] = clip;
+		// Save clip into map by name
+		m_ModelData.animations[name] = clip;
 	}
-
-	return true;
 }
