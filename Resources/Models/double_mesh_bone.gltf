@@ -15,7 +15,7 @@
     ],
     "nodes" : [
         {
-            "name" : "TopBone",
+            "name" : "TopBoneLeft",
             "translation" : [
                 0,
                 4,
@@ -26,7 +26,7 @@
             "children" : [
                 0
             ],
-            "name" : "BottomBone",
+            "name" : "BottomBoneLeft",
             "translation" : [
                 0,
                 -1,
@@ -51,7 +51,7 @@
             ]
         },
         {
-            "name" : "TopBone",
+            "name" : "TopBoneRight",
             "translation" : [
                 0,
                 4,
@@ -62,7 +62,7 @@
             "children" : [
                 4
             ],
-            "name" : "BottomBone",
+            "name" : "BottomBoneRight",
             "translation" : [
                 0,
                 -1,

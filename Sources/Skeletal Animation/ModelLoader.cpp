@@ -49,7 +49,15 @@ void Assimp::Loader::LoadMesh(const aiScene* scene)
 		aiMesh* mesh = scene->mMeshes[i];
 
 		// Set transformation
-		m_ModelData.subset[i].transformation = ConvertToDirectXMatrix(scene->mRootNode->FindNode(mesh->mName)->mTransformation);
+		aiNode* node = scene->mRootNode->FindNode(mesh->mName);
+		if (node != nullptr)
+		{
+			m_ModelData.subset[i].transformation = ConvertToDirectXMatrix(node->mTransformation);
+		}
+		else
+		{
+			m_ModelData.subset[i].transformation = DirectX::XMMatrixIdentity();
+		}
 
 		// Set mesh name
 		m_ModelData.subset[i].name = mesh->mName.C_Str();
@@ -166,7 +174,7 @@ void Assimp::Loader::LoadMeshBones(const aiMesh* mesh)
 	}
 
 	// Assign to bones
-	m_ModelData.bones.insert(m_ModelData.bones.begin(), bones.begin(), bones.end());
+	m_ModelData.bones.insert(m_ModelData.bones.end(), bones.begin(), bones.end());
 }
 
 void Assimp::Loader::LoadAnimations(const aiScene* scene)

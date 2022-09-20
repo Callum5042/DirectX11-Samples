@@ -20,8 +20,7 @@ void DX::Model::Create()
 {
 	// Load model
 	Assimp::Loader loader;
-	//Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\double_mesh_bone.gltf");
-	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\multiple_objects.gltf");
+	Assimp::Model model = loader.Load("..\\..\\Resources\\Models\\3bone.gltf");
 
 	// Assign vertices
 	for (auto& v : model.vertices)

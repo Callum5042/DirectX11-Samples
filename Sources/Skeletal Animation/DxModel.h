@@ -3,6 +3,7 @@
 #include "DxRenderer.h"
 #include <vector>
 #include <DirectXColors.h>
+#include <DirectXMath.h>
 #include "DxShader.h"
 #include <cmath>
 #include <map>
