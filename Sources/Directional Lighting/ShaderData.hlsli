@@ -28,7 +28,7 @@ cbuffer WorldBuffer : register(b1)
 	matrix cWorldInverse;
 }
 
-// Point light buffer
+// Directional light buffer
 cbuffer DirectionalLightBuffer : register(b2)
 {
 	float4 cLightDirection;
