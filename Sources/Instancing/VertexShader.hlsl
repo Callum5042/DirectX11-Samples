@@ -5,9 +5,12 @@ VertexOutput main(VertexInput input)
 {
 	VertexOutput output;
 
+	input.position.x += input.instanceId * 3;
+
 	// Transform to homogeneous clip space.
-	output.position = mul(float4(input.position, 1.0f), input.world);
-	output.position = mul(output.position, cView);
+	//output.position = mul(float4(input.position, 1.0f), cWorld);
+	//output.position = mul(output.position, cView);
+	output.position = mul(float4(input.position, 1.0f), cView);
 	output.position = mul(output.position, cProjection);
 
 	// Set the vertex colour

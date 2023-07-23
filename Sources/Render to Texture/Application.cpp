@@ -4,6 +4,12 @@
 #include <SDL.h>
 #include <iostream>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_sdl.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_stdlib.h"
+#include "imgui/implot.h"
+
 Application::~Application()
 {
     SDLCleanup();
@@ -35,6 +41,14 @@ int Application::Execute()
     auto window_width = 0;
     auto window_height = 0;
     SDL_GetWindowSize(m_SdlWindow, &window_width, &window_height);
+
+    // IMGUI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGui::StyleColorsDark();
+    ImGui_ImplSDL2_InitForD3D(m_SdlWindow);
+    ImGui_ImplDX11_Init(m_DxRenderer->GetDevice(), m_DxRenderer->GetDeviceContext());
 
     m_DxCamera1 = std::make_unique<DX::Camera>(window_width, window_height);
     m_DxCamera2 = std::make_unique<DX::Camera>(window_width, window_height);
@@ -94,6 +108,17 @@ int Application::Execute()
             m_Timer.Tick();
             CalculateFramesPerSecond();
 
+            ImGui_ImplDX11_NewFrame();
+            ImGui_ImplSDL2_NewFrame(m_SdlWindow);
+            ImGui::NewFrame();
+
+            if (ImGui::Begin("Renderer"))
+            {
+                ImGui::Text("Testing");
+            }
+
+            ImGui::End();
+
             //
             // Render to texture
             //
@@ -133,6 +158,20 @@ int Application::Execute()
             auto rendered_texture = m_DxRenderer->GetRenderedTexture();
             m_DxPlane->SetTexture(rendered_texture);
             m_DxPlane->Render();
+
+            if (ImGui::Begin("Viewport"))
+            {
+                ImVec2 pos = ImGui::GetCursorScreenPos();
+                ImVec2 size = ImGui::GetContentRegionAvail();
+
+                auto m_Texture = rendered_texture;
+                ImGui::GetWindowDrawList()->AddImage((void*)m_Texture, pos, ImVec2(pos.x + size.x, pos.y + size.y));
+            }
+
+            ImGui::End();
+
+            ImGui::Render();
+            ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
             // Display the rendered scene
             m_DxRenderer->Present();

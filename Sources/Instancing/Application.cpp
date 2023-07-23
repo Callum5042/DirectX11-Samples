@@ -23,6 +23,12 @@ int Application::Execute()
     m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
     m_DxModel->Create();
 
+
+    for (int i = 0; i < 10000; ++i)
+    {
+        m_DxModel->Add();
+    }
+
     // Initialise and create the DirectX 11 shader
     m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
     m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
@@ -81,9 +87,11 @@ int Application::Execute()
             {
                 if (e.key.repeat == 0)
                 {
-                    static bool wireframe = false;
+                    /*static bool wireframe = false;
                     wireframe = !wireframe;
-                    m_DxRenderer->ToggleWireframe(wireframe);
+                    m_DxRenderer->ToggleWireframe(wireframe);*/
+
+                    m_DxModel->Add();
                 }
             }
         }

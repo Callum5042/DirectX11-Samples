@@ -40,6 +40,9 @@ namespace DX
 		// Render the model
 		void Render();
 
+		// Create new model with instanced data
+		void Add();
+
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 
@@ -57,5 +60,9 @@ namespace DX
 		// Vertex instance data
 		ComPtr<ID3D11Buffer> m_d3dInstanceDataBuffer = nullptr;
 		void CreateInstanceData();
+
+		std::vector<VertexInstanceData> m_InstanceData;
+
+		int m_XDistance = -15;
 	};
 }

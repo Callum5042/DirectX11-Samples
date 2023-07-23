@@ -102,23 +102,24 @@ void DX::Model::CreateInstanceData()
 	auto world_2 = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	auto world_3 = DirectX::XMMatrixTranslation(3.0f, 0.0f, 0.0f);
 
-	std::vector<VertexInstanceData> instance_data = 
+	m_InstanceData =
 	{
 		{ { 1.0f, 0.0f, 0.0f, 1.0f }, DirectX::XMMatrixTranspose(world_1) },
 		{ { 0.0f, 1.0f, 0.0f, 1.0f }, DirectX::XMMatrixTranspose(world_2) },
-		{ { 0.0f, 0.0f, 1.0f, 1.0f }, DirectX::XMMatrixTranspose(world_3) }
+		{ { 0.0f, 0.0f, 1.0f, 1.0f }, DirectX::XMMatrixTranspose(world_3) },
 	};
 
 	// Create instance data buffer
 	D3D11_BUFFER_DESC vertex_buffer_desc = {};
-	vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(VertexInstanceData) * instance_data.size());
+	vertex_buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+	vertex_buffer_desc.ByteWidth = static_cast<UINT>(sizeof(VertexInstanceData) * 10000);
 	vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertex_buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	D3D11_SUBRESOURCE_DATA vertex_subdata = {};
-	vertex_subdata.pSysMem = instance_data.data();
+	/*D3D11_SUBRESOURCE_DATA vertex_subdata = {};
+	vertex_subdata.pSysMem = m_InstanceData.data();*/
 
-	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, &vertex_subdata, m_d3dInstanceDataBuffer.ReleaseAndGetAddressOf()));
+	DX::Check(d3dDevice->CreateBuffer(&vertex_buffer_desc, nullptr, m_d3dInstanceDataBuffer.ReleaseAndGetAddressOf()));
 }
 
 void DX::Model::Render()
@@ -139,5 +140,23 @@ void DX::Model::Render()
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Render geometry
-	d3dDeviceContext->DrawIndexedInstanced(m_IndexCount, 3, 0, 0, 0);
+	UINT render_count = m_InstanceData.size();
+	d3dDeviceContext->DrawIndexedInstanced(m_IndexCount, 1, 0, 0, 0);
+	// d3dDeviceContext->DrawIndexed(m_IndexCount, 0, 0);
+}
+
+void DX::Model::Add()
+{
+	m_XDistance += 3;
+
+	auto world = DirectX::XMMatrixTranslation((float)m_XDistance, 0.0f, 0.0f);
+	m_InstanceData.push_back({ { 0.0f, 0.0f, 1.0f, 1.0f }, DirectX::XMMatrixTranspose(world) });
+
+	// Map new resource
+	D3D11_MAPPED_SUBRESOURCE resource = {};
+	int memorysize = sizeof(VertexInstanceData) * static_cast<int>(m_InstanceData.size());
+
+	DX::Check(m_DxRenderer->GetDeviceContext()->Map(m_d3dInstanceDataBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource));
+	std::memcpy(resource.pData, m_InstanceData.data(), memorysize);
+	m_DxRenderer->GetDeviceContext()->Unmap(m_d3dInstanceDataBuffer.Get(), 0);
 }
