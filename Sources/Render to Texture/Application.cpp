@@ -112,13 +112,6 @@ int Application::Execute()
             ImGui_ImplSDL2_NewFrame(m_SdlWindow);
             ImGui::NewFrame();
 
-            if (ImGui::Begin("Renderer"))
-            {
-                ImGui::Text("Testing");
-            }
-
-            ImGui::End();
-
             //
             // Render to texture
             //
