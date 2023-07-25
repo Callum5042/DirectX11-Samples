@@ -65,6 +65,9 @@ int Application::Execute()
                 {
                     m_DxRenderer->Resize(e.window.data1, e.window.data2);
                     m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
+
+                    window_width = e.window.data1;
+                    window_height = e.window.data2;
                 }
             }
             else if (e.type == SDL_MOUSEMOTION)

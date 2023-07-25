@@ -5,12 +5,12 @@
 #include <iostream>
 #include "DDSTextureLoader.h"
 
-Applicataion::~Applicataion()
+Application::~Application()
 {
 	SDLCleanup();
 }
 
-int Applicataion::Execute()
+int Application::Execute()
 {
 	// Initialise SDL subsystems and creates the window
 	if (!SDLInit())
@@ -77,8 +77,8 @@ int Applicataion::Execute()
 					m_DxRenderer->Resize(e.window.data1, e.window.data2);
 					m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 
-					// Update world constant buffer with new camera view and perspective
-					//SetCameraBuffer();
+					window_width = e.window.data1;
+					window_height = e.window.data2;
 				}
 			}
 			else if (e.type == SDL_MOUSEMOTION)
@@ -89,18 +89,12 @@ int Applicataion::Execute()
 					auto pitch = e.motion.yrel * 0.01f;
 					auto yaw = e.motion.xrel * 0.01f;
 					m_DxCamera->Rotate(pitch, yaw);
-
-					// Update world constant buffer with new camera view and perspective
-					//SetCameraBuffer();
 				}
 			}
 			else if (e.type == SDL_MOUSEWHEEL)
 			{
 				auto direction = static_cast<float>(e.wheel.y);
 				m_DxCamera->UpdateFov(-direction);
-
-				// Update world constant buffer with new camera view and perspective
-				//SetCameraBuffer();
 			}
 			else if (e.type == SDL_KEYDOWN)
 			{
@@ -245,7 +239,7 @@ int Applicataion::Execute()
 	return 0;
 }
 
-void Applicataion::MovePointLight()
+void Application::MovePointLight()
 {
 	auto inputs = SDL_GetKeyboardState(nullptr);
 	float delta_time = static_cast<float>(m_Timer.DeltaTime());
@@ -281,7 +275,7 @@ void Applicataion::MovePointLight()
 	}
 }
 
-void Applicataion::SetCameraBuffer()
+void Application::SetCameraBuffer()
 {
 	DX::CameraBuffer buffer = {};
 	buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
@@ -292,7 +286,7 @@ void Applicataion::SetCameraBuffer()
 	m_DxShadowMapShader->UpdateCameraBuffer(buffer);
 }
 
-bool Applicataion::SDLInit()
+bool Application::SDLInit()
 {
 	// Initialise SDL subsystems
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -316,13 +310,13 @@ bool Applicataion::SDLInit()
 	return true;
 }
 
-void Applicataion::SDLCleanup()
+void Application::SDLCleanup()
 {
 	SDL_DestroyWindow(m_SdlWindow);
 	SDL_Quit();
 }
 
-void Applicataion::CalculateFramesPerSecond()
+void Application::CalculateFramesPerSecond()
 {
 	// Changes the window title to show the frames per second and average frame time every second
 
