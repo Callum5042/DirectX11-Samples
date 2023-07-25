@@ -107,7 +107,6 @@ int Application::Execute()
 
 			// Render overlay to visualize shadow map texture
 			m_DxOverlayShader->Use();
-			m_DxOverlay->SetTexture(*m_DxRenderer->GetShadowMapTexture());
 			m_DxOverlay->Render();
 
 			// Display the rendered scene
@@ -195,7 +194,7 @@ void Application::SetCameraBuffer()
 void Application::SetShadowCameraBuffer()
 {
 	// Calculate view
-	auto eye = DirectX::XMLoadFloat3(&m_DxDirectionalLight->Position);
+	auto eye = DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), 20.0f);
 	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
