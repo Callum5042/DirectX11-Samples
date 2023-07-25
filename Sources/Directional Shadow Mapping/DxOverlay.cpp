@@ -10,14 +10,12 @@ void DX::Overlay::Create()
 {
 	World = DirectX::XMMatrixTranslation(0.0f, 4.0f, 0.0f);
 
-	// GeometryGenerator::CreateBox(1.0f, 1.0f, 1.0f, &m_MeshData);
-
 	m_Vertices =
 	{
-		{ -1.0f, +1.0f, 0.0f, 0.0f, 1.0f, 0.0f  },
-		{ +1.0f, +1.0f, 0.0f, 0.0f, 1.0f, 0.0f  },
-		{ -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f  },
-		{ +1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f  },
+		{ +0.5f, +0.9f, 0.0f, 0.0f, 1.0f, 0.0f  },
+		{ +0.9f, +0.9f, 0.0f, 0.0f, 1.0f, 0.0f  },
+		{ +0.5f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f  },
+		{ +0.9f, +0.5f, 0.0f, 0.0f, 1.0f, 0.0f  },
 	};
 
 	// Double-sided

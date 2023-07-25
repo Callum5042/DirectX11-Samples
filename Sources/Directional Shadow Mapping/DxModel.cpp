@@ -67,4 +67,3 @@ void DX::Model::Render()
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(m_MeshData.indices.size()), 0, 0);
 }
- 

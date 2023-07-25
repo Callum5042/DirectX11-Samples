@@ -12,12 +12,13 @@
 #include "DxDirectionalLight.h"
 
 #include "DxOverlay.h"
+#include "DxOverlayShader.h"
 
-class Applicataion
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
 
@@ -40,6 +41,7 @@ private:
 
 	// Overlay
 	std::unique_ptr<DX::Overlay> m_DxOverlay = nullptr;
+	std::unique_ptr<DX::OverlayShader> m_DxOverlayShader = nullptr;
 
 	// Directional Light
 	std::unique_ptr<DX::DirectionalLight> m_DxDirectionalLight = nullptr;
