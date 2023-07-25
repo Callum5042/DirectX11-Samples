@@ -16,6 +16,9 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{c5ce5fbc-7fad-4f62-b162-d52b928dbe4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Overlay">
+      <UniqueIdentifier>{8600dc3c-9f86-46a2-a197-e786f8bc4494}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -46,6 +49,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DxDirectionalLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxOverlay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxOverlayShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,6 +89,12 @@
     <ClInclude Include="DxDirectionalLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DxOverlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DxOverlayShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -88,10 +103,19 @@
     <FxCompile Include="PixelShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="OverlayPixelShader.hlsl">
+      <Filter>Shader Files\Overlay</Filter>
+    </FxCompile>
+    <FxCompile Include="OverlayVertexShader.hlsl">
+      <Filter>Shader Files\Overlay</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderData.hlsli">
       <Filter>Shader Files</Filter>
+    </None>
+    <None Include="OverlayShaderData.hlsli">
+      <Filter>Shader Files\Overlay</Filter>
     </None>
   </ItemGroup>
 </Project>

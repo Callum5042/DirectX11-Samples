@@ -11,13 +11,20 @@
 #include "DxFloor.h"
 #include "DxDirectionalLight.h"
 
-class Applicataion
+#include "DxOverlay.h"
+#include "DxOverlayShader.h"
+
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
+
+	void RenderScene();
+	void SetRenderToBackBuffer();
+	void SetRenderToShadowMap();
 
 private:
 	// SDL window
@@ -36,6 +43,10 @@ private:
 	std::unique_ptr<DX::Model> m_DxModel = nullptr;
 	std::unique_ptr<DX::Floor> m_DxFloor = nullptr;
 
+	// Overlay
+	std::unique_ptr<DX::Overlay> m_DxOverlay = nullptr;
+	std::unique_ptr<DX::OverlayShader> m_DxOverlayShader = nullptr;
+
 	// Directional Light
 	std::unique_ptr<DX::DirectionalLight> m_DxDirectionalLight = nullptr;
 
@@ -49,10 +60,10 @@ private:
 	void SetCameraBuffer();
 
 	// Update buffers
-	void SetOrthoCameraBuffer();
+	void SetShadowCameraBuffer();
 
-	// Move directional light
-	void MoveDirectionalLight();
+	// Update directional light buffer
+	void UpdateDirectionalLightBuffer();
 
 	// Shadow camera
 	DirectX::XMMATRIX m_ShadowCameraView;

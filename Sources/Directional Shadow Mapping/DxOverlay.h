@@ -6,29 +6,17 @@
 
 namespace DX
 {
-	class DirectionalLight
+	class Overlay
 	{
 	public:
-		DirectionalLight(DX::Renderer* renderer);
-		virtual ~DirectionalLight() = default;
+		Overlay(DX::Renderer* renderer);
+		virtual ~Overlay() = default;
 
 		// Create device
 		void Create();
 
-		// Update
-		void Update(float delta_time);
-
 		// Render the model
 		void Render();
-
-		// Oosition
-		DirectX::XMFLOAT3 Position;
-
-		// Get light direction
-		DirectX::XMVECTOR GetDirection();
-
-		// World
-		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
@@ -42,6 +30,11 @@ namespace DX
 		void CreateIndexBuffer();
 
 		// Mesh data
-		MeshData m_MeshData;
+		std::vector<DX::OverlayVertex> m_Vertices;
+		std::vector<UINT> m_Indices;
+
+		// Texture sampler
+		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
+		void CreateAnisotropicFiltering();
 	};
 }
