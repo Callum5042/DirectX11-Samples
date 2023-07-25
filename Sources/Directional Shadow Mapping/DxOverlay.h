@@ -33,7 +33,7 @@ namespace DX
 		void CreateIndexBuffer();
 
 		// Mesh data
-		std::vector<DX::Vertex> m_Vertices;
+		std::vector<DX::OverlayVertex> m_Vertices;
 		std::vector<UINT> m_Indices;
 	};
 }

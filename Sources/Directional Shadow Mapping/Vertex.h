@@ -18,6 +18,18 @@ namespace DX
 		float nz = 0;
 	};
 
+	struct OverlayVertex
+	{
+		// Vertex position
+		float x = 0;
+		float y = 0;
+		float z = 0;
+
+		// Vertex texture mapping
+		float u = 0;
+		float v = 0;
+	};
+
 	struct MeshData
 	{
 		std::vector<Vertex> vertices;
