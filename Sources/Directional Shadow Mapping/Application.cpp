@@ -26,6 +26,10 @@ int Applicataion::Execute()
     m_DxFloor = std::make_unique<DX::Floor>(m_DxRenderer.get());
     m_DxFloor->Create();
 
+    // Overlay
+    m_DxOverlay = std::make_unique<DX::Overlay>(m_DxRenderer.get());
+    m_DxOverlay->Create();
+
     m_DxDirectionalLight = std::make_unique<DX::DirectionalLight>(m_DxRenderer.get());
     m_DxDirectionalLight->Create();
 
@@ -133,6 +137,10 @@ int Applicataion::Execute()
             // Render the light as a model for visualisation
             m_DxShader->UpdateWorldBuffer(m_DxDirectionalLight->World);
             m_DxDirectionalLight->Render();
+
+            // Overlay
+            m_DxShader->UpdateWorldBuffer(m_DxOverlay->World);
+            m_DxOverlay->Render();
 
             // Display the rendered scene
             m_DxRenderer->Present();

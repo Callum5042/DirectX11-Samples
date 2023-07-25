@@ -11,6 +11,8 @@
 #include "DxFloor.h"
 #include "DxDirectionalLight.h"
 
+#include "DxOverlay.h"
+
 class Applicataion
 {
 public:
@@ -35,6 +37,9 @@ private:
 	// Direct3D 11 model
 	std::unique_ptr<DX::Model> m_DxModel = nullptr;
 	std::unique_ptr<DX::Floor> m_DxFloor = nullptr;
+
+	// Overlay
+	std::unique_ptr<DX::Overlay> m_DxOverlay = nullptr;
 
 	// Directional Light
 	std::unique_ptr<DX::DirectionalLight> m_DxDirectionalLight = nullptr;
