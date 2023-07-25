@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 
 	try
 	{
-		auto application = std::make_unique<Applicataion>();
+		auto application = std::make_unique<Application>();
 		return application->Execute();
 	}
 	catch (const std::exception & e)

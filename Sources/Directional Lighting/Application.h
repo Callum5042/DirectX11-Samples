@@ -11,11 +11,11 @@
 #include "DxFloor.h"
 #include "DxDirectionalLight.h"
 
-class Applicataion
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
 

@@ -4,12 +4,12 @@
 #include <SDL.h>
 #include <iostream>
 
-Applicataion::~Applicataion()
+Application::~Application()
 {
     SDLCleanup();
 }
 
-int Applicataion::Execute()
+int Application::Execute()
 {
     // Initialise SDL subsystems and creates the window
     if (!SDLInit())
@@ -125,7 +125,7 @@ int Applicataion::Execute()
     return 0;
 }
 
-void Applicataion::SetCameraBuffer()
+void Application::SetCameraBuffer()
 {
     DX::CameraBuffer buffer = {};
     buffer.view = DirectX::XMMatrixTranspose(m_DxCamera->GetView());
@@ -135,7 +135,7 @@ void Applicataion::SetCameraBuffer()
     m_DxShader->UpdateCameraBuffer(buffer);
 }
 
-bool Applicataion::SDLInit()
+bool Application::SDLInit()
 {
     // Initialise SDL subsystems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -159,13 +159,13 @@ bool Applicataion::SDLInit()
     return true;
 }
 
-void Applicataion::SDLCleanup()
+void Application::SDLCleanup()
 {
     SDL_DestroyWindow(m_SdlWindow);
     SDL_Quit();
 }
 
-void Applicataion::CalculateFramesPerSecond()
+void Application::CalculateFramesPerSecond()
 {
     // Changes the window title to show the frames per second and average frame time every second
 

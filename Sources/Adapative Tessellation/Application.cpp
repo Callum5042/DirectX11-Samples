@@ -5,12 +5,12 @@
 #include <iostream>
 #include <algorithm>
 
-Applicataion::~Applicataion()
+Application::~Application()
 {
     SDLCleanup();
 }
 
-int Applicataion::Execute()
+int Application::Execute()
 {
     // Initialise SDL subsystems and creates the window
     if (!SDLInit())
@@ -104,7 +104,7 @@ int Applicataion::Execute()
     return 0;
 }
 
-void Applicataion::SetWorldBuffer()
+void Application::SetWorldBuffer()
 {
     DX::WorldBuffer world_buffer = {};
     world_buffer.world = DirectX::XMMatrixTranspose(m_DxModel->World);
@@ -117,7 +117,7 @@ void Applicataion::SetWorldBuffer()
     m_DxShader->UpdateWorldConstantBuffer(world_buffer);
 }
 
-bool Applicataion::SDLInit()
+bool Application::SDLInit()
 {
     // Initialise SDL subsystems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -141,13 +141,13 @@ bool Applicataion::SDLInit()
     return true;
 }
 
-void Applicataion::SDLCleanup()
+void Application::SDLCleanup()
 {
     SDL_DestroyWindow(m_SdlWindow);
     SDL_Quit();
 }
 
-void Applicataion::CalculateFramesPerSecond()
+void Application::CalculateFramesPerSecond()
 {
     // Changes the window title to show the frames per second and average frame time every second
 

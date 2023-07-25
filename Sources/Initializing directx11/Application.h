@@ -5,11 +5,11 @@
 #include "Timer.h"
 #include "DxRenderer.h"
 
-class Applicataion
+class Application
 {
 public:
-	Applicataion() = default;
-	virtual ~Applicataion();
+	Application() = default;
+	virtual ~Application();
 
 	int Execute();
 
