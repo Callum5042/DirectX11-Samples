@@ -22,6 +22,10 @@ public:
 
 	int Execute();
 
+	void RenderScene();
+	void SetRenderToBackBuffer();
+	void SetRenderToShadowMap();
+
 private:
 	// SDL window
 	bool SDLInit();
@@ -56,7 +60,7 @@ private:
 	void SetCameraBuffer();
 
 	// Update buffers
-	void SetOrthoCameraBuffer();
+	void SetShadowCameraBuffer();
 
 	// Move directional light
 	void MoveDirectionalLight();
