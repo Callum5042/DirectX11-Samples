@@ -147,6 +147,7 @@ int Application::Execute()
 
             // Overlay
             m_DxOverlayShader->Use();
+            m_DxOverlay->SetTexture(*m_DxRenderer->GetShadowMapTexture());
             m_DxOverlay->Render();
 
             // Display the rendered scene

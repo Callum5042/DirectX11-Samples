@@ -18,8 +18,8 @@ namespace DX
 		// Render the model
 		void Render();
 
-		// World 
-		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+		// Set overlay texture
+		void SetTexture(ID3D11ShaderResourceView* texture);
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
@@ -35,5 +35,12 @@ namespace DX
 		// Mesh data
 		std::vector<DX::OverlayVertex> m_Vertices;
 		std::vector<UINT> m_Indices;
+
+		// Texture resource
+		ComPtr<ID3D11ShaderResourceView> m_OverlayTexture = nullptr;
+
+		// Texture sampler
+		ComPtr<ID3D11SamplerState> m_AnisotropicSampler = nullptr;
+		void CreateAnisotropicFiltering();
 	};
 }

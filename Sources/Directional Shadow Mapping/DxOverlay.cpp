@@ -8,14 +8,12 @@ DX::Overlay::Overlay(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Overlay::Create()
 {
-	World = DirectX::XMMatrixTranslation(0.0f, 4.0f, 0.0f);
-
 	m_Vertices =
 	{
-		{ +0.5f, +0.9f, 0.0f, 0.0f, 1.0f },
-		{ +0.9f, +0.9f, 0.0f, 1.0f, 1.0f },
+		{ +0.5f, +0.9f, 0.0f, 0.0f, 0.0f },
+		{ +0.9f, +0.9f, 0.0f, 1.0f, 0.0f },
 		{ +0.5f, +0.5f, 0.0f, 0.0f, 1.0f },
-		{ +0.9f, +0.5f, 0.0f, 1.0f, 0.0f },
+		{ +0.9f, +0.5f, 0.0f, 1.0f, 1.0f },
 	};
 
 	m_Indices =
@@ -61,6 +59,28 @@ void DX::Overlay::CreateIndexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
+void DX::Overlay::CreateAnisotropicFiltering()
+{
+	// Filters
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0;
+	samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = 1000.0f;
+
+	DX::Check(m_DxRenderer->GetDevice()->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
+}
+
+void DX::Overlay::SetTexture(ID3D11ShaderResourceView* texture)
+{
+	m_OverlayTexture = texture;
+}
+
 void DX::Overlay::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
@@ -77,6 +97,12 @@ void DX::Overlay::Render()
 
 	// Bind the geometry topology to the Input Assembler
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Bind texture to the pixel shader
+	d3dDeviceContext->PSSetShaderResources(0, 1, m_OverlayTexture.GetAddressOf());
+
+	// Bind to pipeline
+	d3dDeviceContext->PSSetSamplers(1, 1, m_AnisotropicSampler.GetAddressOf());
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(m_Indices.size()), 0, 0);
