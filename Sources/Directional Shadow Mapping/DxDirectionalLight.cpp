@@ -1,10 +1,11 @@
 #include "DxDirectionalLight.h"
 #include <DirectXMath.h>
+#include <SDL.h>
 #include "GeometryGenerator.h"
 
 DX::DirectionalLight::DirectionalLight(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
-	World *= DirectX::XMMatrixTranslation(5.0f, 4.0f, 6.0f);
+	Position = DirectX::XMFLOAT3(5.0f, 4.0f, 6.0f);
 }
 
 void DX::DirectionalLight::Create()
@@ -48,6 +49,43 @@ void DX::DirectionalLight::CreateIndexBuffer()
 	DX::Check(d3dDevice->CreateBuffer(&index_buffer_desc, &index_subdata, m_d3dIndexBuffer.ReleaseAndGetAddressOf()));
 }
 
+void DX::DirectionalLight::Update(float delta_time)
+{
+	auto inputs = SDL_GetKeyboardState(nullptr);
+
+	// Move forward/backward along Z-axis
+	if (inputs[SDL_SCANCODE_W])
+	{
+		Position.z += 1.0f * delta_time;
+	}
+	else if (inputs[SDL_SCANCODE_S])
+	{
+		Position.z -= 1.0f * delta_time;
+	}
+
+	// Move left/right along X-axis
+	if (inputs[SDL_SCANCODE_A])
+	{
+		Position.x += 1.0f * delta_time;
+	}
+	else if (inputs[SDL_SCANCODE_D])
+	{
+		Position.x -= 1.0f * delta_time;
+	}
+
+	// Move up/down along Y-axis v
+	if (inputs[SDL_SCANCODE_E])
+	{
+		Position.y += 1.0f * delta_time;
+	}
+	else if (inputs[SDL_SCANCODE_Q])
+	{
+		Position.y -= 1.0f * delta_time;
+	}
+
+	World = DirectX::XMMatrixTranslation(Position.x, Position.y, Position.z);
+}
+
 void DX::DirectionalLight::Render()
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
@@ -67,4 +105,10 @@ void DX::DirectionalLight::Render()
 
 	// Render geometry
 	d3dDeviceContext->DrawIndexed(static_cast<UINT>(m_MeshData.indices.size()), 0, 0);
+}
+
+DirectX::XMVECTOR DX::DirectionalLight::GetDirection()
+{
+	auto direction = DirectX::XMLoadFloat3(&Position);
+	return DirectX::XMVector3Normalize(direction);
 }

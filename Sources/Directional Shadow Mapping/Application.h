@@ -62,8 +62,8 @@ private:
 	// Update buffers
 	void SetShadowCameraBuffer();
 
-	// Move directional light
-	void MoveDirectionalLight();
+	// Update directional light buffer
+	void UpdateDirectionalLightBuffer();
 
 	// Shadow camera
 	DirectX::XMMATRIX m_ShadowCameraView;

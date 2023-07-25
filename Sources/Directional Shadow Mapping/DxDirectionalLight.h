@@ -15,10 +15,19 @@ namespace DX
 		// Create device
 		void Create();
 
+		// Update
+		void Update(float delta_time);
+
 		// Render the model
 		void Render();
 
-		// World 
+		// Oosition
+		DirectX::XMFLOAT3 Position;
+
+		// Get light direction
+		DirectX::XMVECTOR GetDirection();
+
+		// World
 		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
 	private:
