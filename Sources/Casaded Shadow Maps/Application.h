@@ -14,6 +14,8 @@
 #include "DxOverlay.h"
 #include "DxOverlayShader.h"
 
+#include <vector>
+
 class Application
 {
 public:
@@ -40,7 +42,7 @@ private:
 	std::unique_ptr<DX::Renderer> m_DxRenderer = nullptr;
 	
 	// Direct3D 11 model
-	std::unique_ptr<DX::Model> m_DxModel = nullptr;
+	std::vector<std::unique_ptr<DX::Model>> m_DxModels;
 	std::unique_ptr<DX::Floor> m_DxFloor = nullptr;
 
 	// Overlay

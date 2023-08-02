@@ -107,7 +107,7 @@ void DX::Camera::CalculateProjection()
 	auto field_of_view_radians = DirectX::XMConvertToRadians(m_FieldOfViewDegrees);
 
 	// Calculate camera's perspective
-	m_Projection = DirectX::XMMatrixPerspectiveFovLH(field_of_view_radians, m_AspectRatio, 0.01f, 100.0f);
+	m_Projection = DirectX::XMMatrixPerspectiveFovLH(field_of_view_radians, m_AspectRatio, 0.1f, 100.0f);
 }
 
 void DX::Camera::CalculateView()

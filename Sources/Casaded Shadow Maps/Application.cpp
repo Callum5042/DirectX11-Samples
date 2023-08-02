@@ -20,8 +20,16 @@ int Application::Execute()
 	m_DxRenderer->Create();
 
 	// Initialise and create the DirectX 11 model
-	m_DxModel = std::make_unique<DX::Model>(m_DxRenderer.get());
-	m_DxModel->Create();
+	for (int i = 0; i < 100; ++i)
+	{
+		auto model = std::make_unique<DX::Model>(m_DxRenderer.get());
+		model->Create();
+		model->Position = DirectX::XMFLOAT3(0, 1.0f, i * 5.0f);
+
+		model->World = DirectX::XMMatrixTranslation(model->Position.x, model->Position.y, model->Position.z);
+
+		m_DxModels.push_back(std::move(model));
+	}
 
 	m_DxFloor = std::make_unique<DX::Floor>(m_DxRenderer.get());
 	m_DxFloor->Create();
@@ -124,8 +132,11 @@ int Application::Execute()
 void Application::RenderScene()
 {
 	// Render the model
-	m_DxShader->UpdateWorldBuffer(m_DxModel->World);
-	m_DxModel->Render();
+	for (auto& model : m_DxModels)
+	{
+		m_DxShader->UpdateWorldBuffer(model->World);
+		model->Render();
+	}
 
 	// Render the floor
 	m_DxShader->UpdateWorldBuffer(m_DxFloor->World);

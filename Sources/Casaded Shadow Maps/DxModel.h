@@ -21,6 +21,9 @@ namespace DX
 		// World 
 		DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
+		// Position
+		DirectX::XMFLOAT3 Position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
 

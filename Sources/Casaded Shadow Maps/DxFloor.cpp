@@ -4,12 +4,12 @@
 
 DX::Floor::Floor(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
-	World *= DirectX::XMMatrixTranslation(0.0f, -1.0f, 0.0f);
+	World *= DirectX::XMMatrixTranslation(0.0f, -1.0f, 240.0f);
 }
 
 void DX::Floor::Create()
 {
-	GeometryGenerator::CreatePlane(10.0f, 10.0f, &m_MeshData);
+	GeometryGenerator::CreatePlane(10.0f, 250.0f, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();
