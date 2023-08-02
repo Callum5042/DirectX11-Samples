@@ -3,6 +3,7 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+using namespace DirectX;
 
 Application::~Application()
 {
@@ -91,6 +92,17 @@ int Application::Execute()
 			{
 				auto direction = static_cast<float>(e.wheel.y);
 				m_DxCamera->UpdateFov(-direction);
+			}
+			else if (e.type == SDL_KEYDOWN)
+			{
+				if (e.key.keysym.scancode == SDL_SCANCODE_1)
+				{
+					m_CameraIndex = 0;
+				}
+				else if (e.key.keysym.scancode == SDL_SCANCODE_2)
+				{
+					m_CameraIndex = 1;
+				}
 			}
 		}
 		else
@@ -203,19 +215,63 @@ void Application::SetCameraBuffer()
 	buffer.projection = DirectX::XMMatrixTranspose(m_DxCamera->GetProjection());
 	DirectX::XMStoreFloat3(&buffer.cameraPosition, m_DxCamera->GetPosition());
 
+	// Shadow camera
+	if (m_CameraIndex == 1)
+	{
+		buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
+		buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
+	}
+
 	m_DxShader->UpdateCameraBuffer(buffer);
 }
 
 void Application::SetShadowCameraBuffer()
 {
+	// Calculate bounding box of view frustum
+	XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, (m_DxCamera->GetView() * m_DxCamera->GetProjection()));
+
+	// Get the 8 points of the view frustum in world space
+	XMFLOAT3 frustumCornersWS[8] =
+	{
+		XMFLOAT3(-1.0f,  1.0f, 0.0f),
+		XMFLOAT3(1.0f,  1.0f, 0.0f),
+		XMFLOAT3(1.0f, -1.0f, 0.0f),
+		XMFLOAT3(-1.0f, -1.0f, 0.0f),
+		XMFLOAT3(-1.0f,  1.0f, 1.0f),
+		XMFLOAT3(1.0f,  1.0f, 1.0f),
+		XMFLOAT3(1.0f, -1.0f, 1.0f),
+		XMFLOAT3(-1.0f, -1.0f, 1.0f),
+	};
+
+	for (int i = 0; i < 8; ++i)
+	{
+		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&frustumCornersWS[i]);
+		DirectX::XMStoreFloat3(&frustumCornersWS[i], DirectX::XMVector3TransformCoord(v, invViewProj));
+	}
+
+	// Calculate the centroid of the view frustum slice
+	XMVECTOR frustumCenter = DirectX::XMVectorZero();
+	for (int i = 0; i < 8; ++i)
+	{
+		frustumCenter = frustumCenter + DirectX::XMLoadFloat3(&frustumCornersWS[i]);
+	}
+
+	frustumCenter /= 8.0f;
+
+	// Distance
+	DirectX::XMVECTOR difference = DirectX::XMVectorSubtract(frustumCenter, m_DxCamera->GetPosition());
+	float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(difference));
+
+	// std::cout << "distance: " << distance << '\n';
+
 	// Calculate view
-	auto eye = DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), 20.0f);
-	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	auto eye = frustumCenter + DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), distance);
+	auto at = frustumCenter;
 	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
 
 	// Calculate projection
-	m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(30.0f, 40.0f, 1.0f, 50.0f);
+	m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(distance * 2, distance * 2, 1.0f, distance * 2);
 
 	// Set buffer
 	DX::CameraBuffer buffer = {};
@@ -225,6 +281,26 @@ void Application::SetShadowCameraBuffer()
 
 	m_DxShader->UpdateCameraBuffer(buffer);
 }
+
+//void Application::SetShadowCameraBuffer()
+//{
+//	// Calculate view
+//	auto eye = DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), 20.0f);
+//	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+//	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+//	m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
+//
+//	// Calculate projection
+//	m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(30.0f, 40.0f, 1.0f, 50.0f);
+//
+//	// Set buffer
+//	DX::CameraBuffer buffer = {};
+//	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
+//	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
+//	DirectX::XMStoreFloat3(&buffer.cameraPosition, m_DxCamera->GetPosition());
+//
+//	m_DxShader->UpdateCameraBuffer(buffer);
+//}
 
 bool Application::SDLInit()
 {

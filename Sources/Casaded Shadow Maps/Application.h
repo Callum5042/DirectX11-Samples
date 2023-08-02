@@ -70,4 +70,7 @@ private:
 	// Shadow camera
 	DirectX::XMMATRIX m_ShadowCameraView;
 	DirectX::XMMATRIX m_ShadowCameraProjection;
+
+	// Camera
+	int m_CameraIndex = 0;
 };
