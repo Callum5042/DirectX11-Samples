@@ -12,6 +12,10 @@ Application::~Application()
 
 int Application::Execute()
 {
+	// Set size
+	m_ShadowCameraViews.resize(m_CascadeLevels.size());
+	m_ShadowCameraProjections.resize(m_CascadeLevels.size());
+
 	// Initialise SDL subsystems and creates the window
 	if (!SDLInit())
 		return -1;
@@ -102,6 +106,14 @@ int Application::Execute()
 				else if (e.key.keysym.scancode == SDL_SCANCODE_2)
 				{
 					m_CameraIndex = 1;
+				}
+				else if (e.key.keysym.scancode == SDL_SCANCODE_3)
+				{
+					m_CameraIndex = 2;
+				}
+				else if (e.key.keysym.scancode == SDL_SCANCODE_4)
+				{
+					m_CameraIndex = 3;
 				}
 			}
 		}
@@ -201,8 +213,8 @@ void Application::UpdateDirectionalLightBuffer()
 
 	// Update buffer
 	DX::DirectionalLightBuffer buffer = {};
-	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
-	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
+	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraViews[0]);
+	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[0]);
 	DirectX::XMStoreFloat4(&buffer.direction, direction);
 
 	m_DxShader->UpdateDirectionalLightBuffer(buffer);
@@ -216,10 +228,10 @@ void Application::SetCameraBuffer()
 	DirectX::XMStoreFloat3(&buffer.cameraPosition, m_DxCamera->GetPosition());
 
 	// Shadow camera
-	if (m_CameraIndex == 1)
+	if (m_CameraIndex != 0)
 	{
-		buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
-		buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
+		buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraViews[m_CameraIndex - 1]);
+		buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[m_CameraIndex - 1]);
 	}
 
 	m_DxShader->UpdateCameraBuffer(buffer);
@@ -227,56 +239,63 @@ void Application::SetCameraBuffer()
 
 void Application::SetShadowCameraBuffer()
 {
-	// Calculate bounding box of view frustum
-	XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, (m_DxCamera->GetView() * m_DxCamera->GetProjection()));
-
-	// Get the 8 points of the view frustum in world space
-	XMFLOAT3 frustumCornersWS[8] =
+	for (int cascade_level = 0; cascade_level < m_CascadeLevels.size(); ++cascade_level)
 	{
-		XMFLOAT3(-1.0f,  1.0f, 0.0f),
-		XMFLOAT3(1.0f,  1.0f, 0.0f),
-		XMFLOAT3(1.0f, -1.0f, 0.0f),
-		XMFLOAT3(-1.0f, -1.0f, 0.0f),
-		XMFLOAT3(-1.0f,  1.0f, 1.0f),
-		XMFLOAT3(1.0f,  1.0f, 1.0f),
-		XMFLOAT3(1.0f, -1.0f, 1.0f),
-		XMFLOAT3(-1.0f, -1.0f, 1.0f),
-	};
+		// Calculate bounding box of view frustum
+		float nearZ = m_CascadeLevels[cascade_level].first;
+		float farZ = m_CascadeLevels[cascade_level].second;
 
-	for (int i = 0; i < 8; ++i)
-	{
-		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&frustumCornersWS[i]);
-		DirectX::XMStoreFloat3(&frustumCornersWS[i], DirectX::XMVector3TransformCoord(v, invViewProj));
+		XMMATRIX projection = XMMatrixPerspectiveFovLH(m_DxCamera->GetFieldOfViewRadians(), m_DxCamera->GetAspectRatio(), nearZ, farZ);
+		XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, (m_DxCamera->GetView() * projection));
+
+		// Get the 8 points of the view frustum in world space
+		XMFLOAT3 frustumCornersWS[8] =
+		{
+			XMFLOAT3(-1.0f,  1.0f, 0.0f),
+			XMFLOAT3(1.0f,  1.0f, 0.0f),
+			XMFLOAT3(1.0f, -1.0f, 0.0f),
+			XMFLOAT3(-1.0f, -1.0f, 0.0f),
+			XMFLOAT3(-1.0f,  1.0f, 1.0f),
+			XMFLOAT3(1.0f,  1.0f, 1.0f),
+			XMFLOAT3(1.0f, -1.0f, 1.0f),
+			XMFLOAT3(-1.0f, -1.0f, 1.0f),
+		};
+
+		for (int i = 0; i < 8; ++i)
+		{
+			DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&frustumCornersWS[i]);
+			DirectX::XMStoreFloat3(&frustumCornersWS[i], DirectX::XMVector3TransformCoord(v, invViewProj));
+		}
+
+		// Calculate the centroid of the view frustum slice
+		XMVECTOR frustumCenter = DirectX::XMVectorZero();
+		for (int i = 0; i < 8; ++i)
+		{
+			frustumCenter = frustumCenter + DirectX::XMLoadFloat3(&frustumCornersWS[i]);
+		}
+
+		frustumCenter /= 8.0f;
+
+		// Distance
+		DirectX::XMVECTOR difference = DirectX::XMVectorSubtract(frustumCenter, m_DxCamera->GetPosition());
+		float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(difference));
+
+		// std::cout << "distance: " << distance << '\n';
+
+		// Calculate view
+		auto eye = frustumCenter + DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), distance);
+		auto at = frustumCenter;
+		auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		m_ShadowCameraViews[cascade_level] = DirectX::XMMatrixLookAtLH(eye, at, up);
+
+		// Calculate projection
+		m_ShadowCameraProjections[cascade_level] = DirectX::XMMatrixOrthographicLH(distance * 2, distance * 2, 1.0f, distance * 2);
 	}
-
-	// Calculate the centroid of the view frustum slice
-	XMVECTOR frustumCenter = DirectX::XMVectorZero();
-	for (int i = 0; i < 8; ++i)
-	{
-		frustumCenter = frustumCenter + DirectX::XMLoadFloat3(&frustumCornersWS[i]);
-	}
-
-	frustumCenter /= 8.0f;
-
-	// Distance
-	DirectX::XMVECTOR difference = DirectX::XMVectorSubtract(frustumCenter, m_DxCamera->GetPosition());
-	float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(difference));
-
-	// std::cout << "distance: " << distance << '\n';
-
-	// Calculate view
-	auto eye = frustumCenter + DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), distance);
-	auto at = frustumCenter;
-	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
-
-	// Calculate projection
-	m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(distance * 2, distance * 2, 1.0f, distance * 2);
 
 	// Set buffer
 	DX::CameraBuffer buffer = {};
-	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
-	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
+	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraViews[0]);
+	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[0]);
 	DirectX::XMStoreFloat3(&buffer.cameraPosition, m_DxCamera->GetPosition());
 
 	m_DxShader->UpdateCameraBuffer(buffer);

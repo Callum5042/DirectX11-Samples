@@ -24,7 +24,7 @@
     <ProjectGuid>{3BF96CE9-C751-45A6-83BB-79BFB394EA45}</ProjectGuid>
     <RootNamespace>Texturing</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Casaded Shadow Maps</ProjectName>
+    <ProjectName>Cascade Shadow Maps</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

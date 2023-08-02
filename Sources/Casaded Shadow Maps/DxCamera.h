@@ -35,6 +35,12 @@ namespace DX
 		// Forward
 		DirectX::XMVECTOR Forward();
 
+		// Aspect ratio
+		inline float GetAspectRatio() { return m_AspectRatio; }
+
+		// Field of view in radians
+		inline float GetFieldOfViewRadians() { return DirectX::XMConvertToRadians(m_FieldOfViewDegrees); }
+
 	private:
 		// Projection matrix
 		DirectX::XMMATRIX m_Projection;

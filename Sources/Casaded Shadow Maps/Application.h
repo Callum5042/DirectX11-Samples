@@ -68,9 +68,17 @@ private:
 	void UpdateDirectionalLightBuffer();
 
 	// Shadow camera
-	DirectX::XMMATRIX m_ShadowCameraView;
-	DirectX::XMMATRIX m_ShadowCameraProjection;
+	std::vector<DirectX::XMMATRIX> m_ShadowCameraViews;
+	std::vector<DirectX::XMMATRIX> m_ShadowCameraProjections;
 
 	// Camera
 	int m_CameraIndex = 0;
+
+	// cascades
+	std::vector<std::pair<float, float>> m_CascadeLevels = 
+	{ 
+		{ 1.0f, 20.0f },
+		{ 20.0f, 50.0f },
+		{ 50.0f, 100.0f },
+	};
 };
