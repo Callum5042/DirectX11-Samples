@@ -76,7 +76,7 @@ void DX::Overlay::CreateAnisotropicFiltering()
 	DX::Check(m_DxRenderer->GetDevice()->CreateSamplerState(&samplerDesc, &m_AnisotropicSampler));
 }
 
-void DX::Overlay::Render()
+void DX::Overlay::Render(int cascade_level)
 {
 	auto d3dDeviceContext = m_DxRenderer->GetDeviceContext();
 
@@ -94,7 +94,7 @@ void DX::Overlay::Render()
 	d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Bind texture to the pixel shader
-	d3dDeviceContext->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture());
+	d3dDeviceContext->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture(cascade_level));
 
 	// Bind to pipeline
 	d3dDeviceContext->PSSetSamplers(1, 1, m_AnisotropicSampler.GetAddressOf());

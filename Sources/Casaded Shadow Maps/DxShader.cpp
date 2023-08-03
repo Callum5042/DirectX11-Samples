@@ -21,8 +21,8 @@ DX::Shader::Shader(Renderer* renderer) : m_DxRenderer(renderer)
 	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	comparisonSamplerDesc.MipLODBias = 0.f;
 	comparisonSamplerDesc.MaxAnisotropy = 0;
-	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
-	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 
 	ComPtr<ID3D11SamplerState> shadow_sampler = nullptr;
 	m_DxRenderer->GetDevice()->CreateSamplerState(&comparisonSamplerDesc, shadow_sampler.GetAddressOf());

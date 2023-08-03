@@ -26,7 +26,7 @@ public:
 
 	void RenderScene();
 	void SetRenderToBackBuffer();
-	void SetRenderToShadowMap();
+	void SetRenderToShadowMap(int cascade_level);
 
 private:
 	// SDL window
@@ -62,10 +62,10 @@ private:
 	void SetCameraBuffer();
 
 	// Update buffers
-	void SetShadowCameraBuffer();
+	void SetShadowCameraBuffer(int cascade_level);
 
 	// Update directional light buffer
-	void UpdateDirectionalLightBuffer();
+	void UpdateDirectionalLightBuffer(int cascade_level);
 
 	// Shadow camera
 	std::vector<DirectX::XMMATRIX> m_ShadowCameraViews;

@@ -3,6 +3,7 @@
 #include <exception>
 #include <SDL_video.h>
 #include <d3d11_1.h>
+#include <vector>
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -53,13 +54,13 @@ namespace DX
 		void SetRenderTargetBackBuffer();
 
 		// Void render target texture
-		void SetRenderTargetShadowMap();
+		void SetRenderTargetShadowMap(int cascade_level);
 
 		// Viewport
 		void SetViewport(int width, int height);
 
 		// Get texture
-		ID3D11ShaderResourceView** GetShadowMapTexture() { return m_ShadowMapTexture.GetAddressOf(); }
+		ID3D11ShaderResourceView** GetShadowMapTexture(int cascade_level) { return m_ShadowMapTextures[cascade_level].GetAddressOf(); }
 
 		// Set cull mode
 		void SetRasterBackCull();
@@ -91,9 +92,9 @@ namespace DX
 		ComPtr<ID3D11RasterizerState> m_RasterModelBackShadow = nullptr;
 
 		// Render to texture
-		ComPtr<ID3D11DepthStencilView> m_ShadowMapDepthStencilView = nullptr;
-		ComPtr<ID3D11ShaderResourceView> m_ShadowMapTexture = nullptr;
-		void CreateTextureDepthStencilView();
+		std::vector<ComPtr<ID3D11DepthStencilView>> m_ShadowMapDepthStencilViews;
+		std::vector<ComPtr<ID3D11ShaderResourceView>> m_ShadowMapTextures;
+		void CreateTextureDepthStencilView(int cascade_level);
 		float m_ShadowMapTextureSize = 4096.0f;
 	};
 }

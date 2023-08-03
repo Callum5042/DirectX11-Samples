@@ -23,13 +23,14 @@ float CalculateShadowFactor(PixelInput input)
 	};
 
 	// Sample and average shadow map for shadow factor
-	float lighting = 1.0f;
+	float lighting = 0.0f;
 
 	[unroll]
 	for (int i = 0; i < 9; ++i)
 	{
-		lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
-	}
+        // lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[i], 1), pixel_depth).r;
+        lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
+    }
 
 	return lighting / 9;
 }

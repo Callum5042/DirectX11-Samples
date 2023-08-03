@@ -16,7 +16,7 @@ namespace DX
 		void Create();
 
 		// Render the model
-		void Render();
+		void Render(int cascade_level);
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
