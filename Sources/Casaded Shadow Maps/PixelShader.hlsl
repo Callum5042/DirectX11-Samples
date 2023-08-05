@@ -5,13 +5,17 @@ static const float SMAP_DX = 1.0f / SMAP_SIZE;
 
 float CalculateShadowFactor(PixelInput input)
 {
+	// Calculate pixels depth
+	float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
+	if (pixel_depth > 1.0f)
+	{
+		return 1.0f;
+	}
+
 	// Calculate shadow texture coordinates
 	float2 tex_coords;
 	tex_coords.x = +input.lightViewProjection.x / input.lightViewProjection.w / 2.0f + 0.5f;
 	tex_coords.y = -input.lightViewProjection.y / input.lightViewProjection.w / 2.0f + 0.5f;
-
-	// Calculate pixels depth
-	float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
 
 	// Kernel for soft shadows
 	const float dx = SMAP_DX;
