@@ -13,16 +13,16 @@ DX::Shader::Shader(Renderer* renderer) : m_DxRenderer(renderer)
 	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
 	comparisonSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
 	comparisonSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	comparisonSamplerDesc.BorderColor[0] = 0.0f;
-	comparisonSamplerDesc.BorderColor[1] = 0.0f;
-	comparisonSamplerDesc.BorderColor[2] = 0.0f;
-	comparisonSamplerDesc.BorderColor[3] = 0.0f;
-	comparisonSamplerDesc.MinLOD = 0.f;
+	comparisonSamplerDesc.BorderColor[0] = 1.0f;
+	comparisonSamplerDesc.BorderColor[1] = 1.0f;
+	comparisonSamplerDesc.BorderColor[2] = 1.0f;
+	comparisonSamplerDesc.BorderColor[3] = 1.0f;
+	comparisonSamplerDesc.MinLOD = 0.0f;
 	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	comparisonSamplerDesc.MipLODBias = 0.f;
+	comparisonSamplerDesc.MipLODBias = 0.0f;
 	comparisonSamplerDesc.MaxAnisotropy = 0;
-	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
-	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 
 	ComPtr<ID3D11SamplerState> shadow_sampler = nullptr;
 	m_DxRenderer->GetDevice()->CreateSamplerState(&comparisonSamplerDesc, shadow_sampler.GetAddressOf());
