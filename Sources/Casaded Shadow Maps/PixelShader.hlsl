@@ -11,10 +11,9 @@ float CalculateShadowFactor(PixelInput input)
 	float cascadePlaneDistances[3] = { 20.0f, 50.0f, 100.0f };
 
 	int layer = -1;
-	int cascadeCount = 3;
-	for (int i = 0; i < cascadeCount; ++i)
+	for (int i = 0; i < cCascadeTotal; ++i)
 	{
-		if (depthValue < cascadePlaneDistances[i])
+		if (depthValue < cCascadePlaneDistance[i].x)
 		{
 			layer = i;
 			break;
@@ -23,7 +22,7 @@ float CalculateShadowFactor(PixelInput input)
 
 	if (layer == -1)
 	{
-		layer = cascadeCount - 1;
+		layer = cCascadeTotal - 1;
 	}
 
 	float4 lightViewProjection = float4(input.position, 1.0f);

@@ -26,6 +26,11 @@ namespace DX
 		DirectX::XMMATRIX view[3];
 		DirectX::XMMATRIX projection[3];
 		DirectX::XMFLOAT4 direction;
+
+		int cascadeTotal;
+		float padding[3];
+
+		DirectX::XMFLOAT4 cascadePlaneDistance[3];
 	};
 
 	class Shader

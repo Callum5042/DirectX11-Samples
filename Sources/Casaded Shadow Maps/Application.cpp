@@ -236,6 +236,12 @@ void Application::UpdateDirectionalLightBuffer()
 	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
 
 	DirectX::XMStoreFloat4(&buffer.direction, direction);
+	for (int i = 0; i < m_CascadeLevels.size(); ++i)
+	{
+		buffer.cascadePlaneDistance[i] = XMFLOAT4(m_CascadeLevels[i].second, 0.0f, 0.0f, 0.0f);
+	}
+
+	buffer.cascadeTotal = m_CascadeLevels.size();
 
 	m_DxShader->UpdateDirectionalLightBuffer(buffer);
 }

@@ -34,6 +34,9 @@ cbuffer DirectionalLightBuffer : register(b2)
 	matrix cLightView[3];
     matrix cLightProjection[3];
 	float4 cLightDirection;
+    int cCascadeTotal;
+    float3 padding1;
+    float4 cCascadePlaneDistance[3];
 }
 
 // Shadow map
