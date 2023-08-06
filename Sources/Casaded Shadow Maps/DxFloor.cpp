@@ -9,7 +9,7 @@ DX::Floor::Floor(DX::Renderer* renderer) : m_DxRenderer(renderer)
 
 void DX::Floor::Create()
 {
-	GeometryGenerator::CreatePlane(10.0f, 250.0f, &m_MeshData);
+	GeometryGenerator::CreatePlane(250.0f, 250.0f, &m_MeshData);
 
 	// Create input buffers
 	CreateVertexBuffer();

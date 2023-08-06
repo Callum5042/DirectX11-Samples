@@ -9,34 +9,39 @@ float CalculateShadowFactor(PixelInput input)
 	float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
 	if (pixel_depth > 1.0f)
 	{
-		return 1.0f;
+		return 0.0f;
 	}
 
 	// Calculate shadow texture coordinates
 	float2 tex_coords;
-	tex_coords.x = +input.lightViewProjection.x / input.lightViewProjection.w / 2.0f + 0.5f;
-	tex_coords.y = -input.lightViewProjection.y / input.lightViewProjection.w / 2.0f + 0.5f;
+	tex_coords = input.lightViewProjection.xy / input.lightViewProjection.w;
+	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
+	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
+
+	float closestDepth = gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
+	float shadow = pixel_depth > closestDepth ? 1.0 : 0.0;
+	return shadow;
 
 	// Kernel for soft shadows
-	const float dx = SMAP_DX;
-	const float2 offsets[9] =
-	{
-		float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
-		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-		float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
-	};
+	//const float dx = SMAP_DX;
+	//const float2 offsets[9] =
+	//{
+	//	float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+	//	float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+	//	float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+	//};
 
-	// Sample and average shadow map for shadow factor
-	float lighting = 0.0f;
+	//// Sample and average shadow map for shadow factor
+	//float lighting = 0.0f;
 
-	[unroll]
-	for (int i = 0; i < 9; ++i)
-	{
-        // lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[i], 1), pixel_depth).r;
-        lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
-    }
+	//[unroll]
+	//for (int i = 0; i < 9; ++i)
+	//{
+ //       // lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[i], 1), pixel_depth).r;
+ //       lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
+ //   }
 
-	return lighting / 9;
+	//return lighting / 9;
 }
 
 float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput input)
@@ -48,11 +53,11 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	// Light direction
 	float3 light_direction = cLightDirection.xyz;
 
-	// Shadow map?
+	// Shadow map
 	float shadow_factor = CalculateShadowFactor(input);
 
 	// Diffuse lighting
-	float4 diffuse_light = saturate(dot(-light_direction, normal)) * diffuse_light_colour * shadow_factor;
+	float4 diffuse_light = saturate(dot(-light_direction, normal)) * diffuse_light_colour;
 
 	// Ambient lighting
 	float4 ambient_light = ambient_light_colour;
@@ -62,10 +67,10 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	float3 reflect_direction = reflect(light_direction, normal);
 
 	float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0), 16.0f);
-	float4 specular_light = float4(specular_factor * specular_light_colour) * shadow_factor;
+	float4 specular_light = float4(specular_factor * specular_light_colour);
 
 	// Combine the lights
-	return diffuse_light + ambient_light + specular_light;
+	return ambient_light + ((diffuse_light + specular_light) * (1.0f - shadow_factor));
 }
 
 // Entry point for the vertex shader - will be executed for each pixel

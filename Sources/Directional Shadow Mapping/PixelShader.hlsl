@@ -53,7 +53,7 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	// Light direction
 	float3 light_direction = cLightDirection.xyz;
 
-	// Shadow map?
+	// Shadow map
 	float shadow_factor = CalculateShadowFactor(input);
 
 	// Diffuse lighting

@@ -3,7 +3,10 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+#include <DirectXMath.h>
 using namespace DirectX;
+#undef min
+#undef max
 
 Application::~Application()
 {
@@ -136,7 +139,7 @@ int Application::Execute()
 			}
 
 			// Render to back buffer
-			UpdateDirectionalLightBuffer(2);
+			UpdateDirectionalLightBuffer(0);
 			SetRenderToBackBuffer();
 			RenderScene();
 
@@ -200,7 +203,7 @@ void Application::SetRenderToBackBuffer()
 
 	context->PSSetShaderResources(0, 3, *views);*/
 
-	context->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture(2));
+	context->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture(0));
 }
 
 void Application::SetRenderToShadowMap(int cascade_level)
@@ -248,14 +251,9 @@ void Application::SetCameraBuffer()
 	m_DxShader->UpdateCameraBuffer(buffer);
 }
 
-void Application::SetShadowCameraBuffer(int cascade_level)
+std::vector<XMVECTOR> getFrustumCornersWorldSpace(const XMMATRIX& proj, const XMMATRIX& view)
 {
-	// Calculate bounding box of view frustum
-	float nearZ = m_CascadeLevels[cascade_level].first;
-	float farZ = m_CascadeLevels[cascade_level].second;
-
-	XMMATRIX projection = XMMatrixPerspectiveFovLH(m_DxCamera->GetFieldOfViewRadians(), m_DxCamera->GetAspectRatio(), nearZ, farZ);
-	XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, (m_DxCamera->GetView() * projection));
+	XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, (view * proj));
 
 	// Get the 8 points of the view frustum in world space
 	XMFLOAT3 frustumCornersWS[8] =
@@ -270,35 +268,71 @@ void Application::SetShadowCameraBuffer(int cascade_level)
 		XMFLOAT3(-1.0f, -1.0f, 1.0f),
 	};
 
+	std::vector<XMVECTOR> corners;
 	for (int i = 0; i < 8; ++i)
 	{
 		DirectX::XMVECTOR v = DirectX::XMLoadFloat3(&frustumCornersWS[i]);
 		DirectX::XMStoreFloat3(&frustumCornersWS[i], DirectX::XMVector3TransformCoord(v, invViewProj));
+
+		corners.push_back(DirectX::XMVector3TransformCoord(v, invViewProj));
 	}
 
-	// Calculate the centroid of the view frustum slice
-	XMVECTOR frustumCenter = DirectX::XMVectorZero();
-	for (int i = 0; i < 8; ++i)
+	return corners;
+}
+
+void Application::SetShadowCameraBuffer(int cascade_level)
+{
+	float nearZ = m_CascadeLevels[cascade_level].first;
+	float farZ = m_CascadeLevels[cascade_level].second;
+
+	XMMATRIX projection = XMMatrixPerspectiveFovLH(m_DxCamera->GetFieldOfViewRadians(), m_DxCamera->GetAspectRatio(), nearZ, farZ);
+	XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, (m_DxCamera->GetView() * projection));
+
+	auto corners = getFrustumCornersWorldSpace(projection, m_DxCamera->GetView());
+	
+	// View
+	XMVECTOR center = XMVectorZero();
+	for (const auto& v : corners)
 	{
-		frustumCenter = frustumCenter + DirectX::XMLoadFloat3(&frustumCornersWS[i]);
+		center += v;
 	}
 
-	frustumCenter /= 8.0f;
+	center /= static_cast<float>(corners.size());
 
-	// Distance
-	DirectX::XMVECTOR difference = DirectX::XMVectorSubtract(frustumCenter, m_DxCamera->GetPosition());
-	float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(difference));
+	auto eye = center + m_DxDirectionalLight->GetDirection();
+	auto at = center;
+	auto up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+	const auto lightView = XMMatrixLookAtLH(eye, at, up);
 
-	// std::cout << "distance: " << distance << '\n';
+	// Projection
+	float minX = std::numeric_limits<float>::max();
+	float maxX = std::numeric_limits<float>::lowest();
+	float minY = std::numeric_limits<float>::max();
+	float maxY = std::numeric_limits<float>::lowest();
+	float minZ = std::numeric_limits<float>::max();
+	float maxZ = std::numeric_limits<float>::lowest();
 
-	// Calculate view
-	auto eye = frustumCenter + DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), distance);
-	auto at = frustumCenter;
-	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	m_ShadowCameraViews[cascade_level] = DirectX::XMMatrixLookAtLH(eye, at, up);
+	for (const auto& v : corners)
+	{
+		const auto trf = XMVector4Transform(v, lightView);
+		minX = std::min<float>(minX, XMVectorGetX(trf));
+		maxX = std::max<float>(maxX, XMVectorGetX(trf));
+		minY = std::min<float>(minY, XMVectorGetY(trf));
+		maxY = std::max<float>(maxY, XMVectorGetY(trf));
+		minZ = std::min<float>(minZ, XMVectorGetZ(trf));
+		maxZ = std::max<float>(maxZ, XMVectorGetZ(trf));
+	}
 
-	// Calculate projection
-	m_ShadowCameraProjections[cascade_level] = DirectX::XMMatrixOrthographicLH(distance * 2, distance * 2, 1.0f, distance * 2);
+	// Tune this parameter according to the scene
+	constexpr float zMult = 2.0f;
+	minZ = (minZ < 0) ? minZ * zMult : minZ / zMult;
+	maxZ = (maxZ < 0) ? maxZ / zMult : maxZ * zMult;
+
+	auto lightProjection = XMMatrixOrthographicOffCenterLH(minX, maxX, minY, maxY, minZ, maxZ);
+
+	// Set
+	m_ShadowCameraViews[cascade_level] = lightView;
+	m_ShadowCameraProjections[cascade_level] = lightProjection;
 
 	// Set buffer
 	DX::CameraBuffer buffer = {};
