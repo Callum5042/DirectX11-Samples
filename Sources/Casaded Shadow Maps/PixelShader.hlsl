@@ -43,9 +43,30 @@ float CalculateShadowFactor(PixelInput input)
 	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
 	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
 
+	// Kernel for soft shadows
+	const float dx = SMAP_DX;
+	const float2 offsets[9] =
+	{
+		float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+		float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+	};
+
+	// Sample
 	float closestDepth = -1.0f;
 	if (layer == 0)
 	{
+		/*float lighting = 1.0f;
+
+		[unroll]
+		for (int i = 0; i < 9; ++i)
+		{
+			float closestDepth = gShadowMapC1.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
+			lighting += pixel_depth > closestDepth ? 1.0 : 0.0;
+		}
+
+		return lighting / 9;*/
+
 		closestDepth = gShadowMapC1.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
 	}
 	else if (layer == 1)
@@ -59,27 +80,6 @@ float CalculateShadowFactor(PixelInput input)
 
 	float shadow = pixel_depth > closestDepth ? 1.0 : 0.0;
 	return shadow;
-
-	// Kernel for soft shadows
-	//const float dx = SMAP_DX;
-	//const float2 offsets[9] =
-	//{
-	//	float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
-	//	float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-	//	float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
-	//};
-
-	//// Sample and average shadow map for shadow factor
-	//float lighting = 0.0f;
-
-	//[unroll]
-	//for (int i = 0; i < 9; ++i)
-	//{
- //       // lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[i], 1), pixel_depth).r;
- //       lighting += gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
- //   }
-
-	//return lighting / 9;
 }
 
 float3 VisualizeCascades(PixelInput input)
