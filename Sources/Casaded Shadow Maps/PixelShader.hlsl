@@ -5,8 +5,33 @@ static const float SMAP_DX = 1.0f / SMAP_SIZE;
 
 float CalculateShadowFactor(PixelInput input)
 {
+	float4 fragPosViewSpace = mul(float4(input.position, 1.0f), cView);
+	float depthValue = abs(fragPosViewSpace.z);
+
+	float cascadePlaneDistances[3] = { 20.0f, 50.0f, 100.0f };
+
+	int layer = -1;
+	int cascadeCount = 3;
+	for (int i = 0; i < cascadeCount; ++i)
+	{
+		if (depthValue < cascadePlaneDistances[i])
+		{
+			layer = i;
+			break;
+		}
+	}
+
+	if (layer == -1)
+	{
+		layer = cascadeCount - 1;
+	}
+
+	float4 lightViewProjection = float4(input.position, 1.0f);
+	lightViewProjection = mul(lightViewProjection, cLightView[layer]);
+	lightViewProjection = mul(lightViewProjection, cLightProjection[layer]);
+
 	// Calculate pixels depth
-	float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
+	float pixel_depth = lightViewProjection.z;
 	if (pixel_depth > 1.0f)
 	{
 		return 0.0f;
@@ -14,11 +39,24 @@ float CalculateShadowFactor(PixelInput input)
 
 	// Calculate shadow texture coordinates
 	float2 tex_coords;
-	tex_coords = input.lightViewProjection.xy / input.lightViewProjection.w;
+	tex_coords = lightViewProjection.xy / lightViewProjection.w;
 	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
 	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
 
-	float closestDepth = gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
+	float closestDepth = -1.0f;
+	if (layer == 0)
+	{
+		closestDepth = gShadowMapC1.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
+	}
+	else if (layer == 1)
+	{
+		closestDepth = gShadowMapC2.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
+	}
+	else if (layer == 2)
+	{
+		closestDepth = gShadowMapC3.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
+	}
+
 	float shadow = pixel_depth > closestDepth ? 1.0 : 0.0;
 	return shadow;
 
@@ -42,6 +80,63 @@ float CalculateShadowFactor(PixelInput input)
  //   }
 
 	//return lighting / 9;
+}
+
+float3 VisualizeCascades(PixelInput input)
+{
+	float4 fragPosViewSpace = mul(float4(input.position, 1.0f), cView);
+	float depthValue = abs(fragPosViewSpace.z);
+
+	float cascadePlaneDistances[3] = { 20.0f, 50.0f, 100.0f };
+
+	int layer = -1;
+	int cascadeCount = 3;
+	for (int i = 0; i < cascadeCount; ++i)
+	{
+		if (depthValue < cascadePlaneDistances[i])
+		{
+			layer = i;
+			break;
+		}
+	}
+
+	if (layer == -1)
+	{
+		layer = cascadeCount;
+	}
+
+	float4 lightViewProjection = float4(input.position, 1.0f);
+	lightViewProjection = mul(lightViewProjection, cLightView[layer]);
+	lightViewProjection = mul(lightViewProjection, cLightProjection[layer]);
+
+	// Calculate pixels depth
+	float pixel_depth = lightViewProjection.z;
+	if (pixel_depth > 1.0f)
+	{
+		return 0.0f;
+	}
+
+	// Calculate shadow texture coordinates
+	float2 tex_coords;
+	tex_coords = lightViewProjection.xy / lightViewProjection.w;
+	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
+	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
+
+	float closestDepth = -1.0f;
+	if (layer == 0)
+	{
+		return float3(1.0f, 0.0f, 0.0f);
+	}
+	else if (layer == 1)
+	{
+		return float3(0.0f, 1.0f, 0.0f);
+	}
+	else if (layer == 2)
+	{
+		return float3(0.0f, 0.0f, 1.0f);
+	}
+
+	return float3(0.0f, 0.0f, 0.0f);
 }
 
 float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput input)
@@ -70,6 +165,7 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	float4 specular_light = float4(specular_factor * specular_light_colour);
 
 	// Combine the lights
+	// return ambient_light + float4(shadow_factor, 1.0f);
 	return ambient_light + ((diffuse_light + specular_light) * (1.0f - shadow_factor));
 }
 

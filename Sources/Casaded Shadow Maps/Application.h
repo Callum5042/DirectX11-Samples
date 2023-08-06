@@ -65,7 +65,7 @@ private:
 	void SetShadowCameraBuffer(int cascade_level);
 
 	// Update directional light buffer
-	void UpdateDirectionalLightBuffer(int cascade_level);
+	void UpdateDirectionalLightBuffer();
 
 	// Shadow camera
 	std::vector<DirectX::XMMATRIX> m_ShadowCameraViews;

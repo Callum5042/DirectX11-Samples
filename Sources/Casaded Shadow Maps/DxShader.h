@@ -23,8 +23,8 @@ namespace DX
 
 	struct DirectionalLightBuffer
 	{
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
+		DirectX::XMMATRIX view[3];
+		DirectX::XMMATRIX projection[3];
 		DirectX::XMFLOAT4 direction;
 	};
 

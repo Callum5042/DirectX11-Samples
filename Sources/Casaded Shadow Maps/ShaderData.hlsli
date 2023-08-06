@@ -11,7 +11,6 @@ struct PixelInput
 	float4 positionClipSpace : SV_POSITION;
 	float3 position : POSITION;
 	float3 normal : NORMAL;
-	float4 lightViewProjection : TEXCOORD1;
 };
 
 // Camera buffer
@@ -32,12 +31,14 @@ cbuffer WorldBuffer : register(b1)
 // Point light buffer
 cbuffer DirectionalLightBuffer : register(b2)
 {
-	matrix cLightView;
-	matrix cLightProjection;
+	matrix cLightView[3];
+    matrix cLightProjection[3];
 	float4 cLightDirection;
 }
 
 // Shadow map
 //Texture2DArray gShadowMap : register(t0);
-Texture2D gShadowMap : register(t0);
+Texture2D gShadowMapC1 : register(t0);
+Texture2D gShadowMapC2 : register(t1);
+Texture2D gShadowMapC3 : register(t2);
 SamplerComparisonState gShadowSampler : register(s0);

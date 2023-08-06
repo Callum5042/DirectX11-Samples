@@ -16,10 +16,5 @@ PixelInput main(VertexInput input)
 	// Transform the normals by the inverse world space
 	output.normal = mul(input.normal, (float3x3)cWorldInverse).xyz;
 
-	// Calculate light position - used to sample the shadow map
-	output.lightViewProjection = mul(float4(input.position, 1.0f), cWorld);
-	output.lightViewProjection = mul(output.lightViewProjection, cLightView);
-	output.lightViewProjection = mul(output.lightViewProjection, cLightProjection);
-
 	return output;
 }

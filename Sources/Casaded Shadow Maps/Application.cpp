@@ -139,7 +139,7 @@ int Application::Execute()
 			}
 
 			// Render to back buffer
-			UpdateDirectionalLightBuffer(0);
+			UpdateDirectionalLightBuffer();
 			SetRenderToBackBuffer();
 			RenderScene();
 
@@ -196,14 +196,9 @@ void Application::SetRenderToBackBuffer()
 	// Apply shadow map texture
 	auto context = m_DxRenderer->GetDeviceContext();
 
-	/*ID3D11ShaderResourceView** views[3];
-	views[0] = m_DxRenderer->GetShadowMapTexture(0);
-	views[1] = m_DxRenderer->GetShadowMapTexture(1);
-	views[2] = m_DxRenderer->GetShadowMapTexture(2);
-
-	context->PSSetShaderResources(0, 3, *views);*/
-
 	context->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture(0));
+	context->PSSetShaderResources(1, 1, m_DxRenderer->GetShadowMapTexture(1));
+	context->PSSetShaderResources(2, 1, m_DxRenderer->GetShadowMapTexture(2));
 }
 
 void Application::SetRenderToShadowMap(int cascade_level)
@@ -221,14 +216,25 @@ void Application::SetRenderToShadowMap(int cascade_level)
 	m_DxShader->Use();
 }
 
-void Application::UpdateDirectionalLightBuffer(int cascade_level)
+void Application::UpdateDirectionalLightBuffer()
 {
 	auto direction = DirectX::XMVectorNegate(m_DxDirectionalLight->GetDirection());
 
 	// Update buffer
 	DX::DirectionalLightBuffer buffer = {};
-	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
-	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
+
+	int cascade_level = 0;
+	buffer.view[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
+	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
+
+	cascade_level = 1;
+	buffer.view[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
+	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
+
+	cascade_level = 2;
+	buffer.view[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
+	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
+
 	DirectX::XMStoreFloat4(&buffer.direction, direction);
 
 	m_DxShader->UpdateDirectionalLightBuffer(buffer);
