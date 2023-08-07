@@ -3,35 +3,34 @@
 static const float SMAP_SIZE = 4096.0f;
 static const float SMAP_DX = 1.0f / SMAP_SIZE;
 
-float CalculateShadowFactor(PixelInput input)
+int CalculateCascadeLayer(float pixel_depth)
 {
-	float4 fragPosViewSpace = mul(float4(input.position, 1.0f), cView);
-	float depthValue = abs(fragPosViewSpace.z);
-
-	float cascadePlaneDistances[3] = { 20.0f, 50.0f, 100.0f };
-
-	int layer = -1;
 	for (int i = 0; i < cCascadeTotal; ++i)
 	{
-		if (depthValue < cCascadePlaneDistance[i].x)
+		if (pixel_depth < cCascadePlaneDistance[i].x)
 		{
-			layer = i;
-			break;
+			return i;
 		}
 	}
 
-	if (layer == -1)
-	{
-		layer = cCascadeTotal - 1;
-	}
+	return cCascadeTotal - 1;
+}
 
+float CalculateShadowFactor(PixelInput input)
+{
+	// Calculate the cascade level
+	float4 pixel_view_space = mul(float4(input.position, 1.0f), cView);
+	float pixel_depth = abs(pixel_view_space.z);
+	int layer = CalculateCascadeLayer(pixel_depth);
+
+	// Calculate light view proj matrix based on which cascade we are in
 	float4 lightViewProjection = float4(input.position, 1.0f);
 	lightViewProjection = mul(lightViewProjection, cLightView[layer]);
 	lightViewProjection = mul(lightViewProjection, cLightProjection[layer]);
 
 	// Calculate pixels depth
-	float pixel_depth = lightViewProjection.z;
-	if (pixel_depth > 1.0f)
+	float shadow_depth = lightViewProjection.z;
+	if (shadow_depth > 1.0f)
 	{
 		return 0.0f;
 	}
@@ -55,70 +54,13 @@ float CalculateShadowFactor(PixelInput input)
 	float lighting = 1.0f;
 
 	[unroll]
-	for (int fas = 0; fas < 9; ++fas)
+	for (int j = 0; j < 9; ++j)
 	{
-		float closestDepth = gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[fas], layer), pixel_depth).r;
-		lighting += pixel_depth > closestDepth ? 1.0 : 0.0;
+		float closest_depth = gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[j], layer), shadow_depth).r;
+		lighting += shadow_depth > closest_depth ? 1.0 : 0.0;
 	}
 
 	return lighting / 9;
-}
-
-float3 VisualizeCascades(PixelInput input)
-{
-	float4 fragPosViewSpace = mul(float4(input.position, 1.0f), cView);
-	float depthValue = abs(fragPosViewSpace.z);
-
-	float cascadePlaneDistances[3] = { 20.0f, 50.0f, 100.0f };
-
-	int layer = -1;
-	int cascadeCount = 3;
-	for (int i = 0; i < cascadeCount; ++i)
-	{
-		if (depthValue < cascadePlaneDistances[i])
-		{
-			layer = i;
-			break;
-		}
-	}
-
-	if (layer == -1)
-	{
-		layer = cascadeCount;
-	}
-
-	float4 lightViewProjection = float4(input.position, 1.0f);
-	lightViewProjection = mul(lightViewProjection, cLightView[layer]);
-	lightViewProjection = mul(lightViewProjection, cLightProjection[layer]);
-
-	// Calculate pixels depth
-	float pixel_depth = lightViewProjection.z;
-	if (pixel_depth > 1.0f)
-	{
-		return 0.0f;
-	}
-
-	// Calculate shadow texture coordinates
-	float2 tex_coords;
-	tex_coords = lightViewProjection.xy / lightViewProjection.w;
-	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
-	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
-
-	float closestDepth = -1.0f;
-	if (layer == 0)
-	{
-		return float3(1.0f, 0.0f, 0.0f);
-	}
-	else if (layer == 1)
-	{
-		return float3(0.0f, 1.0f, 0.0f);
-	}
-	else if (layer == 2)
-	{
-		return float3(0.0f, 0.0f, 1.0f);
-	}
-
-	return float3(0.0f, 0.0f, 0.0f);
 }
 
 float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput input)
@@ -147,7 +89,6 @@ float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput i
 	float4 specular_light = float4(specular_factor * specular_light_colour);
 
 	// Combine the lights
-	// return ambient_light + float4(shadow_factor, 1.0f);
 	return ambient_light + ((diffuse_light + specular_light) * (1.0f - shadow_factor));
 }
 
