@@ -31,14 +31,7 @@ void DX::Renderer::Create()
 	SetViewport(window_width, window_height);
 
 	// Create render to texture depth stencil
-	/*const int MAX_CASCADES = 3;
-	m_ShadowMapDepthStencilViews.resize(MAX_CASCADES);
-	m_ShadowMapTextures.resize(MAX_CASCADES);
-
-	for (int cascade_level = 0; cascade_level < MAX_CASCADES; ++cascade_level)
-	{
-	}*/
-	CreateTextureDepthStencilView(0);
+	CreateTextureDepthStencilView();
 
 	CreateRasterModeBackCull();
 	CreateRasterModeBackCullShadow();
@@ -280,7 +273,7 @@ void DX::Renderer::CreateRasterModeBackCullShadow()
 	DX::Check(m_d3dDevice->CreateRasterizerState(&rasterizerState, m_RasterModelBackShadow.ReleaseAndGetAddressOf()));
 }
 
-void DX::Renderer::CreateTextureDepthStencilView(int cascade_level)
+void DX::Renderer::CreateTextureDepthStencilView()
 {
 	// Create texture
 	D3D11_TEXTURE2D_DESC texture_desc = {};
@@ -298,7 +291,6 @@ void DX::Renderer::CreateTextureDepthStencilView(int cascade_level)
 
 	const int MAX_CASCADES = 3;
 	m_ShadowMapDepthStencilViews.resize(MAX_CASCADES);
-	m_ShadowMapTextures.resize(MAX_CASCADES);
 
 	for (int cascade_level = 0; cascade_level < MAX_CASCADES; ++cascade_level)
 	{
@@ -322,5 +314,5 @@ void DX::Renderer::CreateTextureDepthStencilView(int cascade_level)
 	shader_resource_view_desc.Texture2DArray.ArraySize = 3;
 	shader_resource_view_desc.Texture2DArray.FirstArraySlice = 0;
 
-	DX::Check(m_d3dDevice->CreateShaderResourceView(texture.Get(), &shader_resource_view_desc, m_ShadowMapTextures[cascade_level].GetAddressOf()));
+	DX::Check(m_d3dDevice->CreateShaderResourceView(texture.Get(), &shader_resource_view_desc, m_ShadowMapTexture.GetAddressOf()));
 }

@@ -60,7 +60,7 @@ namespace DX
 		void SetViewport(int width, int height);
 
 		// Get texture
-		ID3D11ShaderResourceView** GetShadowMapTexture(int cascade_level) { return m_ShadowMapTextures[cascade_level].GetAddressOf(); }
+		ID3D11ShaderResourceView** GetShadowMapTexture() { return m_ShadowMapTexture.GetAddressOf(); }
 
 		// Set cull mode
 		void SetRasterBackCull();
@@ -93,8 +93,8 @@ namespace DX
 
 		// Render to texture
 		std::vector<ComPtr<ID3D11DepthStencilView>> m_ShadowMapDepthStencilViews;
-		std::vector<ComPtr<ID3D11ShaderResourceView>> m_ShadowMapTextures;
-		void CreateTextureDepthStencilView(int cascade_level);
+		ComPtr<ID3D11ShaderResourceView> m_ShadowMapTexture;
+		void CreateTextureDepthStencilView();
 		float m_ShadowMapTextureSize = 4096.0f;
 	};
 }

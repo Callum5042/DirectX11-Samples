@@ -2,7 +2,6 @@
 
 #include <string>
 #include <SDL.h>
-#include <iostream>
 #include <DirectXMath.h>
 using namespace DirectX;
 #undef min
@@ -149,7 +148,7 @@ int Application::Execute()
 
 			// Render overlay to visualize shadow map texture
 			m_DxOverlayShader->Use();
-			m_DxOverlay->Render(std::max<int>(0, m_CameraIndex - 1));
+			m_DxOverlay->Render();
 
 			// Display the rendered scene
 			m_DxRenderer->Present();
@@ -195,10 +194,7 @@ void Application::SetRenderToBackBuffer()
 
 	// Apply shadow map texture
 	auto context = m_DxRenderer->GetDeviceContext();
-
-	context->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture(0));
-	context->PSSetShaderResources(1, 1, m_DxRenderer->GetShadowMapTexture(1));
-	context->PSSetShaderResources(2, 1, m_DxRenderer->GetShadowMapTexture(2));
+	context->PSSetShaderResources(0, 1, m_DxRenderer->GetShadowMapTexture());
 }
 
 void Application::SetRenderToShadowMap(int cascade_level)
@@ -223,25 +219,16 @@ void Application::UpdateDirectionalLightBuffer()
 	// Update buffer
 	DX::DirectionalLightBuffer buffer = {};
 
-	int cascade_level = 0;
-	buffer.view[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
-	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
-
-	cascade_level = 1;
-	buffer.view[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
-	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
-
-	cascade_level = 2;
-	buffer.view[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[cascade_level]);
-	buffer.projection[cascade_level] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[cascade_level]);
-
 	DirectX::XMStoreFloat4(&buffer.direction, direction);
 	for (int i = 0; i < m_CascadeLevels.size(); ++i)
 	{
+		buffer.view[i] = DirectX::XMMatrixTranspose(m_ShadowCameraViews[i]);
+		buffer.projection[i] = DirectX::XMMatrixTranspose(m_ShadowCameraProjections[i]);
+
 		buffer.cascadePlaneDistance[i] = XMFLOAT4(m_CascadeLevels[i].second, 0.0f, 0.0f, 0.0f);
 	}
 
-	buffer.cascadeTotal = m_CascadeLevels.size();
+	buffer.cascadeTotal = static_cast<int>(m_CascadeLevels.size());
 
 	m_DxShader->UpdateDirectionalLightBuffer(buffer);
 }
@@ -354,26 +341,6 @@ void Application::SetShadowCameraBuffer(int cascade_level)
 
 	m_DxShader->UpdateCameraBuffer(buffer);
 }
-
-//void Application::SetShadowCameraBuffer()
-//{
-//	// Calculate view
-//	auto eye = DirectX::XMVectorScale(m_DxDirectionalLight->GetDirection(), 20.0f);
-//	auto at = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-//	auto up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-//	m_ShadowCameraView = DirectX::XMMatrixLookAtLH(eye, at, up);
-//
-//	// Calculate projection
-//	m_ShadowCameraProjection = DirectX::XMMatrixOrthographicLH(30.0f, 40.0f, 1.0f, 50.0f);
-//
-//	// Set buffer
-//	DX::CameraBuffer buffer = {};
-//	buffer.view = DirectX::XMMatrixTranspose(m_ShadowCameraView);
-//	buffer.projection = DirectX::XMMatrixTranspose(m_ShadowCameraProjection);
-//	DirectX::XMStoreFloat3(&buffer.cameraPosition, m_DxCamera->GetPosition());
-//
-//	m_DxShader->UpdateCameraBuffer(buffer);
-//}
 
 bool Application::SDLInit()
 {
