@@ -24,12 +24,12 @@ float CalculateShadowFactor(PixelInput input)
 	int layer = CalculateCascadeLayer(pixel_depth);
 
 	// Calculate light view proj matrix based on which cascade we are in
-	float4 lightViewProjection = float4(input.position, 1.0f);
-	lightViewProjection = mul(lightViewProjection, cLightView[layer]);
-	lightViewProjection = mul(lightViewProjection, cLightProjection[layer]);
+	float4 light_view_projection = float4(input.position, 1.0f);
+	light_view_projection = mul(light_view_projection, cLightView[layer]);
+	light_view_projection = mul(light_view_projection, cLightProjection[layer]);
 
 	// Calculate pixels depth
-	float shadow_depth = lightViewProjection.z;
+	float shadow_depth = light_view_projection.z;
 	if (shadow_depth > 1.0f)
 	{
 		return 0.0f;
@@ -37,7 +37,7 @@ float CalculateShadowFactor(PixelInput input)
 
 	// Calculate shadow texture coordinates
 	float2 tex_coords;
-	tex_coords = lightViewProjection.xy / lightViewProjection.w;
+	tex_coords = light_view_projection.xy / light_view_projection.w;
 	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
 	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
 
