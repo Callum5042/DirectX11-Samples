@@ -69,7 +69,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model Loading", "Sources\Mo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 Expert", "04 Expert", "{93E0F227-14CE-4EB1-9339-634FBF2ED41B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Casaded Shadow Maps", "Sources\Casaded Shadow Maps\Casaded Shadow Maps.vcxproj", "{3BF96CE9-C751-45A6-83BB-79BFB394EA45}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cascade Shadow Maps", "Sources\Cascaded Shadow Maps\Cascaded Shadow Maps.vcxproj", "{3BF96CE9-C751-45A6-83BB-79BFB394EA45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
