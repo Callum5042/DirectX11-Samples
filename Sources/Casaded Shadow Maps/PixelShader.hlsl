@@ -3,45 +3,64 @@
 static const float SMAP_SIZE = 4096.0f;
 static const float SMAP_DX = 1.0f / SMAP_SIZE;
 
+int CalculateCascadeLayer(float pixel_depth)
+{
+	for (int i = 0; i < cCascadeTotal; ++i)
+	{
+		if (pixel_depth < cCascadePlaneDistance[i].x)
+		{
+			return i;
+		}
+	}
+
+	return cCascadeTotal - 1;
+}
+
 float CalculateShadowFactor(PixelInput input)
 {
+	// Calculate the cascade level
+	float4 pixel_view_space = mul(float4(input.position, 1.0f), cView);
+	float pixel_depth = abs(pixel_view_space.z);
+	int layer = CalculateCascadeLayer(pixel_depth);
+
+	// Calculate light view proj matrix based on which cascade we are in
+	float4 light_view_projection = float4(input.position, 1.0f);
+	light_view_projection = mul(light_view_projection, cLightView[layer]);
+	light_view_projection = mul(light_view_projection, cLightProjection[layer]);
+
 	// Calculate pixels depth
-	float pixel_depth = input.lightViewProjection.z / input.lightViewProjection.w;
-	if (pixel_depth > 1.0f)
+	float shadow_depth = light_view_projection.z;
+	if (shadow_depth > 1.0f)
 	{
 		return 0.0f;
 	}
 
 	// Calculate shadow texture coordinates
 	float2 tex_coords;
-	tex_coords = input.lightViewProjection.xy / input.lightViewProjection.w;
+	tex_coords = light_view_projection.xy / light_view_projection.w;
 	tex_coords.x = +tex_coords.x * 0.5f + 0.5f;
 	tex_coords.y = -tex_coords.y * 0.5f + 0.5f;
 
-	float closestDepth = gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
-	float shadow = pixel_depth > closestDepth ? 1.0 : 0.0;
-	return shadow;
-
 	// Kernel for soft shadows
-	//const float dx = SMAP_DX;
-	//const float2 offsets[9] =
-	//{
-	//	float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
-	//	float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-	//	float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
-	//};
+	const float dx = SMAP_DX;
+	const float2 offsets[9] =
+	{
+		float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+		float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+	};
 
-	//// Sample and average shadow map for shadow factor
-	//float lighting = 1.0f;
+	// Sample
+	float lighting = 1.0f;
 
-	//[unroll]
-	//for (int i = 0; i < 9; ++i)
-	//{
-	//	float closestDepth = gShadowMap.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
-	//	lighting += pixel_depth > closestDepth ? 1.0 : 0.0;
-	//}
+	[unroll]
+	for (int j = 0; j < 9; ++j)
+	{
+		float closest_depth = gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[j], layer), shadow_depth).r;
+		lighting += shadow_depth > closest_depth ? 1.0 : 0.0;
+	}
 
-	//return lighting / 9;
+	return lighting / 9;
 }
 
 float4 CalculateDirectionalLighting(float3 position, float3 normal, PixelInput input)
