@@ -31,14 +31,14 @@ void DX::Renderer::Create()
 	SetViewport(window_width, window_height);
 
 	// Create render to texture depth stencil
-	const int MAX_CASCADES = 3;
+	/*const int MAX_CASCADES = 3;
 	m_ShadowMapDepthStencilViews.resize(MAX_CASCADES);
 	m_ShadowMapTextures.resize(MAX_CASCADES);
 
 	for (int cascade_level = 0; cascade_level < MAX_CASCADES; ++cascade_level)
 	{
-		CreateTextureDepthStencilView(cascade_level);
-	}
+	}*/
+	CreateTextureDepthStencilView(0);
 
 	CreateRasterModeBackCull();
 	CreateRasterModeBackCullShadow();
@@ -128,7 +128,7 @@ void DX::Renderer::CreateDeviceAndContext()
 	// Create device and device context
 	D3D_FEATURE_LEVEL featureLevel;
 	DX::Check(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceFlag, featureLevels, numFeatureLevels,
-		D3D11_SDK_VERSION, m_d3dDevice.ReleaseAndGetAddressOf(), &featureLevel, m_d3dDeviceContext.ReleaseAndGetAddressOf()));
+			  D3D11_SDK_VERSION, m_d3dDevice.ReleaseAndGetAddressOf(), &featureLevel, m_d3dDeviceContext.ReleaseAndGetAddressOf()));
 
 	// Check if Direct3D 11.1 is supported, if not fall back to Direct3D 11
 	if (featureLevel != D3D_FEATURE_LEVEL_11_1)
@@ -286,7 +286,7 @@ void DX::Renderer::CreateTextureDepthStencilView(int cascade_level)
 	D3D11_TEXTURE2D_DESC texture_desc = {};
 	texture_desc.Width = static_cast<UINT>(m_ShadowMapTextureSize);
 	texture_desc.Height = static_cast<UINT>(m_ShadowMapTextureSize);
-	texture_desc.ArraySize = 1;
+	texture_desc.ArraySize = 3;
 	texture_desc.SampleDesc.Count = 1;
 	texture_desc.SampleDesc.Quality = 0;
 	texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -296,19 +296,31 @@ void DX::Renderer::CreateTextureDepthStencilView(int cascade_level)
 	ComPtr<ID3D11Texture2D> texture = nullptr;
 	DX::Check(m_d3dDevice->CreateTexture2D(&texture_desc, 0, texture.GetAddressOf()));
 
-	// Create depth stencil view
-	D3D11_DEPTH_STENCIL_VIEW_DESC depth_view_desc = {};
-	depth_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depth_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	const int MAX_CASCADES = 3;
+	m_ShadowMapDepthStencilViews.resize(MAX_CASCADES);
+	m_ShadowMapTextures.resize(MAX_CASCADES);
 
-	DX::Check(m_d3dDevice->CreateDepthStencilView(texture.Get(), &depth_view_desc, m_ShadowMapDepthStencilViews[cascade_level].GetAddressOf()));
+	for (int cascade_level = 0; cascade_level < MAX_CASCADES; ++cascade_level)
+	{
+		// Create depth stencil view
+		D3D11_DEPTH_STENCIL_VIEW_DESC depth_view_desc = {};
+		depth_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depth_view_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+		depth_view_desc.Texture2DArray.ArraySize = 1;
+		depth_view_desc.Texture2DArray.FirstArraySlice = cascade_level;
+		depth_view_desc.Texture2DArray.MipSlice = 0;
+
+		DX::Check(m_d3dDevice->CreateDepthStencilView(texture.Get(), &depth_view_desc, m_ShadowMapDepthStencilViews[cascade_level].GetAddressOf()));
+	}
 
 	// Create shadow resource
 	D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc = {};
 	shader_resource_view_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
-	shader_resource_view_desc.Texture2D.MipLevels = 1;
+	shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+	shader_resource_view_desc.Texture2DArray.MostDetailedMip = 0;
+	shader_resource_view_desc.Texture2DArray.MipLevels = 1;
+	shader_resource_view_desc.Texture2DArray.ArraySize = 3;
+	shader_resource_view_desc.Texture2DArray.FirstArraySlice = 0;
 
 	DX::Check(m_d3dDevice->CreateShaderResourceView(texture.Get(), &shader_resource_view_desc, m_ShadowMapTextures[cascade_level].GetAddressOf()));
 }

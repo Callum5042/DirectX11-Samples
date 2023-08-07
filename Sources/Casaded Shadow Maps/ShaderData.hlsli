@@ -40,8 +40,5 @@ cbuffer DirectionalLightBuffer : register(b2)
 }
 
 // Shadow map
-//Texture2DArray gShadowMap : register(t0);
-Texture2D gShadowMapC1 : register(t0);
-Texture2D gShadowMapC2 : register(t1);
-Texture2D gShadowMapC3 : register(t2);
+Texture2DArray gShadowMap : register(t0);
 SamplerComparisonState gShadowSampler : register(s0);

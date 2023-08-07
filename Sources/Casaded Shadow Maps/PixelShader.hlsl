@@ -52,33 +52,16 @@ float CalculateShadowFactor(PixelInput input)
 	};
 
 	// Sample
-	float closestDepth = -1.0f;
-	if (layer == 0)
-	{
-		/*float lighting = 1.0f;
+	float lighting = 1.0f;
 
-		[unroll]
-		for (int i = 0; i < 9; ++i)
-		{
-			float closestDepth = gShadowMapC1.SampleCmpLevelZero(gShadowSampler, tex_coords.xy + offsets[i], pixel_depth).r;
-			lighting += pixel_depth > closestDepth ? 1.0 : 0.0;
-		}
-
-		return lighting / 9;*/
-
-		closestDepth = gShadowMapC1.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
-	}
-	else if (layer == 1)
+	[unroll]
+	for (int fas = 0; fas < 9; ++fas)
 	{
-		closestDepth = gShadowMapC2.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
-	}
-	else if (layer == 2)
-	{
-		closestDepth = gShadowMapC3.SampleCmpLevelZero(gShadowSampler, tex_coords.xy, pixel_depth).r;
+		float closestDepth = gShadowMap.SampleCmpLevelZero(gShadowSampler, float3(tex_coords.xy + offsets[fas], layer), pixel_depth).r;
+		lighting += pixel_depth > closestDepth ? 1.0 : 0.0;
 	}
 
-	float shadow = pixel_depth > closestDepth ? 1.0 : 0.0;
-	return shadow;
+	return lighting / 9;
 }
 
 float3 VisualizeCascades(PixelInput input)
