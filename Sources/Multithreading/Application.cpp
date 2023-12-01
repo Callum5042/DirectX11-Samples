@@ -3,6 +3,7 @@
 #include <string>
 #include <SDL.h>
 #include <iostream>
+#include <thread>
 
 Application::~Application()
 {
@@ -51,28 +52,11 @@ int Application::Execute()
 	// Starts the timer
 	m_Timer.Start();
 
-	// Main application event loop
-	SDL_Event e = {};
-	while (e.type != SDL_QUIT)
+	// Render thread
+	bool running = true;
+	std::thread render_thread([&]
 	{
-		if (SDL_PollEvent(&e))
-		{
-			if (e.type == SDL_WINDOWEVENT)
-			{
-				// On resize event, resize the DxRender device
-				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
-				{
-					m_DxRenderer->Resize(e.window.data1, e.window.data2);
-					m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
-				}
-			}
-			else if (e.type == SDL_MOUSEWHEEL)
-			{
-				auto direction = static_cast<float>(e.wheel.y);
-				m_DxCamera->UpdateFov(-direction);
-			}
-		}
-		else
+		while (running)
 		{
 			m_Timer.Tick();
 			CalculateFramesPerSecond();
@@ -94,6 +78,57 @@ int Application::Execute()
 			// Display the rendered scene
 			m_DxRenderer->Present();
 		}
+	});
+
+	// Main application event loop
+	SDL_Event e = {};
+	while (e.type != SDL_QUIT)
+	{
+		if (SDL_PollEvent(&e))
+		{
+			if (e.type == SDL_WINDOWEVENT)
+			{
+				// On resize event, resize the DxRender device
+				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					//m_DxRenderer->Resize(e.window.data1, e.window.data2);
+					//m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
+				}
+			}
+			else if (e.type == SDL_MOUSEWHEEL)
+			{
+				auto direction = static_cast<float>(e.wheel.y);
+				//m_DxCamera->UpdateFov(-direction);
+			}
+		}
+		else
+		{
+			/*m_Timer.Tick();
+			CalculateFramesPerSecond();*/
+
+			//// Clear the buffers
+			//m_DxRenderer->Clear();
+
+			//// Bind the shader to the pipeline
+			//m_DxShader->Use();
+
+			//// Render the model
+			//for (auto& model : m_DxModels)
+			//{
+			//	model->Update(m_Timer.DeltaTime());
+			//	UpdateWorldBuffer(model.get());
+			//	model->Render();
+			//}
+
+			//// Display the rendered scene
+			//m_DxRenderer->Present();
+		}
+	}
+
+	running = false;
+	if (render_thread.joinable())
+	{
+		render_thread.join();
 	}
 
 	return 0;
