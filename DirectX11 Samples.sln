@@ -71,6 +71,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 Expert", "04 Expert", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cascade Shadow Maps", "Sources\Cascaded Shadow Maps\Cascaded Shadow Maps.vcxproj", "{3BF96CE9-C751-45A6-83BB-79BFB394EA45}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Multithreading", "Sources\Multithreading\Multithreading.vcxproj", "{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -319,6 +321,14 @@ Global
 		{3BF96CE9-C751-45A6-83BB-79BFB394EA45}.Release|x64.Build.0 = Release|x64
 		{3BF96CE9-C751-45A6-83BB-79BFB394EA45}.Release|x86.ActiveCfg = Release|Win32
 		{3BF96CE9-C751-45A6-83BB-79BFB394EA45}.Release|x86.Build.0 = Release|Win32
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Debug|x64.ActiveCfg = Debug|x64
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Debug|x64.Build.0 = Debug|x64
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Debug|x86.ActiveCfg = Debug|Win32
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Debug|x86.Build.0 = Debug|Win32
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Release|x64.ActiveCfg = Release|x64
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Release|x64.Build.0 = Release|x64
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Release|x86.ActiveCfg = Release|Win32
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -354,6 +364,7 @@ Global
 		{F6DCB360-5113-4A50-AAC0-3545DA724444} = {AA239D65-A05A-47B9-845D-299E916B1A5D}
 		{20A9DA78-DA28-4A6A-B27E-20115C4EF639} = {5F15C4B7-0012-421E-B8EF-33AB6989FA5A}
 		{3BF96CE9-C751-45A6-83BB-79BFB394EA45} = {93E0F227-14CE-4EB1-9339-634FBF2ED41B}
+		{AE2E9D7C-AE8C-4667-BE74-452D2D2E4FD5} = {93E0F227-14CE-4EB1-9339-634FBF2ED41B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C7B81E0-2EFE-4DDF-8BF1-29ED9666D6B3}
