@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <SDL_video.h>
 #include "Timer.h"
 #include "DxRenderer.h"
@@ -30,7 +31,7 @@ private:
 	std::unique_ptr<DX::Renderer> m_DxRenderer = nullptr;
 	
 	// Direct3D 11 model
-	std::unique_ptr<DX::Model> m_DxModel = nullptr;
+	std::vector<std::unique_ptr<DX::Model>> m_DxModels;
 
 	// Direct3D 11 shader
 	std::unique_ptr<DX::Shader> m_DxShader = nullptr;
@@ -39,5 +40,5 @@ private:
 	std::unique_ptr<DX::Camera> m_DxCamera = nullptr;
 
 	// Update world buffer
-	void UpdateWorldBuffer();
+	void UpdateWorldBuffer(DX::Model* model);
 };

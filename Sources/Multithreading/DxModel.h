@@ -25,7 +25,10 @@ namespace DX
 		virtual ~Model() = default;
 
 		// Create device
-		void Create();
+		void Create(float x, float y, float z);
+
+		// Update model
+		void Update(double deltaTime);
 
 		// Render the model
 		void Render();
@@ -35,6 +38,13 @@ namespace DX
 
 	private:
 		DX::Renderer* m_DxRenderer = nullptr;
+
+		// Position
+		float m_PositionX = 0;
+		float m_PositionY = 0;
+		float m_PositionZ = 0;
+
+		float m_AngleRadians = 0;
 
 		// Number of indices to draw
 		UINT m_IndexCount = 0;

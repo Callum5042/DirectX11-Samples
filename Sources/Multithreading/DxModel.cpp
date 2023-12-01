@@ -7,8 +7,12 @@ DX::Model::Model(DX::Renderer* renderer) : m_DxRenderer(renderer)
 {
 }
 
-void DX::Model::Create()
+void DX::Model::Create(float x, float y, float z)
 {
+	m_PositionX = x;
+	m_PositionY = y;
+	m_PositionZ = z;
+
 	// Create input buffers
 	CreateVertexBuffer();
 	CreateIndexBuffer();
@@ -118,6 +122,15 @@ void DX::Model::LoadTexture()
 	ComPtr<ID3D11Resource> resource = nullptr;
 	DX::Check(DirectX::CreateDDSTextureFromFile(d3dDevice, L"..\\..\\Resources\\Textures\\crate_diffuse.dds", 
 	resource.ReleaseAndGetAddressOf(), m_DiffuseTexture.ReleaseAndGetAddressOf()));
+}
+
+void DX::Model::Update(double deltaTime)
+{
+	m_AngleRadians = m_AngleRadians + static_cast<float>(deltaTime);
+
+	World = DirectX::XMMatrixIdentity();
+	World *= DirectX::XMMatrixRotationY(m_AngleRadians);
+	World *= DirectX::XMMatrixTranslation(m_PositionX, m_PositionY, m_PositionZ);
 }
 
 void DX::Model::Render()
