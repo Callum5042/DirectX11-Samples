@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <iostream>
 #include <thread>
+#include <mutex>
 
 Application::~Application()
 {
@@ -52,31 +53,39 @@ int Application::Execute()
 	// Starts the timer
 	m_Timer.Start();
 
+	// Mutex
+	std::mutex mrlock;
+
 	// Render thread
 	bool running = true;
 	std::thread render_thread([&]
 	{
 		while (running)
 		{
-			m_Timer.Tick();
-			CalculateFramesPerSecond();
-
-			// Clear the buffers
-			m_DxRenderer->Clear();
-
-			// Bind the shader to the pipeline
-			m_DxShader->Use();
-
-			// Render the model
-			for (auto& model : m_DxModels)
+			if (mrlock.try_lock())
 			{
-				model->Update(m_Timer.DeltaTime());
-				UpdateWorldBuffer(model.get());
-				model->Render();
-			}
+				m_Timer.Tick();
+				CalculateFramesPerSecond();
 
-			// Display the rendered scene
-			m_DxRenderer->Present();
+				// Clear the buffers
+				m_DxRenderer->Clear();
+
+				// Bind the shader to the pipeline
+				m_DxShader->Use();
+
+				// Render the model
+				for (auto& model : m_DxModels)
+				{
+					model->Update(m_Timer.DeltaTime());
+					UpdateWorldBuffer(model.get());
+					model->Render();
+				}
+
+				mrlock.unlock();
+
+				// Display the rendered scene
+				m_DxRenderer->Present();
+			}
 		}
 	});
 
@@ -91,37 +100,16 @@ int Application::Execute()
 				// On resize event, resize the DxRender device
 				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
-					//m_DxRenderer->Resize(e.window.data1, e.window.data2);
-					//m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
+					std::lock_guard<std::mutex> lock(mrlock);
+					m_DxRenderer->Resize(e.window.data1, e.window.data2);
+					m_DxCamera->UpdateAspectRatio(e.window.data1, e.window.data2);
 				}
 			}
 			else if (e.type == SDL_MOUSEWHEEL)
 			{
 				auto direction = static_cast<float>(e.wheel.y);
-				//m_DxCamera->UpdateFov(-direction);
+				m_DxCamera->UpdateFov(-direction);
 			}
-		}
-		else
-		{
-			/*m_Timer.Tick();
-			CalculateFramesPerSecond();*/
-
-			//// Clear the buffers
-			//m_DxRenderer->Clear();
-
-			//// Bind the shader to the pipeline
-			//m_DxShader->Use();
-
-			//// Render the model
-			//for (auto& model : m_DxModels)
-			//{
-			//	model->Update(m_Timer.DeltaTime());
-			//	UpdateWorldBuffer(model.get());
-			//	model->Render();
-			//}
-
-			//// Display the rendered scene
-			//m_DxRenderer->Present();
 		}
 	}
 
