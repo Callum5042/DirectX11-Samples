@@ -1,6 +1,7 @@
 #include "DxRenderer.h"
-#include <SDL.h>
+#include <iostream>
 #include <DirectXColors.h>
+#include <SDL_messagebox.h>
 
 // Required for using SDL_SysWMinfo
 #include <SDL_syswm.h>
@@ -32,6 +33,19 @@ void DX::Renderer::Create()
 
 	// Create anistropic texture filter
 	CreateAnisotropicFiltering();
+
+	// Check threading support
+	D3D11_FEATURE_DATA_THREADING thread_support_data;
+	if (m_d3dDevice->CheckFeatureSupport(D3D11_FEATURE_THREADING, &thread_support_data, sizeof(thread_support_data)) == S_OK)
+	{
+		std::cout << "D3D11_FEATURE_THREADING is supported\n";
+		std::cout << "> DriverConcurrentCreates: " << (thread_support_data.DriverConcurrentCreates ? "true" : "false") << '\n';
+		std::cout << "> DriverCommandLists: " << (thread_support_data.DriverCommandLists ? "true" : "false") << '\n';
+	}
+	else
+	{
+		SDL_ShowSimpleMessageBox(0, "Warning", "D3D11_FEATURE_THREADING not supported", nullptr);
+	}
 }
 
 void DX::Renderer::Resize(int width, int height)
