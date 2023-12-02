@@ -48,8 +48,6 @@ int Application::Execute()
 	result2.wait();
 	result3.wait();
 
-
-
 	// Initialise and create the DirectX 11 shader
 	m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
 	m_DxShader->LoadVertexShader("Shaders/VertexShader.cso");
