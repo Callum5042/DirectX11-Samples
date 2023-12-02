@@ -5,6 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <future>
 
 Application::~Application()
 {
@@ -22,21 +23,32 @@ int Application::Execute()
 	m_DxRenderer->Create();
 
 	// Initialise and create the DirectX 11 model
+	std::future result1 = std::async(std::launch::async, [&]
 	{
 		std::unique_ptr<DX::Model> model = std::make_unique<DX::Model>(m_DxRenderer.get());
 		model->Create(-3.0f, 0.0f, 0.0f);
 		m_DxModels.push_back(std::move(model));
-	}
+	});
+
+	std::future result2 = std::async(std::launch::async, [&]
 	{
 		std::unique_ptr<DX::Model> model = std::make_unique<DX::Model>(m_DxRenderer.get());
 		model->Create(0.0f, 0.0f, 0.0f);
 		m_DxModels.push_back(std::move(model));
-	}
+	});
+
+	std::future result3 = std::async(std::launch::async, [&]
 	{
 		std::unique_ptr<DX::Model> model = std::make_unique<DX::Model>(m_DxRenderer.get());
 		model->Create(3.0f, 0.0f, 0.0f);
 		m_DxModels.push_back(std::move(model));
-	}
+	});
+
+	result1.wait();
+	result2.wait();
+	result3.wait();
+
+
 
 	// Initialise and create the DirectX 11 shader
 	m_DxShader = std::make_unique<DX::Shader>(m_DxRenderer.get());
